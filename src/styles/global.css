@@ -171,6 +171,77 @@ a {
   font-weight: 700;
 }
 
+.speaker-page {
+  gap: 26px;
+}
+
+.speaker-hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 290px;
+  padding: 16px 0 8px;
+}
+
+.speaker-hero__image-wrap {
+  width: min(100%, 260px);
+  display: flex;
+  justify-content: center;
+}
+
+.speaker-hero__image {
+  width: 100%;
+  max-width: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 20px rgba(19, 24, 33, 0.1));
+}
+
+.speaker-nav {
+  position: absolute;
+  top: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #a8adb6;
+  cursor: pointer;
+}
+
+.speaker-nav--left {
+  left: 0;
+}
+
+.speaker-nav--right {
+  right: 0;
+}
+
+.speaker-nav__arrow {
+  font-size: 72px;
+  line-height: 0.8;
+}
+
+.speaker-nav__label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.speaker-page__title {
+  margin: -2px 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.speaker-status-grid {
+  margin-top: -4px;
+}
+
+.speaker-menu-list {
+  margin-top: 8px;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -381,6 +452,18 @@ a {
 
   .recommend-card__meta {
     white-space: normal;
+  }
+
+  .speaker-nav__arrow {
+    font-size: 58px;
+  }
+
+  .speaker-nav__label {
+    font-size: 14px;
+  }
+
+  .speaker-page__title {
+    font-size: 20px;
   }
 
   .menu-item {
