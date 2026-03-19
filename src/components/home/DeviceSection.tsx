@@ -1,16 +1,18 @@
+import "./DeviceSection.css";
 import { ChevronRightIcon } from "@/components/home/HomeIcons";
 import type { HomeDevice } from "@/mocks/homeDevices";
+import { getDeviceDetailPath } from "@/utils/deviceRoutes";
 
 interface DeviceSectionProps {
   devices: HomeDevice[];
   onOpenDevices: () => void;
-  onOpenCoffeeMachine: () => void;
+  onOpenDevice: (deviceId: string) => void;
 }
 
 export default function DeviceSection({
   devices,
   onOpenDevices,
-  onOpenCoffeeMachine,
+  onOpenDevice,
 }: DeviceSectionProps) {
   return (
     <section className="home-section">
@@ -34,17 +36,18 @@ export default function DeviceSection({
 
       <div className="device-grid">
         {devices.map((device) => {
-          const isCoffeeMachine = device.id === "coffee-machine";
+          const deviceDetailPath = getDeviceDetailPath(device.productCode);
+          const isInteractive = Boolean(deviceDetailPath);
 
           return (
             <button
               key={device.id}
               type="button"
               className={`device-card${
-                isCoffeeMachine ? " device-card--interactive" : ""
+                isInteractive ? " device-card--interactive" : ""
               }`}
               aria-label={`${device.name} 디바이스`}
-              onClick={isCoffeeMachine ? onOpenCoffeeMachine : undefined}
+              onClick={isInteractive ? () => onOpenDevice(device.id) : undefined}
             >
               <span className="device-card__visual" aria-hidden="true">
                 {device.iconSrc ? (
