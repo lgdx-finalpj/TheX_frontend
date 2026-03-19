@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import LightingContent from "@/components/Lighting/LightingContent";
+import LightingContent from "@/components/lighting/LightingContent";
 
 export default function LightingMain() {
   const navigate = useNavigate();
