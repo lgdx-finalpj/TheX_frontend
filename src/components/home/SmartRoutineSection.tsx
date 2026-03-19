@@ -1,3 +1,4 @@
+import "./SmartRoutineSection.css";
 import { ChevronRightIcon } from "@/components/home/HomeIcons";
 
 interface SmartRoutineSectionProps {
@@ -27,7 +28,7 @@ export default function SmartRoutineSection({
         </button>
       </div>
 
-      <button type="button" className="routine-card">
+      <button type="button" className="routine-card" onClick={onOpenMoodCreate}>
         <span className="routine-card__icon" aria-hidden="true">
           <span className="routine-card__spark" />
         </span>

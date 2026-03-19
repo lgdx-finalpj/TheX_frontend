@@ -1,3 +1,4 @@
+import "./PlaceholderPage.css";
 import MobileLayout from "@/layouts/MobileLayout";
 
 interface PlaceholderPageProps {
@@ -9,7 +10,7 @@ export default function PlaceholderPage({ message }: PlaceholderPageProps) {
     <MobileLayout>
       <div className="page placeholder-page">
         <div className="placeholder-page__content">
-          <p className="placeholder-page__eyebrow">구현준비중 /</p>
+          <p className="placeholder-page__eyebrow">구현 준비중</p>
           <h1>{message}</h1>
         </div>
       </div>

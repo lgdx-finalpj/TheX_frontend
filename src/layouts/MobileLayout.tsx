@@ -1,3 +1,4 @@
+import "./MobileLayout.css";
 import type { ReactNode } from "react";
 import backgroundColor1 from "@/assets/bg_color/background_color1.png";
 

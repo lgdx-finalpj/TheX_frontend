@@ -1,3 +1,4 @@
+import "./HomeHeader.css";
 import { homeOwnerNickname } from "@/mocks/homeDevices";
 import {
   BellIcon,
