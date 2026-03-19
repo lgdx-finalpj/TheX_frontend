@@ -683,8 +683,8 @@ input::placeholder {
 .recipe-category-page__card {
   display: grid;
   align-items: center;
-  grid-template-columns: 118px 1fr;
-  gap: 18px;
+  grid-template-columns: 104px 1fr;
+  gap: 12px;
   width: 100%;
   min-height: 168px;
   padding: 18px 22px;
@@ -695,13 +695,13 @@ input::placeholder {
 }
 
 .recipe-category-page__card img {
-  width: 118px;
-  height: 118px;
+  width: 104px;
+  height: 104px;
   object-fit: contain;
 }
 
 .recipe-category-page__card span {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 500;
   letter-spacing: -0.06em;
   line-height: 1.12;
@@ -778,17 +778,17 @@ input::placeholder {
   }
 
   .recipe-category-page__card {
-    grid-template-columns: 102px 1fr;
+    grid-template-columns: 96px 1fr;
     min-height: 150px;
     padding: 18px;
   }
 
   .recipe-category-page__card img {
-    width: 102px;
-    height: 102px;
+    width: 96px;
+    height: 96px;
   }
 
   .recipe-category-page__card span {
-    font-size: 24px;
+    font-size: 21px;
   }
 }
