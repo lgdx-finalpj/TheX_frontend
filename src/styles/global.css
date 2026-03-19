@@ -440,8 +440,8 @@ input::placeholder {
   padding: 0 18px;
   transform: translateX(-50%);
   border-radius: 999px;
-  background: linear-gradient(90deg, #1d1d1f 0%, #33363f 100%);
-  color: #ffffff;
+  background: #ffffff;
+  color: #4f42ff;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.04em;
