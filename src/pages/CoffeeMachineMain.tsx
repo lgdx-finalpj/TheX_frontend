@@ -4,5 +4,10 @@ import CoffeeMachineContent from "@/components/coffee-machine/CoffeeMachineConte
 export default function CoffeeMachineMain() {
   const navigate = useNavigate();
 
-  return <CoffeeMachineContent onSpeakerClick={() => navigate("/devices/speaker")} />;
+  return (
+    <CoffeeMachineContent
+      onSpeakerClick={() => navigate("/devices/speaker")}
+      onAiRecommendedClick={() => navigate("/devices/coffee-machine/ai-recommended")}
+    />
+  );
 }

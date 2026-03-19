@@ -9,6 +9,7 @@ import StatusCard from "@/components/device-detail/StatusCard";
 
 interface CoffeeMachineContentProps {
   onSpeakerClick?: () => void;
+  onAiRecommendedClick?: () => void;
 }
 
 const statusCards = [
@@ -24,7 +25,10 @@ const menuItems = [
   { iconSrc: supplyIcon, label: "소모품 정보" },
 ];
 
-export default function CoffeeMachineContent({ onSpeakerClick }: CoffeeMachineContentProps) {
+export default function CoffeeMachineContent({
+  onSpeakerClick,
+  onAiRecommendedClick,
+}: CoffeeMachineContentProps) {
   return (
     <MobileLayout>
       <main className="device-page">
@@ -61,7 +65,12 @@ export default function CoffeeMachineContent({ onSpeakerClick }: CoffeeMachineCo
           ))}
         </section>
 
-        <button className="recommend-card" type="button" aria-label="AI 추천 레시피">
+        <button
+          className="recommend-card"
+          type="button"
+          aria-label="AI 추천 레시피"
+          onClick={onAiRecommendedClick}
+        >
           <span className="recommend-card__header">
             <strong className="recommend-card__title">LG의 오늘 추천 커피!</strong>
             <span className="recommend-card__meta">[현재 온도 : 4℃ / 현재 습도 : 40%]</span>
