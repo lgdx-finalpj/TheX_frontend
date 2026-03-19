@@ -24,7 +24,7 @@ export default function BasicRecipeList({
   return (
     <section className="recipe-page__list" aria-label={listLabel}>
       {recipes.map((recipe) => (
-        <BasicRecipeCard key={recipe.id} recipe={recipe} />
+        <BasicRecipeCard key={recipe.recipe_id} recipe={recipe} />
       ))}
     </section>
   );

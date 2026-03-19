@@ -2,12 +2,12 @@ import plusIcon from "@/assets/icon_image/+ 아이콘.png";
 import bellIcon from "@/assets/icon_image/종모양 아이콘.png";
 import downArrowIcon from "@/assets/icon_image/keyboard_arrow_down 아이콘.png";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
-import type { RecipeTabId } from "@/mocks/basicRecipes";
+import type { RecipeTabKey } from "@/mocks/basicRecipes";
 
 interface BasicRecipeHeaderProps {
-  tabs: ReadonlyArray<{ id: RecipeTabId; label: string }>;
-  activeTab: RecipeTabId;
-  onTabChange: (tabId: RecipeTabId) => void;
+  tabs: ReadonlyArray<{ tab_key: RecipeTabKey; label: string }>;
+  activeTab: RecipeTabKey;
+  onTabChange: (tabKey: RecipeTabKey) => void;
 }
 
 export default function BasicRecipeHeader({
@@ -39,10 +39,10 @@ export default function BasicRecipeHeader({
       <nav className="recipe-page__tabs" aria-label="레시피 탭">
         {tabs.map((tab) => (
           <button
-            key={tab.id}
+            key={tab.tab_key}
             type="button"
-            className={`recipe-page__tab ${activeTab === tab.id ? "is-active" : ""}`}
-            onClick={() => onTabChange(tab.id)}
+            className={`recipe-page__tab ${activeTab === tab.tab_key ? "is-active" : ""}`}
+            onClick={() => onTabChange(tab.tab_key)}
           >
             {tab.label}
           </button>

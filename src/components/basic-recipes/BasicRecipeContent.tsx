@@ -8,7 +8,7 @@ import {
   type RecipeFlavor,
   type RecipeItem,
   type RecipeModeAccent,
-  type RecipeTabId,
+  type RecipeTabKey,
 } from "@/mocks/basicRecipes";
 
 interface BasicRecipeContentProps {
@@ -26,7 +26,7 @@ export default function BasicRecipeContent({
   myRecipes,
   onModeClick,
 }: BasicRecipeContentProps) {
-  const [activeTab, setActiveTab] = useState<RecipeTabId>("browse");
+  const [activeTab, setActiveTab] = useState<RecipeTabKey>("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
 
@@ -34,9 +34,11 @@ export default function BasicRecipeContent({
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filteredRecipes = recipes.filter((recipe) => {
-    const matchesFlavor = selectedFlavor ? recipe.category === selectedFlavor : true;
+    const matchesFlavor = selectedFlavor
+      ? recipe.recipe_category === selectedFlavor
+      : true;
     const matchesSearch = normalizedQuery
-      ? recipe.name.toLowerCase().includes(normalizedQuery)
+      ? recipe.recipe_name.toLowerCase().includes(normalizedQuery)
       : true;
 
     return matchesFlavor && matchesSearch;

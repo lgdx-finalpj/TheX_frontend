@@ -40,22 +40,26 @@ export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
           aria-hidden="true"
           className="recipe-card__icon"
         />
-        <strong className="recipe-card__title">{recipe.name}</strong>
+        <strong className="recipe-card__title">{recipe.recipe_name}</strong>
       </div>
 
       <div className="recipe-card__actions">
-        <div className="recipe-card__score" aria-label={`좋아요 ${recipe.likes}`}>
+        <div className="recipe-card__score" aria-label={`저장 수 ${recipe.save_count}`}>
           <img src={starIcon} alt="" aria-hidden="true" />
-          <span>{recipe.likes}</span>
+          <span>{recipe.save_count}</span>
         </div>
-        <button type="button" className="icon-button" aria-label={`${recipe.name} 상세`}>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label={`${recipe.recipe_name} 상세`}
+        >
           <img src={chevronRightIcon} alt="" aria-hidden="true" />
         </button>
         <div className="recipe-card__menu-anchor" ref={menuRef}>
           <button
             type="button"
             className="icon-button"
-            aria-label={`${recipe.name} 옵션`}
+            aria-label={`${recipe.recipe_name} 옵션`}
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((currentOpen) => !currentOpen)}
           >
@@ -63,7 +67,7 @@ export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
           </button>
 
           {isMenuOpen ? (
-            <div className="recipe-card__menu" role="menu" aria-label={`${recipe.name} 액션`}>
+            <div className="recipe-card__menu" role="menu" aria-label={`${recipe.recipe_name} 액션`}>
               <button type="button" className="recipe-card__menu-item" role="menuitem">
                 레시피 저장
               </button>
