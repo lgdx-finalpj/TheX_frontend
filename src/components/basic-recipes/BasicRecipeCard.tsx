@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import coffeeCupIcon from "@/assets/icon_image/커피잔 아이콘.png";
 import starIcon from "@/assets/icon_image/별 아이콘.png";
 import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
@@ -7,9 +8,14 @@ import type { RecipeItem } from "@/mocks/basicRecipes";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
+  detailBasePath: string;
 }
 
-export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
+export default function BasicRecipeCard({
+  recipe,
+  detailBasePath,
+}: BasicRecipeCardProps) {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const displayRecipeName = recipe.user_nickname
@@ -47,7 +53,7 @@ export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
       </div>
 
       <div className="recipe-card__actions">
-        <div className="recipe-card__score" aria-label={`저장 수 ${recipe.save_count}`}>
+        <div className="recipe-card__score" aria-label={`레시피 저장 수 ${recipe.save_count}`}>
           <img src={starIcon} alt="" aria-hidden="true" />
           <span>{recipe.save_count}</span>
         </div>
@@ -55,6 +61,7 @@ export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
           type="button"
           className="icon-button"
           aria-label={`${displayRecipeName} 상세`}
+          onClick={() => navigate(`${detailBasePath}/${recipe.recipe_id}`)}
         >
           <img src={chevronRightIcon} alt="" aria-hidden="true" />
         </button>

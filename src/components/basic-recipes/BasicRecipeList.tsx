@@ -3,11 +3,13 @@ import type { RecipeItem } from "@/mocks/basicRecipes";
 
 interface BasicRecipeListProps {
   recipes: ReadonlyArray<RecipeItem>;
+  detailBasePath: string;
   listLabel: string;
 }
 
 export default function BasicRecipeList({
   recipes,
+  detailBasePath,
   listLabel,
 }: BasicRecipeListProps) {
   if (recipes.length === 0) {
@@ -24,7 +26,11 @@ export default function BasicRecipeList({
   return (
     <section className="recipe-page__list" aria-label={listLabel}>
       {recipes.map((recipe) => (
-        <BasicRecipeCard key={recipe.recipe_id} recipe={recipe} />
+        <BasicRecipeCard
+          key={recipe.recipe_id}
+          recipe={recipe}
+          detailBasePath={detailBasePath}
+        />
       ))}
     </section>
   );

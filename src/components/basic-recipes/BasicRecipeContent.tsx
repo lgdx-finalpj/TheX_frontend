@@ -16,6 +16,7 @@ interface BasicRecipeContentProps {
   markerAccent: RecipeModeAccent;
   browseRecipes: ReadonlyArray<RecipeItem>;
   myRecipes: ReadonlyArray<RecipeItem>;
+  detailBasePath: string;
   onModeClick: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function BasicRecipeContent({
   markerAccent,
   browseRecipes,
   myRecipes,
+  detailBasePath,
   onModeClick,
 }: BasicRecipeContentProps) {
   const [activeTab, setActiveTab] = useState<RecipeTabKey>("browse");
@@ -35,7 +37,7 @@ export default function BasicRecipeContent({
 
   const filteredRecipes = recipes.filter((recipe) => {
     const matchesFlavor = selectedFlavor
-      ? recipe.recipe_category === selectedFlavor
+      ? recipe.filter_label === selectedFlavor
       : true;
     const matchesSearch = normalizedQuery
       ? recipe.recipe_name.toLowerCase().includes(normalizedQuery)
@@ -67,7 +69,11 @@ export default function BasicRecipeContent({
           onSearchChange={setSearchQuery}
           onFlavorToggle={handleFlavorToggle}
         />
-        <BasicRecipeList recipes={filteredRecipes} listLabel={`${modeLabel} 레시피 목록`} />
+        <BasicRecipeList
+          recipes={filteredRecipes}
+          detailBasePath={detailBasePath}
+          listLabel={`${modeLabel} 레시피 목록`}
+        />
       </main>
     </div>
   );
