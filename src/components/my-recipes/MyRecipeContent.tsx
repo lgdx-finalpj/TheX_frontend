@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
 import BasicRecipeHeader from "@/components/basic-recipes/BasicRecipeHeader";
 import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
+import useCustomRecipes from "@/hooks/useCustomRecipes";
 import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import {
@@ -10,13 +11,11 @@ import {
   recipeFlavorChips,
   recipeTabs,
   type RecipeFlavor,
-  type RecipeItem,
   type RecipeTabKey,
 } from "@/mocks/basicRecipes";
 import {
   BASIC_RECIPE_ROUTE,
-  getBasicRecipeDetailPath,
-  getPopularRecipeDetailPath,
+  getMyRecipeDetailPath,
   RECIPE_CATEGORY_SELECTION_ROUTE,
 } from "@/routes/paths";
 
@@ -24,11 +23,16 @@ export default function MyRecipeContent() {
   const navigate = useNavigate();
   const savedRecipeIds = useSavedRecipeIds();
   const hiddenMyRecipeIds = useHiddenMyRecipeIds();
+  const customRecipes = useCustomRecipes();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
   const normalizedQuery = searchQuery.trim().toLowerCase();
+  const availableRecipes = useMemo(
+    () => [...customRecipes, ...allRecipes],
+    [customRecipes],
+  );
 
-  const savedRecipes = allRecipes.filter(
+  const savedRecipes = availableRecipes.filter(
     (recipe) =>
       savedRecipeIds.includes(recipe.recipe_id) &&
       !hiddenMyRecipeIds.includes(recipe.recipe_id),
@@ -60,11 +64,6 @@ export default function MyRecipeContent() {
     setSelectedFlavor((currentFlavor) => (currentFlavor === chip ? null : chip));
   };
 
-  const getDetailPath = (recipe: RecipeItem) =>
-    recipe.recipe_source === "popular"
-      ? getPopularRecipeDetailPath(recipe.recipe_id)
-      : getBasicRecipeDetailPath(recipe.recipe_id);
-
   return (
     <div className="page recipe-page my-recipe-page">
       <BasicRecipeHeader
@@ -84,7 +83,7 @@ export default function MyRecipeContent() {
         />
         <BasicRecipeList
           recipes={filteredRecipes}
-          getDetailPath={getDetailPath}
+          getDetailPath={(recipe) => getMyRecipeDetailPath(recipe.recipe_id)}
           listLabel="나의 레시피 목록"
           emptyTitle="저장한 레시피가 없습니다."
           emptyDescription="기본 레시피나 인기 레시피에서 저장한 뒤 다시 확인해보세요."

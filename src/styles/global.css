@@ -708,6 +708,102 @@ input::placeholder {
   white-space: pre-line;
 }
 
+.recipe-create-page__content {
+  min-height: 100vh;
+  padding: 28px 22px 40px;
+  background: #eef0f4;
+}
+
+.recipe-create-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 44px;
+}
+
+.recipe-create-form__card {
+  display: grid;
+  gap: 16px;
+  padding: 22px 28px 24px;
+  border-radius: 28px;
+  background: #ffffff;
+}
+
+.recipe-create-form__card--textarea {
+  gap: 18px;
+}
+
+.recipe-create-form__label {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.recipe-create-form__card input,
+.recipe-create-form__card textarea,
+.recipe-create-form__inline-field {
+  width: 100%;
+  border: 2px solid #e6e2de;
+  border-radius: 24px;
+  background: #ffffff;
+  color: #111111;
+}
+
+.recipe-create-form__card input,
+.recipe-create-form__inline-field {
+  min-height: 58px;
+  padding: 0 30px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+
+.recipe-create-form__card textarea {
+  min-height: 104px;
+  padding: 22px 28px;
+  resize: none;
+  border: 2px solid #e6e2de;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.38;
+  letter-spacing: -0.045em;
+  outline: 0;
+}
+
+.recipe-create-form__inline-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.recipe-create-form__inline-field input {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+
+.recipe-create-form__inline-field span {
+  flex-shrink: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.recipe-create-form__submit {
+  min-height: 78px;
+  margin-top: 8px;
+  border-radius: 24px;
+  background: #d7cabd;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.recipe-create-form__submit:disabled {
+  opacity: 0.7;
+}
+
 @media (max-width: 390px) {
   .mobile-frame {
     max-width: none;
@@ -790,5 +886,24 @@ input::placeholder {
 
   .recipe-category-page__card span {
     font-size: 21px;
+  }
+
+  .recipe-create-page__content {
+    padding-inline: 16px;
+  }
+
+  .recipe-create-form__card {
+    padding-inline: 18px;
+  }
+
+  .recipe-create-form__card input,
+  .recipe-create-form__card textarea,
+  .recipe-create-form__inline-field {
+    font-size: 16px;
+  }
+
+  .recipe-create-form__submit {
+    min-height: 72px;
+    font-size: 20px;
   }
 }

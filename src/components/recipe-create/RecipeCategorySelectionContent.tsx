@@ -3,22 +3,26 @@ import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
 import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
+import { getNonCoffeeRecipeCreatePath } from "@/routes/paths";
 
 const recipeCategoryOptions = [
   {
     category_key: "coffee",
     title: "LG 듀오보\n캡슐 커피 레시피",
     image: coffeeCategoryImage,
+    path: undefined,
   },
   {
     category_key: "smoothie",
     title: "집에서 만드는\n달콤한 스무디",
     image: smoothieCategoryImage,
+    path: getNonCoffeeRecipeCreatePath("smoothie"),
   },
   {
     category_key: "tea",
     title: "집에서 만드는\n프리미엄 차",
     image: teaCategoryImage,
+    path: getNonCoffeeRecipeCreatePath("tea"),
   },
 ] as const;
 
@@ -59,6 +63,11 @@ export default function RecipeCategorySelectionContent() {
                 type="button"
                 className="recipe-category-page__card"
                 aria-label={option.title.replace("\n", " ")}
+                onClick={() => {
+                  if (option.path) {
+                    navigate(option.path);
+                  }
+                }}
               >
                 <img src={option.image} alt="" aria-hidden="true" />
                 <span>{option.title}</span>

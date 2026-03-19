@@ -139,12 +139,15 @@ export function isRecipeOwnedByCurrentUser(recipe: RecipeItem) {
   );
 }
 
-export function getSharedPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) {
+export function getSharedPopularRecipes(
+  sharedRecipeIds: ReadonlyArray<string>,
+  customRecipes: ReadonlyArray<RecipeItem> = [],
+) {
   if (!canCurrentUserShareRecipes()) {
     return [] as RecipeItem[];
   }
 
-  return allRecipes
+  return [...allRecipes, ...customRecipes]
     .filter(
       (recipe) =>
         sharedRecipeIds.includes(recipe.recipe_id) &&
@@ -160,8 +163,14 @@ export function getSharedPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) 
     }));
 }
 
-export function getPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) {
-  return [...popularBrowseRecipes, ...getSharedPopularRecipes(sharedRecipeIds)];
+export function getPopularRecipes(
+  sharedRecipeIds: ReadonlyArray<string>,
+  customRecipes: ReadonlyArray<RecipeItem> = [],
+) {
+  return [
+    ...popularBrowseRecipes,
+    ...getSharedPopularRecipes(sharedRecipeIds, customRecipes),
+  ];
 }
 
 export type RecipeTabKey = (typeof recipeTabs)[number]["tab_key"];

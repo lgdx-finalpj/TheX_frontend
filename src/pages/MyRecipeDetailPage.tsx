@@ -1,17 +1,15 @@
 import { useParams } from "react-router-dom";
 import RecipeDetailContent from "@/components/recipe-detail/RecipeDetailContent";
 import useCustomRecipes from "@/hooks/useCustomRecipes";
-import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import MobileLayout from "@/layouts/MobileLayout";
-import { getPopularRecipes } from "@/mocks/basicRecipes";
+import { allRecipes } from "@/mocks/basicRecipes";
 import NotFoundPage from "@/pages/NotFoundPage";
-import { POPULAR_RECIPE_ROUTE } from "@/routes/paths";
+import { MY_RECIPE_ROUTE } from "@/routes/paths";
 
-export default function PopularRecipeDetailPage() {
+export default function MyRecipeDetailPage() {
   const { recipeId } = useParams();
-  const sharedRecipeIds = useSharedRecipeIds();
   const customRecipes = useCustomRecipes();
-  const recipe = getPopularRecipes(sharedRecipeIds, customRecipes).find(
+  const recipe = [...customRecipes, ...allRecipes].find(
     (item) => item.recipe_id === recipeId,
   );
 
@@ -22,8 +20,8 @@ export default function PopularRecipeDetailPage() {
   return (
     <MobileLayout>
       <RecipeDetailContent
-        pageTitle="인기 레시피 조회"
-        backPath={POPULAR_RECIPE_ROUTE}
+        pageTitle="나의 레시피 조회"
+        backPath={MY_RECIPE_ROUTE}
         recipe={recipe}
       />
     </MobileLayout>

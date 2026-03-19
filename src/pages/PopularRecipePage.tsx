@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
+import useCustomRecipes from "@/hooks/useCustomRecipes";
 import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
@@ -16,7 +17,8 @@ import {
 export default function PopularRecipePage() {
   const navigate = useNavigate();
   const sharedRecipeIds = useSharedRecipeIds();
-  const popularRecipes = getPopularRecipes(sharedRecipeIds);
+  const customRecipes = useCustomRecipes();
+  const popularRecipes = getPopularRecipes(sharedRecipeIds, customRecipes);
 
   const handleTabChange = (tabKey: RecipeTabKey) => {
     switch (tabKey) {
