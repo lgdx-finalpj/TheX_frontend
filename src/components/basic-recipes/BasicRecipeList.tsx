@@ -3,12 +3,16 @@ import type { RecipeItem } from "@/mocks/basicRecipes";
 
 interface BasicRecipeListProps {
   recipes: ReadonlyArray<RecipeItem>;
+  listLabel: string;
 }
 
-export default function BasicRecipeList({ recipes }: BasicRecipeListProps) {
+export default function BasicRecipeList({
+  recipes,
+  listLabel,
+}: BasicRecipeListProps) {
   if (recipes.length === 0) {
     return (
-      <section className="recipe-page__list" aria-label="기본 레시피 목록">
+      <section className="recipe-page__list" aria-label={listLabel}>
         <div className="recipe-page__empty">
           <strong>검색 결과가 없습니다.</strong>
           <p>다른 키워드나 필터로 다시 찾아보세요.</p>
@@ -18,7 +22,7 @@ export default function BasicRecipeList({ recipes }: BasicRecipeListProps) {
   }
 
   return (
-    <section className="recipe-page__list" aria-label="기본 레시피 목록">
+    <section className="recipe-page__list" aria-label={listLabel}>
       {recipes.map((recipe) => (
         <BasicRecipeCard key={recipe.id} recipe={recipe} />
       ))}

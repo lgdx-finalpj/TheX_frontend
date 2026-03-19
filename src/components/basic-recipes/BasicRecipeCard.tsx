@@ -18,7 +18,7 @@ export default function BasicRecipeCard({ recipe }: BasicRecipeCardProps) {
           aria-hidden="true"
           className="recipe-card__icon"
         />
-        <strong>{recipe.name}</strong>
+        <strong className="recipe-card__title">{recipe.name}</strong>
       </div>
 
       <div className="recipe-card__actions">

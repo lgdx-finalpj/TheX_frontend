@@ -3,15 +3,27 @@ import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
 import BasicRecipeHeader from "@/components/basic-recipes/BasicRecipeHeader";
 import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
 import {
-  browseRecipes,
-  myRecipes,
   recipeFlavorChips,
   recipeTabs,
   type RecipeFlavor,
+  type RecipeItem,
+  type RecipeModeAccent,
   type RecipeTabId,
 } from "@/mocks/basicRecipes";
 
-export default function BasicRecipeContent() {
+interface BasicRecipeContentProps {
+  modeLabel: string;
+  markerAccent: RecipeModeAccent;
+  browseRecipes: ReadonlyArray<RecipeItem>;
+  myRecipes: ReadonlyArray<RecipeItem>;
+}
+
+export default function BasicRecipeContent({
+  modeLabel,
+  markerAccent,
+  browseRecipes,
+  myRecipes,
+}: BasicRecipeContentProps) {
   const [activeTab, setActiveTab] = useState<RecipeTabId>("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
@@ -42,13 +54,15 @@ export default function BasicRecipeContent() {
 
       <main className="page-content recipe-page__content">
         <BasicRecipeFilters
+          modeLabel={modeLabel}
+          markerAccent={markerAccent}
           searchQuery={searchQuery}
           selectedFlavor={selectedFlavor}
           chips={recipeFlavorChips}
           onSearchChange={setSearchQuery}
           onFlavorToggle={handleFlavorToggle}
         />
-        <BasicRecipeList recipes={filteredRecipes} />
+        <BasicRecipeList recipes={filteredRecipes} listLabel={`${modeLabel} 레시피 목록`} />
       </main>
     </div>
   );

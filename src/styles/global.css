@@ -301,13 +301,16 @@ input::placeholder {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
-.recipe-card__info strong {
+.recipe-card__title {
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.055em;
-  white-space: nowrap;
+  line-height: 1.08;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .recipe-card__icon {
@@ -402,7 +405,7 @@ input::placeholder {
     padding-inline: 18px;
   }
 
-  .recipe-card__info strong {
+  .recipe-card__title {
     font-size: 20px;
   }
 }
