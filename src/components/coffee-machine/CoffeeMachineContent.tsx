@@ -1,6 +1,7 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
 import backIcon from "@/assets/icon_image/lsicon_arrow-left-filled.png";
+import menuArrowIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import recipeIcon from "@/assets/icon_image/레시피 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
 import supplyIcon from "@/assets/icon_image/소모품 정보 아이콘.png";
@@ -21,7 +22,6 @@ const statusCards = [
 ];
 
 const menuItems = [
-  { iconSrc: recipeIcon, label: "레시피" },
   { iconSrc: controlIcon, label: "주요 기능 제어" },
   { iconSrc: supplyIcon, label: "소모품 정보" },
 ];
@@ -90,6 +90,16 @@ export default function CoffeeMachineContent({
         </button>
 
         <nav className="menu-list" aria-label="주요 메뉴">
+          <button className="menu-item" type="button" aria-label="레시피">
+            <span className="menu-item__icon" aria-hidden="true">
+              <img className="menu-item__icon-image" src={recipeIcon} alt="" />
+            </span>
+            <span className="menu-item__label">레시피</span>
+            <span className="menu-item__arrow" aria-hidden="true">
+              <img className="menu-item__arrow-image" src={menuArrowIcon} alt="" />
+            </span>
+          </button>
+
           {menuItems.map((item) => (
             <MenuItem key={item.label} iconSrc={item.iconSrc} label={item.label} />
           ))}
