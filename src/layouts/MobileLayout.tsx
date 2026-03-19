@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./MobileLayout.css";
 
 interface MobileLayoutProps {
   children: ReactNode;
