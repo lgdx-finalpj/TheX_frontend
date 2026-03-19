@@ -610,6 +610,104 @@ input::placeholder {
   white-space: pre-line;
 }
 
+.recipe-category-page__content {
+  min-height: 100vh;
+  padding: 28px 22px 40px;
+  background: #eef0f4;
+}
+
+.recipe-category-page__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recipe-category-page__top h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+
+.recipe-category-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.recipe-category-page__back img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.recipe-category-page__intro {
+  margin-top: 34px;
+}
+
+.recipe-category-page__intro strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.28;
+}
+
+.recipe-category-page__intro p {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.04em;
+  line-height: 1.22;
+}
+
+.recipe-category-page__section {
+  margin-top: 86px;
+}
+
+.recipe-category-page__section h2 {
+  margin: 0 0 24px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.065em;
+}
+
+.recipe-category-page__list {
+  display: grid;
+  gap: 14px;
+}
+
+.recipe-category-page__card {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 118px 1fr;
+  gap: 18px;
+  width: 100%;
+  min-height: 168px;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: #ffffff;
+  text-align: left;
+  box-shadow: 0 10px 22px rgba(44, 49, 58, 0.04);
+}
+
+.recipe-category-page__card img {
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+}
+
+.recipe-category-page__card span {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 1.12;
+  white-space: pre-line;
+}
+
 @media (max-width: 390px) {
   .mobile-frame {
     max-width: none;
@@ -657,5 +755,40 @@ input::placeholder {
   .recipe-detail__hero-image {
     width: 180px;
     height: 180px;
+  }
+
+  .recipe-category-page__content {
+    padding-inline: 16px;
+  }
+
+  .recipe-category-page__top h1 {
+    font-size: 24px;
+  }
+
+  .recipe-category-page__intro strong {
+    font-size: 21px;
+  }
+
+  .recipe-category-page__section {
+    margin-top: 70px;
+  }
+
+  .recipe-category-page__section h2 {
+    font-size: 26px;
+  }
+
+  .recipe-category-page__card {
+    grid-template-columns: 102px 1fr;
+    min-height: 150px;
+    padding: 18px;
+  }
+
+  .recipe-category-page__card img {
+    width: 102px;
+    height: 102px;
+  }
+
+  .recipe-category-page__card span {
+    font-size: 24px;
   }
 }

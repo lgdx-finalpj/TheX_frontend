@@ -17,6 +17,7 @@ import {
   BASIC_RECIPE_ROUTE,
   getBasicRecipeDetailPath,
   getPopularRecipeDetailPath,
+  RECIPE_CATEGORY_SELECTION_ROUTE,
 } from "@/routes/paths";
 
 export default function MyRecipeContent() {
@@ -91,7 +92,11 @@ export default function MyRecipeContent() {
         />
       </main>
 
-      <button type="button" className="my-recipe-page__floating-button">
+      <button
+        type="button"
+        className="my-recipe-page__floating-button"
+        onClick={() => navigate(RECIPE_CATEGORY_SELECTION_ROUTE)}
+      >
         나만의 레시피 커스텀하기
       </button>
     </div>
