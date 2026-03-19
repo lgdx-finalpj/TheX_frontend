@@ -1,5 +1,4 @@
 import searchIcon from "@/assets/icon_image/돋보기 아이콘.png";
-import defaultRecipeIcon from "@/assets/icon_image/기본 레시피 아이콘 수정본.png";
 import type { RecipeFlavor } from "@/mocks/basicRecipes";
 
 interface BasicRecipeFiltersProps {
@@ -25,7 +24,11 @@ export default function BasicRecipeFilters({
           className="recipe-page__mode-pill is-active"
           aria-label="기본 레시피"
         >
-          <img src={defaultRecipeIcon} alt="" aria-hidden="true" />
+          <span className="recipe-page__mode-pill-label">기본</span>
+          <span className="recipe-page__mode-pill-marker" aria-hidden="true">
+            <span className="recipe-page__mode-pill-bar is-primary" />
+            <span className="recipe-page__mode-pill-bar" />
+          </span>
         </button>
 
         <label className="recipe-page__search">
