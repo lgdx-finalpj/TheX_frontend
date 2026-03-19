@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import AiRecommended from "@/components/coffee-machine/airecommended/AiRecommended";
+import AiRecommendedContent from "@/components/coffee-machine/ai-recommended/AiRecommendedContent";
 
 export default function AiRecommendedMain() {
   const navigate = useNavigate();
 
-  return <AiRecommended onBackClick={() => navigate("/devices/coffee-machine")} />;
+  return <AiRecommendedContent onBackClick={() => navigate("/devices/coffee-machine")} />;
 }
