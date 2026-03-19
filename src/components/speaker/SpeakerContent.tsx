@@ -8,6 +8,7 @@ import StatusCard from "@/components/device-detail/StatusCard";
 
 interface SpeakerContentProps {
   onCoffeeMachineClick?: () => void;
+  onLightingClick?: () => void;
 }
 
 const speakerStatusCards = [
@@ -20,7 +21,7 @@ const speakerMenuItems = [
   { iconSrc: controlIcon, label: "주요 기능 제어" },
 ];
 
-export default function SpeakerContent({ onCoffeeMachineClick }: SpeakerContentProps) {
+export default function SpeakerContent({ onCoffeeMachineClick, onLightingClick }: SpeakerContentProps) {
   return (
     <MobileLayout>
       <main className="device-page speaker-page">
@@ -48,7 +49,7 @@ export default function SpeakerContent({ onCoffeeMachineClick }: SpeakerContentP
             <img className="speaker-hero__image" src={speakerImage} alt="LG 스피커" />
           </div>
 
-          <button className="speaker-nav speaker-nav--right" type="button">
+          <button className="speaker-nav speaker-nav--right" type="button" onClick={onLightingClick}>
             <span className="speaker-nav__arrow" aria-hidden="true">
               ›
             </span>

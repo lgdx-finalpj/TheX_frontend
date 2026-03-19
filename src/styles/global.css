@@ -242,6 +242,80 @@ a {
   margin-top: 8px;
 }
 
+.lighting-page {
+  gap: 22px;
+}
+
+.lighting-hero {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px 0 2px;
+}
+
+.lighting-nav {
+  position: absolute;
+  left: 4px;
+  top: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #a8adb6;
+  cursor: pointer;
+}
+
+.lighting-nav__arrow {
+  font-size: 72px;
+  line-height: 0.8;
+}
+
+.lighting-nav__label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.lighting-hero__image-wrap {
+  width: min(100%, 250px);
+  display: flex;
+  justify-content: center;
+}
+
+.lighting-hero__image {
+  width: 100%;
+  max-width: 210px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(233, 213, 129, 0.22));
+}
+
+.lighting-page__title {
+  margin: -6px 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.lighting-status-grid {
+  margin-top: 2px;
+}
+
+.lighting-status-grid .status-card {
+  min-height: 100px;
+  padding: 14px 18px 12px;
+}
+
+.lighting-status-grid .status-card__value {
+  min-height: 56px;
+  font-size: 20px;
+}
+
+.lighting-menu-list {
+  margin-top: 10px;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -463,6 +537,18 @@ a {
   }
 
   .speaker-page__title {
+    font-size: 20px;
+  }
+
+  .lighting-nav__arrow {
+    font-size: 58px;
+  }
+
+  .lighting-nav__label {
+    font-size: 14px;
+  }
+
+  .lighting-page__title {
     font-size: 20px;
   }
 
