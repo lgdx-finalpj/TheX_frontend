@@ -3,21 +3,25 @@ import type { RecipeItem } from "@/mocks/basicRecipes";
 
 interface BasicRecipeListProps {
   recipes: ReadonlyArray<RecipeItem>;
-  detailBasePath: string;
+  getDetailPath: (recipe: RecipeItem) => string;
   listLabel: string;
+  emptyTitle: string;
+  emptyDescription: string;
 }
 
 export default function BasicRecipeList({
   recipes,
-  detailBasePath,
+  getDetailPath,
   listLabel,
+  emptyTitle,
+  emptyDescription,
 }: BasicRecipeListProps) {
   if (recipes.length === 0) {
     return (
       <section className="recipe-page__list" aria-label={listLabel}>
         <div className="recipe-page__empty">
-          <strong>검색 결과가 없습니다.</strong>
-          <p>다른 키워드나 필터로 다시 찾아보세요.</p>
+          <strong>{emptyTitle}</strong>
+          <p>{emptyDescription}</p>
         </div>
       </section>
     );
@@ -29,7 +33,7 @@ export default function BasicRecipeList({
         <BasicRecipeCard
           key={recipe.recipe_id}
           recipe={recipe}
-          detailBasePath={detailBasePath}
+          getDetailPath={getDetailPath}
         />
       ))}
     </section>

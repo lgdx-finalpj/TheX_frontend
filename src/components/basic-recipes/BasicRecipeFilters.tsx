@@ -2,22 +2,24 @@ import searchIcon from "@/assets/icon_image/돋보기 아이콘.png";
 import type { RecipeFlavor, RecipeModeAccent } from "@/mocks/basicRecipes";
 
 interface BasicRecipeFiltersProps {
-  modeLabel: string;
-  markerAccent: RecipeModeAccent;
+  modeLabel?: string;
+  markerAccent?: RecipeModeAccent;
   searchQuery: string;
   selectedFlavor: RecipeFlavor | null;
   chips: ReadonlyArray<RecipeFlavor>;
-  onModeClick: () => void;
+  showModeToggle?: boolean;
+  onModeClick?: () => void;
   onSearchChange: (value: string) => void;
   onFlavorToggle: (chip: RecipeFlavor) => void;
 }
 
 export default function BasicRecipeFilters({
   modeLabel,
-  markerAccent,
+  markerAccent = "top",
   searchQuery,
   selectedFlavor,
   chips,
+  showModeToggle = true,
   onModeClick,
   onSearchChange,
   onFlavorToggle,
@@ -35,20 +37,26 @@ export default function BasicRecipeFilters({
   return (
     <section className="recipe-page__controls" aria-label="레시피 필터">
       <div className="recipe-page__control-row">
-        <button
-          type="button"
-          className="recipe-page__mode-pill is-active"
-          aria-label={`${modeLabel} 레시피 페이지로 이동`}
-          onClick={onModeClick}
-        >
-          <span className="recipe-page__mode-pill-label">{modeLabel}</span>
-          <span className="recipe-page__mode-pill-marker" aria-hidden="true">
-            <span className={topBarClassName} />
-            <span className={bottomBarClassName} />
-          </span>
-        </button>
+        {showModeToggle ? (
+          <button
+            type="button"
+            className="recipe-page__mode-pill is-active"
+            aria-label={`${modeLabel} 레시피 페이지로 이동`}
+            onClick={onModeClick}
+          >
+            <span className="recipe-page__mode-pill-label">{modeLabel}</span>
+            <span className="recipe-page__mode-pill-marker" aria-hidden="true">
+              <span className={topBarClassName} />
+              <span className={bottomBarClassName} />
+            </span>
+          </button>
+        ) : null}
 
-        <label className="recipe-page__search">
+        <label
+          className={`recipe-page__search ${
+            showModeToggle ? "" : "recipe-page__search--full"
+          }`}
+        >
           <img src={searchIcon} alt="" aria-hidden="true" />
           <input
             type="search"

@@ -1,18 +1,13 @@
-import MobileLayout from "@/layouts/MobileLayout";
-import {
-  popularBrowseRecipes,
-  popularMyRecipes,
-} from "@/mocks/basicRecipes";
-import NotFoundPage from "@/pages/NotFoundPage";
 import RecipeDetailContent from "@/components/recipe-detail/RecipeDetailContent";
+import MobileLayout from "@/layouts/MobileLayout";
+import { popularBrowseRecipes } from "@/mocks/basicRecipes";
+import NotFoundPage from "@/pages/NotFoundPage";
 import { POPULAR_RECIPE_ROUTE } from "@/routes/paths";
 import { useParams } from "react-router-dom";
 
 export default function PopularRecipeDetailPage() {
   const { recipeId } = useParams();
-  const recipe = [...popularBrowseRecipes, ...popularMyRecipes].find(
-    (item) => item.recipe_id === recipeId,
-  );
+  const recipe = popularBrowseRecipes.find((item) => item.recipe_id === recipeId);
 
   if (!recipe) {
     return <NotFoundPage />;

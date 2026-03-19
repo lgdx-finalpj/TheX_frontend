@@ -5,24 +5,27 @@ import starIcon from "@/assets/icon_image/별 아이콘.png";
 import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중 팝업창.png";
+import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import type { RecipeItem } from "@/mocks/basicRecipes";
+import { saveRecipe } from "@/utils/savedRecipes";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
-  detailBasePath: string;
+  getDetailPath: (recipe: RecipeItem) => string;
 }
 
 type ExtractStatus = "idle" | "extracting" | "completed";
 
 export default function BasicRecipeCard({
   recipe,
-  detailBasePath,
+  getDetailPath,
 }: BasicRecipeCardProps) {
   const navigate = useNavigate();
+  const savedRecipeIds = useSavedRecipeIds();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [extractStatus, setExtractStatus] = useState<ExtractStatus>("idle");
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const isSaved = savedRecipeIds.includes(recipe.recipe_id);
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
     : recipe.recipe_name;
@@ -74,7 +77,7 @@ export default function BasicRecipeCard({
   }, [extractStatus]);
 
   const handleSaveClick = () => {
-    setIsSaved(true);
+    saveRecipe(recipe.recipe_id);
   };
 
   const handleExtractClick = () => {
@@ -104,7 +107,7 @@ export default function BasicRecipeCard({
             type="button"
             className="icon-button"
             aria-label={`${displayRecipeName} 상세`}
-            onClick={() => navigate(`${detailBasePath}/${recipe.recipe_id}`)}
+            onClick={() => navigate(getDetailPath(recipe))}
           >
             <img src={chevronRightIcon} alt="" aria-hidden="true" />
           </button>

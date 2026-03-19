@@ -14,25 +14,24 @@ import {
 interface BasicRecipeContentProps {
   modeLabel: string;
   markerAccent: RecipeModeAccent;
-  browseRecipes: ReadonlyArray<RecipeItem>;
-  myRecipes: ReadonlyArray<RecipeItem>;
-  detailBasePath: string;
+  recipes: ReadonlyArray<RecipeItem>;
+  activeTab: RecipeTabKey;
   onModeClick: () => void;
+  onTabChange: (tabKey: RecipeTabKey) => void;
+  getDetailPath: (recipe: RecipeItem) => string;
 }
 
 export default function BasicRecipeContent({
   modeLabel,
   markerAccent,
-  browseRecipes,
-  myRecipes,
-  detailBasePath,
+  recipes,
+  activeTab,
   onModeClick,
+  onTabChange,
+  getDetailPath,
 }: BasicRecipeContentProps) {
-  const [activeTab, setActiveTab] = useState<RecipeTabKey>("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
-
-  const recipes = activeTab === "browse" ? browseRecipes : myRecipes;
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filteredRecipes = recipes.filter((recipe) => {
@@ -55,7 +54,7 @@ export default function BasicRecipeContent({
       <BasicRecipeHeader
         tabs={recipeTabs}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={onTabChange}
       />
 
       <main className="page-content recipe-page__content">
@@ -71,8 +70,10 @@ export default function BasicRecipeContent({
         />
         <BasicRecipeList
           recipes={filteredRecipes}
-          detailBasePath={detailBasePath}
+          getDetailPath={getDetailPath}
           listLabel={`${modeLabel} 레시피 목록`}
+          emptyTitle="검색 결과가 없습니다."
+          emptyDescription="다른 키워드나 필터로 다시 찾아보세요."
         />
       </main>
     </div>
