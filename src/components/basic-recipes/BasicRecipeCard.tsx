@@ -10,6 +10,7 @@ import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import {
   canCurrentUserShareRecipes,
+  isRecipeOwnedByCurrentUser,
   type RecipeItem,
 } from "@/mocks/basicRecipes";
 import {
@@ -42,7 +43,9 @@ export default function BasicRecipeCard({
   const isSaved =
     savedRecipeIds.includes(recipe.recipe_id) &&
     !hiddenMyRecipeIds.includes(recipe.recipe_id);
-  const isShared = sharedRecipeIds.includes(recipe.recipe_id);
+  const isOwnedByCurrentUser = isRecipeOwnedByCurrentUser(recipe);
+  const isShared =
+    isOwnedByCurrentUser && sharedRecipeIds.includes(recipe.recipe_id);
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
     : recipe.recipe_name;
@@ -104,7 +107,7 @@ export default function BasicRecipeCard({
   };
 
   const handleShareClick = () => {
-    if (!canCurrentUserShareRecipes()) {
+    if (!canCurrentUserShareRecipes() || !isOwnedByCurrentUser) {
       return;
     }
 

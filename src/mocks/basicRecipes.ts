@@ -132,13 +132,24 @@ export function canCurrentUserShareRecipes() {
   return CURRENT_USER_ID === "1" && CURRENT_USER_NICKNAME === "LHCS";
 }
 
+export function isRecipeOwnedByCurrentUser(recipe: RecipeItem) {
+  return (
+    recipe.user_id === CURRENT_USER_ID &&
+    recipe.user_nickname === CURRENT_USER_NICKNAME
+  );
+}
+
 export function getSharedPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) {
   if (!canCurrentUserShareRecipes()) {
     return [] as RecipeItem[];
   }
 
   return allRecipes
-    .filter((recipe) => sharedRecipeIds.includes(recipe.recipe_id))
+    .filter(
+      (recipe) =>
+        sharedRecipeIds.includes(recipe.recipe_id) &&
+        isRecipeOwnedByCurrentUser(recipe),
+    )
     .map((recipe) => ({
       ...recipe,
       recipe_id: `shared_${CURRENT_USER_ID}_${recipe.recipe_id}`,
