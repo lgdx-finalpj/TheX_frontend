@@ -1,3 +1,24 @@
+@font-face {
+  font-family: "LG Smart";
+  src:
+    local("LG Smart UI"),
+    local("LG Smart UI Regular"),
+    local("LG_Smart_UI-Regular"),
+    local("LG Smart UI Light"),
+    local("LG_Smart_UI-Light");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MOTU LG Smart_H";
+  src:
+    local("MOTU LG Smart_H"),
+    local("LG Smart_H"),
+    local("LG Smart UI Light"),
+    local("LG Smart UI");
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -11,7 +32,12 @@ body,
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family:
+    "LG Smart",
+    "MOTU LG Smart_H",
+    "Apple SD Gothic Neo",
+    "Malgun Gothic",
+    sans-serif;
   background-color: #d3d3d3;
   color: #111827;
 }
@@ -26,68 +52,4 @@ input,
 textarea,
 select {
   font: inherit;
-}
-
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  background-color: #d3d3d3;
-}
-
-.mobile-frame {
-  width: 100%;
-  max-width: 430px;
-  min-height: 100vh;
-  background-image: url("../assets/background_color1.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
-}
-
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-header {
-  padding: 24px 20px 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.page-header h1 {
-  margin: 0 0 8px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.page-header p {
-  margin: 0;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.page-content {
-  flex: 1;
-  padding: 20px;
-}
-
-.card {
-  padding: 20px;
-  border-radius: 16px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-}
-
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 18px;
-}
-
-.card p {
-  margin: 0;
-  line-height: 1.5;
 }
