@@ -5,6 +5,7 @@ import starIcon from "@/assets/icon_image/별 아이콘.png";
 import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중 팝업창.png";
+import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import type { RecipeItem } from "@/mocks/basicRecipes";
@@ -30,11 +31,14 @@ export default function BasicRecipeCard({
 }: BasicRecipeCardProps) {
   const navigate = useNavigate();
   const savedRecipeIds = useSavedRecipeIds();
+  const hiddenMyRecipeIds = useHiddenMyRecipeIds();
   const sharedRecipeIds = useSharedRecipeIds();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [extractStatus, setExtractStatus] = useState<ExtractStatus>("idle");
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const isSaved = savedRecipeIds.includes(recipe.recipe_id);
+  const isSaved =
+    savedRecipeIds.includes(recipe.recipe_id) &&
+    !hiddenMyRecipeIds.includes(recipe.recipe_id);
   const isShared = sharedRecipeIds.includes(recipe.recipe_id);
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
