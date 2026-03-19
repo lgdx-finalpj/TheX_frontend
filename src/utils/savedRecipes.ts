@@ -90,6 +90,10 @@ export function saveRecipe(recipeId: string) {
   restoreMyRecipe(recipeId);
 }
 
+export function removeSavedRecipe(recipeId: string) {
+  removeRecipeId(SAVED_RECIPES_KEY, SAVED_RECIPES_EVENT, recipeId);
+}
+
 export function subscribeSavedRecipes(listener: () => void) {
   return subscribeRecipeIds(SAVED_RECIPES_KEY, SAVED_RECIPES_EVENT, listener);
 }

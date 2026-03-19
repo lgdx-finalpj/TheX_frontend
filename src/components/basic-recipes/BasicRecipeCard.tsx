@@ -8,7 +8,12 @@ import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import type { RecipeItem } from "@/mocks/basicRecipes";
-import { hideMyRecipe, saveRecipe, shareRecipe } from "@/utils/savedRecipes";
+import {
+  hideMyRecipe,
+  removeSavedRecipe,
+  saveRecipe,
+  shareRecipe,
+} from "@/utils/savedRecipes";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
@@ -86,6 +91,7 @@ export default function BasicRecipeCard({
   };
 
   const handleDeleteClick = () => {
+    removeSavedRecipe(recipe.recipe_id);
     hideMyRecipe(recipe.recipe_id);
     setIsMenuOpen(false);
   };
