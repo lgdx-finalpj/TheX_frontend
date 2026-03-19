@@ -16,6 +16,7 @@ interface BasicRecipeContentProps {
   markerAccent: RecipeModeAccent;
   browseRecipes: ReadonlyArray<RecipeItem>;
   myRecipes: ReadonlyArray<RecipeItem>;
+  onModeClick: () => void;
 }
 
 export default function BasicRecipeContent({
@@ -23,6 +24,7 @@ export default function BasicRecipeContent({
   markerAccent,
   browseRecipes,
   myRecipes,
+  onModeClick,
 }: BasicRecipeContentProps) {
   const [activeTab, setActiveTab] = useState<RecipeTabId>("browse");
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,6 +61,7 @@ export default function BasicRecipeContent({
           searchQuery={searchQuery}
           selectedFlavor={selectedFlavor}
           chips={recipeFlavorChips}
+          onModeClick={onModeClick}
           onSearchChange={setSearchQuery}
           onFlavorToggle={handleFlavorToggle}
         />
