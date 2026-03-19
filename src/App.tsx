@@ -1,7 +1,12 @@
 import Router from "@/routes/Router";
+import { MoodCustomDraftProvider } from "@/state/MoodCustomDraftProvider";
 
 function App() {
-  return <Router />;
+  return (
+    <MoodCustomDraftProvider>
+      <Router />
+    </MoodCustomDraftProvider>
+  );
 }
 
 export default App;
