@@ -1,5 +1,6 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
+import backIcon from "@/assets/icon_image/lsicon_arrow-left-filled.png";
 import recipeIcon from "@/assets/icon_image/레시피 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
 import supplyIcon from "@/assets/icon_image/소모품 정보 아이콘.png";
@@ -34,7 +35,7 @@ export default function CoffeeMachineContent({
       <main className="device-page">
         <header className="device-topbar">
           <button className="icon-button icon-button--plain" type="button" aria-label="이전으로">
-            ←
+            <img className="icon-button__image icon-button__image--back" src={backIcon} alt="" />
           </button>
 
           <h1 className="device-topbar__title">듀오보 2.0</h1>

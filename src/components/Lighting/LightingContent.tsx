@@ -1,5 +1,6 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import lightingImage from "@/assets/elc_icon/조명.png";
+import backIcon from "@/assets/icon_image/lsicon_arrow-left-filled.png";
 import usefulIcon from "@/assets/icon_image/유용한 기능 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
 import settingsIcon from "@/assets/icon_image/톱니바퀴 아이콘.png";
@@ -26,7 +27,7 @@ export default function LightingContent({ onSpeakerClick }: LightingContentProps
       <main className="device-page lighting-page">
         <header className="device-topbar">
           <button className="icon-button icon-button--plain" type="button" aria-label="이전으로">
-            ←
+            <img className="icon-button__image icon-button__image--back" src={backIcon} alt="" />
           </button>
 
           <h1 className="device-topbar__title">조명</h1>
