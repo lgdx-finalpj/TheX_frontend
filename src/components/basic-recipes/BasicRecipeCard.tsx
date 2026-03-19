@@ -8,7 +8,10 @@ import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중
 import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
-import type { RecipeItem } from "@/mocks/basicRecipes";
+import {
+  canCurrentUserShareRecipes,
+  type RecipeItem,
+} from "@/mocks/basicRecipes";
 import {
   hideMyRecipe,
   removeSavedRecipe,
@@ -101,6 +104,10 @@ export default function BasicRecipeCard({
   };
 
   const handleShareClick = () => {
+    if (!canCurrentUserShareRecipes()) {
+      return;
+    }
+
     shareRecipe(recipe.recipe_id);
   };
 

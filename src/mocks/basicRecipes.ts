@@ -3,7 +3,15 @@ export const recipeTabs = [
   { tab_key: "mine", label: "나의 레시피" },
 ] as const;
 
-export const recipeFlavorChips = ["아메리카노", "라떼", "카푸치노", "콜드브루"] as const;
+export const recipeFlavorChips = [
+  "아메리카노",
+  "라떼",
+  "카푸치노",
+  "콜드브루",
+] as const;
+
+export const CURRENT_USER_ID = "1";
+export const CURRENT_USER_NICKNAME = "LHCS";
 
 export type RecipeCategory = "커피" | "스무디" | "차";
 export type RecipeSource = "basic" | "popular";
@@ -18,6 +26,7 @@ export interface RecipeItem {
   filter_label: string;
   recipe_level: string;
   total_size: string;
+  user_id?: string;
   user_nickname?: string;
   capsule_temp1?: string;
   ingredient?: string;
@@ -33,12 +42,12 @@ export const basicBrowseRecipes = [
     recipe_type: "기본",
     recipe_category: "커피",
     recipe_source: "basic",
-    filter_label: "에스프레소",
+    filter_label: "아메리카노",
     recipe_level: "쉬움",
     capsule_temp1: "High",
     total_size: "80mL",
     recipe_memo:
-      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90°C로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
+      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90℃로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
   },
   {
     recipe_id: "coffee_recipe_002",
@@ -52,7 +61,7 @@ export const basicBrowseRecipes = [
     capsule_temp1: "High",
     total_size: "220mL",
     recipe_memo:
-      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90°C로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
+      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90℃로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
   },
   {
     recipe_id: "coffee_recipe_003",
@@ -93,12 +102,12 @@ export const popularBrowseRecipes = [
     recipe_type: "인기",
     recipe_category: "커피",
     recipe_source: "popular",
-    filter_label: "에스프레소",
+    filter_label: "아메리카노",
     recipe_level: "쉬움",
     capsule_temp1: "High",
     total_size: "80mL",
     recipe_memo:
-      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90°C로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
+      "1. 에스프레소 계열 캡슐 2개를 장착한다.\n2. 더블 에스프레소 80mL를 만든다.\n[캡슐 A 추출량: 40mL, 캡슐 B 추출량: 40mL로 설정]\n3. 온도를 90℃로 설정한다.\n4. 추출하기 버튼을 클릭한다.",
   },
   {
     recipe_id: "non_coffee_recipe_102",
@@ -108,7 +117,7 @@ export const popularBrowseRecipes = [
     recipe_type: "인기",
     recipe_category: "스무디",
     recipe_source: "popular",
-    filter_label: "스무디",
+    filter_label: "콜드브루",
     recipe_level: "쉬움",
     ingredient: "블루베리 100g, 우유 120mL, 얼음 4~5개",
     total_size: "220mL",
@@ -118,6 +127,31 @@ export const popularBrowseRecipes = [
 ] satisfies ReadonlyArray<RecipeItem>;
 
 export const allRecipes = [...basicBrowseRecipes, ...popularBrowseRecipes];
+
+export function canCurrentUserShareRecipes() {
+  return CURRENT_USER_ID === "1" && CURRENT_USER_NICKNAME === "LHCS";
+}
+
+export function getSharedPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) {
+  if (!canCurrentUserShareRecipes()) {
+    return [] as RecipeItem[];
+  }
+
+  return allRecipes
+    .filter((recipe) => sharedRecipeIds.includes(recipe.recipe_id))
+    .map((recipe) => ({
+      ...recipe,
+      recipe_id: `shared_${CURRENT_USER_ID}_${recipe.recipe_id}`,
+      recipe_type: "인기",
+      recipe_source: "popular" as const,
+      user_id: CURRENT_USER_ID,
+      user_nickname: CURRENT_USER_NICKNAME,
+    }));
+}
+
+export function getPopularRecipes(sharedRecipeIds: ReadonlyArray<string>) {
+  return [...popularBrowseRecipes, ...getSharedPopularRecipes(sharedRecipeIds)];
+}
 
 export type RecipeTabKey = (typeof recipeTabs)[number]["tab_key"];
 export type RecipeFlavor = (typeof recipeFlavorChips)[number];

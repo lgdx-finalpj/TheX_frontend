@@ -1,7 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
-import { popularBrowseRecipes, type RecipeItem, type RecipeTabKey } from "@/mocks/basicRecipes";
+import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import MobileLayout from "@/layouts/MobileLayout";
+import {
+  getPopularRecipes,
+  type RecipeItem,
+  type RecipeTabKey,
+} from "@/mocks/basicRecipes";
 import {
   BASIC_RECIPE_ROUTE,
   getPopularRecipeDetailPath,
@@ -10,6 +15,8 @@ import {
 
 export default function PopularRecipePage() {
   const navigate = useNavigate();
+  const sharedRecipeIds = useSharedRecipeIds();
+  const popularRecipes = getPopularRecipes(sharedRecipeIds);
 
   const handleTabChange = (tabKey: RecipeTabKey) => {
     switch (tabKey) {
@@ -22,14 +29,15 @@ export default function PopularRecipePage() {
     }
   };
 
-  const getDetailPath = (recipe: RecipeItem) => getPopularRecipeDetailPath(recipe.recipe_id);
+  const getDetailPath = (recipe: RecipeItem) =>
+    getPopularRecipeDetailPath(recipe.recipe_id);
 
   return (
     <MobileLayout>
       <BasicRecipeContent
         modeLabel="인기"
         markerAccent="bottom"
-        recipes={popularBrowseRecipes}
+        recipes={popularRecipes}
         activeTab="browse"
         onModeClick={() => navigate(BASIC_RECIPE_ROUTE)}
         onTabChange={handleTabChange}
