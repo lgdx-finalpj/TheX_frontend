@@ -11,6 +11,7 @@ export interface RecipeItem {
   save_count: string;
   recipe_type: string;
   recipe_category: string;
+  user_nickname?: string;
 }
 
 export const basicBrowseRecipes = [
@@ -64,14 +65,16 @@ export const basicMyRecipes = [
 export const popularBrowseRecipes = [
   {
     recipe_id: "coffee_recipe_101",
-    recipe_name: "쿨냥이님의 에스프레소",
+    user_nickname: "쿨냥이",
+    recipe_name: "에스프레소",
     save_count: "10,569",
     recipe_type: "인기",
     recipe_category: "에스프레소",
   },
   {
     recipe_id: "coffee_recipe_102",
-    recipe_name: "캡틴님의 블루베리 스무디",
+    user_nickname: "캡틴",
+    recipe_name: "블루베리 스무디",
     save_count: "8,603",
     recipe_type: "인기",
     recipe_category: "라떼",
@@ -81,7 +84,7 @@ export const popularBrowseRecipes = [
 export const popularMyRecipes = [
   {
     recipe_id: "coffee_recipe_103",
-    recipe_name: "나의 베스트 카푸치노",
+    recipe_name: "베스트 카푸치노",
     save_count: "1,024",
     recipe_type: "나의 레시피",
     recipe_category: "카푸치노",
