@@ -6,12 +6,14 @@ import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중 팝업창.png";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
+import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
 import type { RecipeItem } from "@/mocks/basicRecipes";
-import { saveRecipe } from "@/utils/savedRecipes";
+import { hideMyRecipe, saveRecipe, shareRecipe } from "@/utils/savedRecipes";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
   getDetailPath: (recipe: RecipeItem) => string;
+  menuVariant?: "default" | "mine";
 }
 
 type ExtractStatus = "idle" | "extracting" | "completed";
@@ -19,13 +21,16 @@ type ExtractStatus = "idle" | "extracting" | "completed";
 export default function BasicRecipeCard({
   recipe,
   getDetailPath,
+  menuVariant = "default",
 }: BasicRecipeCardProps) {
   const navigate = useNavigate();
   const savedRecipeIds = useSavedRecipeIds();
+  const sharedRecipeIds = useSharedRecipeIds();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [extractStatus, setExtractStatus] = useState<ExtractStatus>("idle");
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isSaved = savedRecipeIds.includes(recipe.recipe_id);
+  const isShared = sharedRecipeIds.includes(recipe.recipe_id);
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
     : recipe.recipe_name;
@@ -80,6 +85,15 @@ export default function BasicRecipeCard({
     saveRecipe(recipe.recipe_id);
   };
 
+  const handleDeleteClick = () => {
+    hideMyRecipe(recipe.recipe_id);
+    setIsMenuOpen(false);
+  };
+
+  const handleShareClick = () => {
+    shareRecipe(recipe.recipe_id);
+  };
+
   const handleExtractClick = () => {
     setIsMenuOpen(false);
     setExtractStatus("extracting");
@@ -99,7 +113,10 @@ export default function BasicRecipeCard({
         </div>
 
         <div className="recipe-card__actions">
-          <div className="recipe-card__score" aria-label={`레시피 저장 수 ${recipe.save_count}`}>
+          <div
+            className="recipe-card__score"
+            aria-label={`레시피 저장 수 ${recipe.save_count}`}
+          >
             <img src={starIcon} alt="" aria-hidden="true" />
             <span>{recipe.save_count}</span>
           </div>
@@ -123,23 +140,71 @@ export default function BasicRecipeCard({
             </button>
 
             {isMenuOpen ? (
-              <div className="recipe-card__menu" role="menu" aria-label={`${displayRecipeName} 액션`}>
-                <button
-                  type="button"
-                  className={`recipe-card__menu-item ${isSaved ? "is-saved" : ""}`}
-                  role="menuitem"
-                  onClick={handleSaveClick}
-                >
-                  {isSaved ? "저장됨" : "레시피 저장"}
-                </button>
-                <button
-                  type="button"
-                  className="recipe-card__menu-item"
-                  role="menuitem"
-                  onClick={handleExtractClick}
-                >
-                  레시피 추출
-                </button>
+              <div
+                className={`recipe-card__menu ${
+                  menuVariant === "mine" ? "is-my-recipe-menu" : ""
+                }`}
+                role="menu"
+                aria-label={`${displayRecipeName} 작업 메뉴`}
+              >
+                {menuVariant === "mine" ? (
+                  <>
+                    <button
+                      type="button"
+                      className="recipe-card__menu-item"
+                      role="menuitem"
+                    >
+                      레시피 수정
+                    </button>
+                    <button
+                      type="button"
+                      className="recipe-card__menu-item"
+                      role="menuitem"
+                      onClick={handleDeleteClick}
+                    >
+                      레시피 삭제
+                    </button>
+                    <button
+                      type="button"
+                      className={`recipe-card__menu-item ${
+                        isShared ? "is-shared" : ""
+                      }`}
+                      role="menuitem"
+                      onClick={handleShareClick}
+                    >
+                      {isShared ? "공유됨" : "레시피 공유"}
+                    </button>
+                    <button
+                      type="button"
+                      className="recipe-card__menu-item"
+                      role="menuitem"
+                      onClick={handleExtractClick}
+                    >
+                      레시피 추출
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={`recipe-card__menu-item ${
+                        isSaved ? "is-saved" : ""
+                      }`}
+                      role="menuitem"
+                      onClick={handleSaveClick}
+                    >
+                      {isSaved ? "저장됨" : "레시피 저장"}
+                    </button>
+                    <button
+                      type="button"
+                      className="recipe-card__menu-item"
+                      role="menuitem"
+                      onClick={handleExtractClick}
+                    >
+                      레시피 추출
+                    </button>
+                  </>
+                )}
               </div>
             ) : null}
           </div>

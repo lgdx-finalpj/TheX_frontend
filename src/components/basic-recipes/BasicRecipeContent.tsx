@@ -19,6 +19,7 @@ interface BasicRecipeContentProps {
   onModeClick: () => void;
   onTabChange: (tabKey: RecipeTabKey) => void;
   getDetailPath: (recipe: RecipeItem) => string;
+  menuVariant?: "default" | "mine";
 }
 
 export default function BasicRecipeContent({
@@ -29,6 +30,7 @@ export default function BasicRecipeContent({
   onModeClick,
   onTabChange,
   getDetailPath,
+  menuVariant = "default",
 }: BasicRecipeContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
@@ -74,6 +76,7 @@ export default function BasicRecipeContent({
           listLabel={`${modeLabel} 레시피 목록`}
           emptyTitle="검색 결과가 없습니다."
           emptyDescription="다른 키워드나 필터로 다시 찾아보세요."
+          menuVariant={menuVariant}
         />
       </main>
     </div>

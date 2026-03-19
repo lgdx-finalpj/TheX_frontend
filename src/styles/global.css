@@ -391,6 +391,15 @@ input::placeholder {
   background: #d7d7d7;
 }
 
+.recipe-card__menu-item.is-shared {
+  background: #d7d7d7;
+}
+
+.recipe-card__menu.is-my-recipe-menu {
+  gap: 8px;
+  width: 190px;
+}
+
 .recipe-extract-overlay {
   position: fixed;
   inset: 0;

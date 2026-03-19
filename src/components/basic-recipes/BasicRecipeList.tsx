@@ -7,6 +7,7 @@ interface BasicRecipeListProps {
   listLabel: string;
   emptyTitle: string;
   emptyDescription: string;
+  menuVariant?: "default" | "mine";
 }
 
 export default function BasicRecipeList({
@@ -15,6 +16,7 @@ export default function BasicRecipeList({
   listLabel,
   emptyTitle,
   emptyDescription,
+  menuVariant = "default",
 }: BasicRecipeListProps) {
   if (recipes.length === 0) {
     return (
@@ -34,6 +36,7 @@ export default function BasicRecipeList({
           key={recipe.recipe_id}
           recipe={recipe}
           getDetailPath={getDetailPath}
+          menuVariant={menuVariant}
         />
       ))}
     </section>

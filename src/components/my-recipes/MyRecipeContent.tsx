@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
 import BasicRecipeHeader from "@/components/basic-recipes/BasicRecipeHeader";
 import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
+import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
 import {
   allRecipes,
@@ -16,17 +18,19 @@ import {
   getBasicRecipeDetailPath,
   getPopularRecipeDetailPath,
 } from "@/routes/paths";
-import { useNavigate } from "react-router-dom";
 
 export default function MyRecipeContent() {
   const navigate = useNavigate();
   const savedRecipeIds = useSavedRecipeIds();
+  const hiddenMyRecipeIds = useHiddenMyRecipeIds();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const savedRecipes = allRecipes.filter((recipe) =>
-    savedRecipeIds.includes(recipe.recipe_id),
+  const savedRecipes = allRecipes.filter(
+    (recipe) =>
+      savedRecipeIds.includes(recipe.recipe_id) &&
+      !hiddenMyRecipeIds.includes(recipe.recipe_id),
   );
 
   const filteredRecipes = savedRecipes.filter((recipe) => {
@@ -81,8 +85,9 @@ export default function MyRecipeContent() {
           recipes={filteredRecipes}
           getDetailPath={getDetailPath}
           listLabel="나의 레시피 목록"
-          emptyTitle="저장된 레시피가 없습니다."
+          emptyTitle="저장한 레시피가 없습니다."
           emptyDescription="기본 레시피나 인기 레시피에서 저장한 뒤 다시 확인해보세요."
+          menuVariant="mine"
         />
       </main>
 
