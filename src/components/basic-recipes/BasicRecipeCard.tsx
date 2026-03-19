@@ -17,6 +17,7 @@ export default function BasicRecipeCard({
 }: BasicRecipeCardProps) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
@@ -39,6 +40,10 @@ export default function BasicRecipeCard({
       document.removeEventListener("mousedown", handlePointerDown);
     };
   }, [isMenuOpen]);
+
+  const handleSaveClick = () => {
+    setIsSaved(true);
+  };
 
   return (
     <article className="recipe-card">
@@ -78,8 +83,13 @@ export default function BasicRecipeCard({
 
           {isMenuOpen ? (
             <div className="recipe-card__menu" role="menu" aria-label={`${displayRecipeName} 액션`}>
-              <button type="button" className="recipe-card__menu-item" role="menuitem">
-                레시피 저장
+              <button
+                type="button"
+                className={`recipe-card__menu-item ${isSaved ? "is-saved" : ""}`}
+                role="menuitem"
+                onClick={handleSaveClick}
+              >
+                {isSaved ? "저장됨" : "레시피 저장"}
               </button>
               <button type="button" className="recipe-card__menu-item" role="menuitem">
                 레시피 추출
