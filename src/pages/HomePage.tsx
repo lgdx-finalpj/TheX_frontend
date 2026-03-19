@@ -1,14 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
-import SpeakerMainPage from "@/pages/SpeakerMain";
+import { Navigate } from "react-router-dom";
 
 export default function HomePage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  if (location.pathname === "/speaker") {
-    return <SpeakerMainPage onCoffeeMachineClick={() => navigate("/")} />;
-  }
-
-  return <CoffeeMachineMain onSpeakerClick={() => navigate("/speaker")} />;
+  return <Navigate to="/devices/coffee-machine" replace />;
 }
