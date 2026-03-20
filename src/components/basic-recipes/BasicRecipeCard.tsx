@@ -16,6 +16,7 @@ import {
 import {
   hideMyRecipe,
   removeSavedRecipe,
+  removeSharedRecipe,
   saveRecipe,
   shareRecipe,
 } from "@/utils/savedRecipes";
@@ -102,6 +103,7 @@ export default function BasicRecipeCard({
 
   const handleDeleteClick = () => {
     removeSavedRecipe(recipe.recipe_id);
+    removeSharedRecipe(recipe.recipe_id);
     hideMyRecipe(recipe.recipe_id);
     setIsMenuOpen(false);
   };

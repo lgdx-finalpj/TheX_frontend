@@ -126,6 +126,10 @@ export function shareRecipe(recipeId: string) {
   addRecipeId(SHARED_RECIPE_IDS_KEY, SHARED_RECIPE_IDS_EVENT, recipeId);
 }
 
+export function removeSharedRecipe(recipeId: string) {
+  removeRecipeId(SHARED_RECIPE_IDS_KEY, SHARED_RECIPE_IDS_EVENT, recipeId);
+}
+
 export function subscribeSharedRecipes(listener: () => void) {
   return subscribeRecipeIds(
     SHARED_RECIPE_IDS_KEY,
