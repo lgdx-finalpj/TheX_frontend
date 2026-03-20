@@ -1,7 +1,10 @@
 import "./DeviceCards.css";
 import "./DevicePageContent.css";
-import { devicePageDevices, type DevicePageDevice } from "@/mocks/devicePageDevices";
+import { createAndAssignProductGroup } from "@/api/productGroups";
+import { useMyProductDevices } from "@/hooks/useMyProductDevices";
+import type { DevicePageDevice } from "@/mocks/devicePageDevices";
 import { getDeviceDetailPath } from "@/utils/deviceRoutes";
+import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,14 +35,16 @@ interface DeviceCardProps {
   device: DevicePageDevice;
   isGroupingMode: boolean;
   isSelected: boolean;
-  onToggleSelection: (deviceId: string) => void;
-  onOpenDevice: (deviceId: string) => void;
+  isSubmitting: boolean;
+  onToggleSelection: (deviceId: number) => void;
+  onOpenDevice: (deviceId: number) => void;
 }
 
 function DeviceCard({
   device,
   isGroupingMode,
   isSelected,
+  isSubmitting,
   onToggleSelection,
   onOpenDevice,
 }: DeviceCardProps) {
@@ -81,6 +86,7 @@ function DeviceCard({
         onClick={() => onToggleSelection(device.id)}
         aria-pressed={isSelected}
         aria-label={`${device.name} ${device.statusLabel}`}
+        disabled={isSubmitting}
       >
         {cardContent}
       </button>
@@ -124,7 +130,7 @@ function ValidationModal({ message, onClose }: ValidationModalProps) {
         onClick={(event) => event.stopPropagation()}
       >
         <p className="validation-modal__eyebrow">제품 그룹화 안내</p>
-        <h2 id="validation-modal-title">잠깐만 확인해 주세요</h2>
+        <h2 id="validation-modal-title">입력값을 확인해주세요</h2>
         <p id="validation-modal-description" className="validation-modal__message">
           {message}
         </p>
@@ -140,25 +146,81 @@ function ValidationModal({ message, onClose }: ValidationModalProps) {
   );
 }
 
+function getApiErrorMessage(error: unknown) {
+  if (axios.isAxiosError(error)) {
+    const requestUrl = error.config?.url ?? "";
+    const isProductGroupApiRequest = requestUrl.includes("/api/product/");
+    const currentOrigin =
+      typeof window !== "undefined" ? window.location.origin : "";
+    const resolvedBaseUrl = error.config?.baseURL ?? currentOrigin;
+    const isGoingToViteDevServer =
+      resolvedBaseUrl.includes("localhost:5173") ||
+      resolvedBaseUrl.includes("127.0.0.1:5173");
+
+    if (
+      error.response?.status === 404 &&
+      isProductGroupApiRequest &&
+      isGoingToViteDevServer
+    ) {
+      return "백엔드 API 주소가 아직 연결되지 않았어요. `.env`에 `VITE_API_BASE_URL` 또는 `VITE_API_PROXY_TARGET`을 설정한 뒤 개발 서버를 다시 실행해주세요.";
+    }
+
+    const responseData = error.response?.data;
+
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      "message" in responseData &&
+      typeof responseData.message === "string"
+    ) {
+      return responseData.message;
+    }
+
+    if (typeof responseData === "string" && responseData.trim()) {
+      return responseData;
+    }
+  }
+
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  return "제품 그룹화 API 연동 중 문제가 발생했습니다.";
+}
+
 export default function DevicePageContent() {
   const navigate = useNavigate();
+  const { devices, isLoading, error } = useMyProductDevices();
   const [isGroupingMode, setIsGroupingMode] = useState(false);
   const [groupName, setGroupName] = useState("");
-  const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<number[]>([]);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
   const [hasTouchedGroupName, setHasTouchedGroupName] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const trimmedGroupName = groupName.trim();
   const isGroupNameValid = trimmedGroupName.length >= 1;
   const hasEnoughSelectedDevices = selectedDeviceIds.length >= 2;
-  const isReadyToComplete = isGroupNameValid && hasEnoughSelectedDevices;
+  const isReadyToComplete =
+    isGroupNameValid &&
+    hasEnoughSelectedDevices &&
+    !isSubmitting &&
+    !isLoading;
 
   function handleToggleGroupingMode() {
+    if (isSubmitting || isLoading) {
+      return;
+    }
+
     setValidationMessage(null);
     setIsGroupingMode((current) => !current);
   }
 
-  function handleToggleDeviceSelection(deviceId: string) {
+  function handleToggleDeviceSelection(deviceId: number) {
+    if (isSubmitting || isLoading) {
+      return;
+    }
+
     setSelectedDeviceIds((current) =>
       current.includes(deviceId)
         ? current.filter((id) => id !== deviceId)
@@ -166,8 +228,8 @@ export default function DevicePageContent() {
     );
   }
 
-  function handleOpenDevice(deviceId: string) {
-    const selectedDevice = devicePageDevices.find((device) => device.id === deviceId);
+  function handleOpenDevice(deviceId: number) {
+    const selectedDevice = devices.find((device) => device.id === deviceId);
     const deviceDetailPath = selectedDevice
       ? getDeviceDetailPath(selectedDevice.productCode)
       : undefined;
@@ -177,9 +239,9 @@ export default function DevicePageContent() {
     }
   }
 
-  function handleCompleteGrouping() {
+  async function handleCompleteGrouping() {
     if (!isGroupNameValid) {
-      setValidationMessage("그룹화 이름을 설정하세요.");
+      setValidationMessage("그룹 이름을 입력해주세요.");
       return;
     }
 
@@ -188,13 +250,28 @@ export default function DevicePageContent() {
       return;
     }
 
-    navigate("/devices/grouped", {
-      state: {
-        fromGrouping: true,
-        groupName: trimmedGroupName,
-        selectedDeviceIds,
-      },
-    });
+    if (isSubmitting || isLoading) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setValidationMessage(null);
+
+      await createAndAssignProductGroup(trimmedGroupName, selectedDeviceIds);
+
+      navigate("/devices/grouped", {
+        state: {
+          fromGrouping: true,
+          groupName: trimmedGroupName,
+          selectedDeviceIds,
+        },
+      });
+    } catch (requestError) {
+      setValidationMessage(getApiErrorMessage(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -206,6 +283,7 @@ export default function DevicePageContent() {
             isGroupingMode ? " grouping-toggle--active" : ""
           }`}
           onClick={handleToggleGroupingMode}
+          disabled={isSubmitting || isLoading}
         >
           <span className="grouping-toggle__icon">
             <ProductGroupIcon />
@@ -220,7 +298,7 @@ export default function DevicePageContent() {
                 <h2>제품 그룹화</h2>
                 {hasTouchedGroupName && !isGroupNameValid ? (
                   <p className="grouping-panel__helper grouping-panel__helper--error">
-                    그룹화 이름은 필수 입력값이에요.
+                    그룹 이름은 필수 입력값이에요.
                   </p>
                 ) : null}
               </div>
@@ -233,8 +311,9 @@ export default function DevicePageContent() {
                 }`}
                 onClick={handleCompleteGrouping}
                 aria-disabled={!isReadyToComplete}
+                disabled={isSubmitting || isLoading}
               >
-                완료
+                {isSubmitting ? "저장 중..." : "완료"}
               </button>
             </div>
 
@@ -247,28 +326,40 @@ export default function DevicePageContent() {
                 placeholder="제품 그룹화 이름 설정"
                 rows={2}
                 aria-invalid={!isGroupNameValid}
+                disabled={isSubmitting || isLoading}
               />
             </label>
 
             <p
               className={`grouping-panel__helper${
-                hasEnoughSelectedDevices ? "" : " grouping-panel__helper--error"
+                isLoading || hasEnoughSelectedDevices
+                  ? ""
+                  : " grouping-panel__helper--error"
               }`}
             >
-              {hasEnoughSelectedDevices
-                ? `${selectedDeviceIds.length}개의 제품이 선택되었어요.`
-                : "그룹화할 제품을 2개 이상 선택해 주세요."}
+              {isLoading
+                ? "제품 목록을 불러오는 중입니다."
+                : hasEnoughSelectedDevices
+                  ? `${selectedDeviceIds.length}개의 제품을 선택했어요.`
+                  : "그룹화할 제품을 2개 이상 선택해주세요."}
             </p>
           </section>
         ) : null}
 
+        {!isLoading && error ? (
+          <p className="grouping-panel__helper grouping-panel__helper--error">
+            {error}
+          </p>
+        ) : null}
+
         <section className="device-page-grid" aria-label="등록된 디바이스">
-          {devicePageDevices.map((device) => (
+          {devices.map((device) => (
             <DeviceCard
               key={device.id}
               device={device}
               isGroupingMode={isGroupingMode}
               isSelected={selectedDeviceIds.includes(device.id)}
+              isSubmitting={isSubmitting || isLoading}
               onToggleSelection={handleToggleDeviceSelection}
               onOpenDevice={handleOpenDevice}
             />
