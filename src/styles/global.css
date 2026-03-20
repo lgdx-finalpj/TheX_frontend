@@ -769,6 +769,11 @@ input::placeholder {
   outline: 0;
 }
 
+.recipe-create-form__card input::placeholder,
+.recipe-create-form__card textarea::placeholder {
+  color: #a7acb4;
+}
+
 .recipe-create-form__inline-field {
   display: flex;
   align-items: center;

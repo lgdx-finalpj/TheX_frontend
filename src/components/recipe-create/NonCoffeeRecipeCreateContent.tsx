@@ -11,6 +11,32 @@ const categoryMap = {
   tea: "차",
 } as const;
 
+const nonCoffeeExamples = {
+  smoothie: {
+    recipe_name: "블루베리 스무디 집버전",
+    ingredient: "블루베리 100g, 우유 120ml, 얼음, 꿀",
+    total_size: "220",
+    recipe_level: "쉬움",
+    recipe_content:
+      "1. 블루베리를 깨끗한 물에 씻어 준비한다.\n2. 믹서기에 블루베리 100g 등 준비물을 전부 넣는다.\n3. 기호에 따라 꿀 또는 시럽 1큰술을 추가한다.\n4. 믹서기로 약 30초 정도 갈아 스무디 상태로 만든다.\n5. 완성된 블루베리 스무디를 컵에 담아 마신다.",
+  },
+  tea: {
+    recipe_name: "유자차 홈카페 버전",
+    ingredient: "유자청 30g, 따뜻한 물 180ml, 레몬 슬라이스",
+    total_size: "180",
+    recipe_level: "쉬움",
+    recipe_content:
+      "1. 컵에 유자청 30g을 넣는다.\n2. 따뜻한 물 180ml를 천천히 붓는다.\n3. 유자청이 잘 풀리도록 가볍게 저어준다.\n4. 기호에 따라 레몬 슬라이스를 올린다.\n5. 향이 살아 있을 때 따뜻하게 즐긴다.",
+  },
+} as const;
+
+type FieldKey =
+  | "recipe_name"
+  | "ingredient"
+  | "total_size"
+  | "recipe_level"
+  | "recipe_content";
+
 export default function NonCoffeeRecipeCreateContent() {
   const navigate = useNavigate();
   const { categoryKey } = useParams();
@@ -23,24 +49,27 @@ export default function NonCoffeeRecipeCreateContent() {
           : null,
     [categoryKey],
   );
-  const [recipeName, setRecipeName] = useState("블루베리 스무디 집버전");
-  const [ingredient, setIngredient] = useState("블루베리 100g, 우유 120ml, 얼음, 꿀");
-  const [totalSize, setTotalSize] = useState("220");
-  const [recipeLevel, setRecipeLevel] = useState("쉬움");
-  const [recipeContent, setRecipeContent] = useState(
-    "1. 블루베리를 깨끗한 물에 씻어 준비한다.\n2. 믹서기에 블루베리 100g 등 준비물을 전부 넣는다.\n3. 기호에 따라 꿀 또는 시럽 1큰술을 추가한다.\n4. 믹서기로 약 30초 정도 갈아 스무디 상태로 만든다.\n5. 완성된 블루베리 스무디를 컵에 담아 마신다.",
-  );
+  const exampleSet = categoryKey === "tea" ? nonCoffeeExamples.tea : nonCoffeeExamples.smoothie;
+  const [focusedField, setFocusedField] = useState<FieldKey | null>(null);
+  const [recipeName, setRecipeName] = useState("");
+  const [ingredient, setIngredient] = useState("");
+  const [totalSize, setTotalSize] = useState("");
+  const [recipeLevel, setRecipeLevel] = useState("");
+  const [recipeContent, setRecipeContent] = useState("");
 
   if (!recipeCategory) {
     return null;
   }
 
   const isFormValid =
-    recipeName.trim() &&
-    ingredient.trim() &&
-    totalSize.trim() &&
-    recipeLevel.trim() &&
-    recipeContent.trim();
+    recipeName.trim() !== "" &&
+    ingredient.trim() !== "" &&
+    totalSize.trim() !== "" &&
+    recipeLevel.trim() !== "" &&
+    recipeContent.trim() !== "";
+
+  const getPlaceholder = (field: FieldKey, example: string) =>
+    focusedField === field ? "" : example;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -91,6 +120,9 @@ export default function NonCoffeeRecipeCreateContent() {
             <span className="recipe-create-form__label">레시피 이름</span>
             <input
               value={recipeName}
+              placeholder={getPlaceholder("recipe_name", exampleSet.recipe_name)}
+              onFocus={() => setFocusedField("recipe_name")}
+              onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeName(event.target.value)}
             />
           </label>
@@ -100,6 +132,9 @@ export default function NonCoffeeRecipeCreateContent() {
             <textarea
               rows={2}
               value={ingredient}
+              placeholder={getPlaceholder("ingredient", exampleSet.ingredient)}
+              onFocus={() => setFocusedField("ingredient")}
+              onBlur={() => setFocusedField(null)}
               onChange={(event) => setIngredient(event.target.value)}
             />
           </label>
@@ -110,6 +145,9 @@ export default function NonCoffeeRecipeCreateContent() {
               <input
                 inputMode="numeric"
                 value={totalSize}
+                placeholder={getPlaceholder("total_size", exampleSet.total_size)}
+                onFocus={() => setFocusedField("total_size")}
+                onBlur={() => setFocusedField(null)}
                 onChange={(event) => setTotalSize(event.target.value)}
               />
               <span>ml</span>
@@ -120,6 +158,9 @@ export default function NonCoffeeRecipeCreateContent() {
             <span className="recipe-create-form__label">레시피 난이도</span>
             <input
               value={recipeLevel}
+              placeholder={getPlaceholder("recipe_level", exampleSet.recipe_level)}
+              onFocus={() => setFocusedField("recipe_level")}
+              onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeLevel(event.target.value)}
             />
           </label>
@@ -129,6 +170,9 @@ export default function NonCoffeeRecipeCreateContent() {
             <textarea
               rows={6}
               value={recipeContent}
+              placeholder={getPlaceholder("recipe_content", exampleSet.recipe_content)}
+              onFocus={() => setFocusedField("recipe_content")}
+              onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeContent(event.target.value)}
             />
           </label>
