@@ -2,21 +2,22 @@ import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
+import { MY_RECIPE_ROUTE } from "@/routes/paths";
 import { createNonCoffeeRecipe } from "@/utils/customRecipes";
 import { saveRecipe } from "@/utils/savedRecipes";
-import { MY_RECIPE_ROUTE } from "@/routes/paths";
 
 const categoryMap = {
   smoothie: "스무디",
   tea: "차",
 } as const;
 
+const recipeLevelOptions = ["쉬움", "보통", "어려움"] as const;
+
 const nonCoffeeExamples = {
   smoothie: {
     recipe_name: "블루베리 스무디 집버전",
     ingredient: "블루베리 100g, 우유 120ml, 얼음, 꿀",
     total_size: "220",
-    recipe_level: "쉬움",
     recipe_content:
       "1. 블루베리를 깨끗한 물에 씻어 준비한다.\n2. 믹서기에 블루베리 100g 등 준비물을 전부 넣는다.\n3. 기호에 따라 꿀 또는 시럽 1큰술을 추가한다.\n4. 믹서기로 약 30초 정도 갈아 스무디 상태로 만든다.\n5. 완성된 블루베리 스무디를 컵에 담아 마신다.",
   },
@@ -24,18 +25,12 @@ const nonCoffeeExamples = {
     recipe_name: "유자차 홈카페 버전",
     ingredient: "유자청 30g, 따뜻한 물 180ml, 레몬 슬라이스",
     total_size: "180",
-    recipe_level: "쉬움",
     recipe_content:
       "1. 컵에 유자청 30g을 넣는다.\n2. 따뜻한 물 180ml를 천천히 붓는다.\n3. 유자청이 잘 풀리도록 가볍게 저어준다.\n4. 기호에 따라 레몬 슬라이스를 올린다.\n5. 향이 살아 있을 때 따뜻하게 즐긴다.",
   },
 } as const;
 
-type FieldKey =
-  | "recipe_name"
-  | "ingredient"
-  | "total_size"
-  | "recipe_level"
-  | "recipe_content";
+type FieldKey = "recipe_name" | "ingredient" | "total_size" | "recipe_content";
 
 export default function NonCoffeeRecipeCreateContent() {
   const navigate = useNavigate();
@@ -49,7 +44,8 @@ export default function NonCoffeeRecipeCreateContent() {
           : null,
     [categoryKey],
   );
-  const exampleSet = categoryKey === "tea" ? nonCoffeeExamples.tea : nonCoffeeExamples.smoothie;
+  const exampleSet =
+    categoryKey === "tea" ? nonCoffeeExamples.tea : nonCoffeeExamples.smoothie;
   const [focusedField, setFocusedField] = useState<FieldKey | null>(null);
   const [recipeName, setRecipeName] = useState("");
   const [ingredient, setIngredient] = useState("");
@@ -154,16 +150,29 @@ export default function NonCoffeeRecipeCreateContent() {
             </div>
           </label>
 
-          <label className="recipe-create-form__card">
+          <div className="recipe-create-form__card">
             <span className="recipe-create-form__label">레시피 난이도</span>
-            <input
-              value={recipeLevel}
-              placeholder={getPlaceholder("recipe_level", exampleSet.recipe_level)}
-              onFocus={() => setFocusedField("recipe_level")}
-              onBlur={() => setFocusedField(null)}
-              onChange={(event) => setRecipeLevel(event.target.value)}
-            />
-          </label>
+            <div
+              className="recipe-create-form__level-toggle"
+              role="radiogroup"
+              aria-label="레시피 난이도"
+            >
+              {recipeLevelOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`recipe-create-form__level-option ${
+                    recipeLevel === option ? "is-active" : ""
+                  }`}
+                  role="radio"
+                  aria-checked={recipeLevel === option}
+                  onClick={() => setRecipeLevel(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <label className="recipe-create-form__card recipe-create-form__card--textarea">
             <span className="recipe-create-form__label">레시피 본문(논커피용)</span>
