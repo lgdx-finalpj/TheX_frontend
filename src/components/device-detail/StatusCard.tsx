@@ -13,5 +13,5 @@ export default function StatusCard({ title, lines }: StatusCardProps) {
         ))}
       </div>
     </article>
-  );
+  ); 
 }
