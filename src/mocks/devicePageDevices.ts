@@ -54,7 +54,7 @@ const productStateByCode: Record<
   },
 };
 
-const groupedDescriptionsByCode: Record<string, string[]> = {
+export const groupedDescriptionsByCode: Record<string, string[]> = {
   COFFEE001: [
     "온도: 80 °C",
     "추출시간: 30초",
@@ -75,10 +75,10 @@ const groupedDescriptionsByCode: Record<string, string[]> = {
 const defaultProductGroup = mockProductGroups[0] ?? null;
 
 export interface DevicePageDevice {
-  id: string;
+  id: number;
   productCode: string;
   productNo: string;
-  groupId: string | null;
+  groupId: number | null;
   name: string;
   iconSrc: string;
   isOn: boolean;
@@ -92,7 +92,7 @@ export const defaultGroupedDeviceIds = mockProductInfo
 export const defaultGroupedGroupName =
   defaultProductGroup?.group_name ?? "제품 그룹화";
 
-export const groupedDeviceDescriptions: Record<string, string[]> = Object.fromEntries(
+export const groupedDeviceDescriptions: Record<number, string[]> = Object.fromEntries(
   mockProductInfo.map((product) => [
     product.product_info_id,
     groupedDescriptionsByCode[product.product_code] ?? [],

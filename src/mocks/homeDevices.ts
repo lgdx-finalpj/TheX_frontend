@@ -18,7 +18,7 @@ const productIconsByCode: Record<string, string> = {
 };
 
 export interface HomeDevice {
-  id: string;
+  id: number;
   productCode: string;
   name: string;
   iconSrc?: string;

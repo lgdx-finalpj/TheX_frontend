@@ -9,17 +9,17 @@ export interface UsersInfoRecord {
 }
 
 export interface ProductGroupRecord {
-  group_id: string;
+  group_id: number;
   group_name: string;
   user_id: string;
 }
 
 export interface ProductInfoRecord {
-  product_info_id: string;
+  product_info_id: number;
   product_name: string;
   product_code: string;
   product_no: string;
-  group_id: string | null;
+  group_id: number | null;
 }
 
 export const mockUserInfo: UsersInfoRecord = {
@@ -42,7 +42,7 @@ export const mockUserInfo: UsersInfoRecord = {
 
 export const mockProductGroups: ProductGroupRecord[] = [
   {
-    group_id: "GROUP0000000001",
+    group_id: 1,
     group_name: "LG Home Cafe Solution",
     user_id: mockUserInfo.user_id,
   },
@@ -52,49 +52,49 @@ const defaultGroupId = mockProductGroups[0]?.group_id ?? null;
 
 export const mockProductInfo: ProductInfoRecord[] = [
   {
-    product_info_id: "PRDINFO0001",
+    product_info_id: 1,
     product_name: "커피머신",
     product_code: "COFFEE001",
     product_no: "CM-2026-LHCS-0001",
     group_id: defaultGroupId,
   },
   {
-    product_info_id: "PRDINFO0002",
+    product_info_id: 2,
     product_name: "조명",
     product_code: "LIGHT001",
     product_no: "LT-2026-LHCS-0001",
     group_id: defaultGroupId,
   },
   {
-    product_info_id: "PRDINFO0003",
+    product_info_id: 3,
     product_name: "세탁기",
     product_code: "WASHER001",
     product_no: "WM-2026-LHCS-0001",
     group_id: null,
   },
   {
-    product_info_id: "PRDINFO0004",
+    product_info_id: 4,
     product_name: "스피커",
     product_code: "SPEAKER01",
     product_no: "SP-2026-LHCS-0001",
     group_id: defaultGroupId,
   },
   {
-    product_info_id: "PRDINFO0005",
+    product_info_id: 5,
     product_name: "텔레비전",
     product_code: "TV001",
     product_no: "TV-2026-LHCS-0001",
     group_id: null,
   },
   {
-    product_info_id: "PRDINFO0006",
+    product_info_id: 6,
     product_name: "냉장고",
     product_code: "FRIDGE001",
     product_no: "RF-2026-LHCS-0001",
     group_id: null,
   },
   {
-    product_info_id: "PRDINFO0007",
+    product_info_id: 7,
     product_name: "에어컨",
     product_code: "AIRCON001",
     product_no: "AC-2026-LHCS-0001",

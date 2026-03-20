@@ -2,11 +2,11 @@ import "./GroupedDevicePage.css";
 import GroupedDeviceContent from "@/components/grouped-device/GroupedDeviceContent";
 import HomeHeader from "@/components/home/HomeHeader";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
+import { useMyProductDevices } from "@/hooks/useMyProductDevices";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
   defaultGroupedDeviceIds,
   defaultGroupedGroupName,
-  devicePageDevices,
 } from "@/mocks/devicePageDevices";
 import { getDeviceDetailPath } from "@/utils/deviceRoutes";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -14,12 +14,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 interface GroupedDevicePageLocationState {
   fromGrouping?: boolean;
   groupName?: string;
-  selectedDeviceIds?: string[];
+  selectedDeviceIds?: number[];
 }
 
 export default function GroupedDevicePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { devices } = useMyProductDevices();
   const state =
     (location.state as GroupedDevicePageLocationState | null) ?? null;
 
@@ -33,15 +34,15 @@ export default function GroupedDevicePage() {
       ? state.groupName.trim() || "제품 그룹화"
       : defaultGroupedGroupName;
 
-  const groupedDevices = devicePageDevices.filter((device) =>
+  const groupedDevices = devices.filter((device) =>
     selectedDeviceIds.includes(device.id),
   );
-  const otherDevices = devicePageDevices.filter(
+  const otherDevices = devices.filter(
     (device) => !selectedDeviceIds.includes(device.id),
   );
 
-  function handleOpenDevice(deviceId: string) {
-    const selectedDevice = devicePageDevices.find(
+  function handleOpenDevice(deviceId: number) {
+    const selectedDevice = devices.find(
       (device) => device.id === deviceId,
     );
     const deviceDetailPath = selectedDevice

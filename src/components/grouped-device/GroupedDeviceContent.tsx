@@ -1,7 +1,7 @@
 import "./GroupedDeviceContent.css";
 import "@/components/device-page/DeviceCards.css";
 import {
-  groupedDeviceDescriptions,
+  groupedDescriptionsByCode,
   type DevicePageDevice,
 } from "@/mocks/devicePageDevices";
 import { getDeviceDetailPath } from "@/utils/deviceRoutes";
@@ -11,16 +11,16 @@ interface GroupedDeviceContentProps {
   groupedDevices: DevicePageDevice[];
   otherDevices: DevicePageDevice[];
   onReleaseGrouping: () => void;
-  onOpenDevice: (deviceId: string) => void;
+  onOpenDevice: (deviceId: number) => void;
 }
 
 interface GroupedDeviceCardProps {
   device: DevicePageDevice;
-  onOpenDevice: (deviceId: string) => void;
+  onOpenDevice: (deviceId: number) => void;
 }
 
 function GroupedDeviceCard({ device, onOpenDevice }: GroupedDeviceCardProps) {
-  const detailLines = groupedDeviceDescriptions[device.id] ?? [];
+  const detailLines = groupedDescriptionsByCode[device.productCode] ?? [];
   const deviceDetailPath = getDeviceDetailPath(device.productCode);
   const isInteractive = Boolean(deviceDetailPath);
 
@@ -81,7 +81,7 @@ function GroupedDeviceCard({ device, onOpenDevice }: GroupedDeviceCardProps) {
 
 interface OtherDeviceCardProps {
   device: DevicePageDevice;
-  onOpenDevice: (deviceId: string) => void;
+  onOpenDevice: (deviceId: number) => void;
 }
 
 function OtherDeviceCard({ device, onOpenDevice }: OtherDeviceCardProps) {

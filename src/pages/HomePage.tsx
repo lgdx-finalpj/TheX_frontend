@@ -4,15 +4,23 @@ import DeviceSection from "@/components/home/DeviceSection";
 import HomeHeader from "@/components/home/HomeHeader";
 import SmartRoutineSection from "@/components/home/SmartRoutineSection";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
+import { useMyProductDevices } from "@/hooks/useMyProductDevices";
 import MobileLayout from "@/layouts/MobileLayout";
-import { homeDevices } from "@/mocks/homeDevices";
 import { getDeviceDetailPath } from "@/utils/deviceRoutes";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { devices } = useMyProductDevices();
 
-  function handleOpenDevice(deviceId: string) {
+  const homeDevices = devices.map((device) => ({
+    id: device.id,
+    productCode: device.productCode,
+    name: device.name,
+    iconSrc: device.iconSrc,
+  }));
+
+  function handleOpenDevice(deviceId: number) {
     const selectedDevice = homeDevices.find((device) => device.id === deviceId);
     const deviceDetailPath = selectedDevice
       ? getDeviceDetailPath(selectedDevice.productCode)

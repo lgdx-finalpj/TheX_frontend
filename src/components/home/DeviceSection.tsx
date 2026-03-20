@@ -6,7 +6,7 @@ import { getDeviceDetailPath } from "@/utils/deviceRoutes";
 interface DeviceSectionProps {
   devices: HomeDevice[];
   onOpenDevices: () => void;
-  onOpenDevice: (deviceId: string) => void;
+  onOpenDevice: (deviceId: number) => void;
 }
 
 export default function DeviceSection({
