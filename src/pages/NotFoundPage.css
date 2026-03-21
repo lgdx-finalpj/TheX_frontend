@@ -1,0 +1,24 @@
+.page-header {
+  padding: 56px 24px 16px;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.page-header p {
+  margin: 10px 0 0;
+  color: #555d68;
+}
+
+.card {
+  margin: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(40, 46, 56, 0.06);
+}
