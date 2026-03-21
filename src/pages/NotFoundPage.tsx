@@ -1,5 +1,6 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import { Link } from "react-router-dom";
+import "./NotFoundPage.css";
 
 export default function NotFoundPage() {
   return (

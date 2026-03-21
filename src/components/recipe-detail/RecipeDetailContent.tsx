@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import plusIcon from "@/assets/icon_image/+ 아이콘.png";
-import bellIcon from "@/assets/icon_image/종모양 아이콘.png";
-import downArrowIcon from "@/assets/icon_image/keyboard_arrow_down 아이콘.png";
+import "@/components/basic-recipes/BasicRecipe.css";
+import HomeHeader from "@/components/basic-recipes/HomeHeader";
+import "./RecipeDetail.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
-import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import starIcon from "@/assets/icon_image/별 아이콘.png";
 import thermometerIcon from "@/assets/icon_image/온도계 아이콘.png";
 import beanIcon from "@/assets/icon_image/원두 아이콘.png";
@@ -40,24 +39,7 @@ export default function RecipeDetailContent({
   return (
     <div className="page recipe-detail-page">
       <header className="recipe-page__header">
-        <div className="recipe-page__topbar">
-          <button type="button" className="recipe-page__location">
-            <span>LHCS 홈</span>
-            <img src={downArrowIcon} alt="" aria-hidden="true" />
-          </button>
-
-          <div className="recipe-page__header-actions">
-            <button type="button" className="icon-button" aria-label="추가">
-              <img src={plusIcon} alt="" aria-hidden="true" />
-            </button>
-            <button type="button" className="icon-button" aria-label="알림">
-              <img src={bellIcon} alt="" aria-hidden="true" />
-            </button>
-            <button type="button" className="icon-button" aria-label="더보기">
-              <img src={moreIcon} alt="" aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+        <HomeHeader />
 
         <div className="recipe-detail__nav">
           <button

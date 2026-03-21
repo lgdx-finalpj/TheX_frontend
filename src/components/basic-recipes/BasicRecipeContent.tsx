@@ -1,6 +1,7 @@
 import { useState } from "react";
+import "./BasicRecipe.css";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
-import BasicRecipeHeader from "@/components/basic-recipes/BasicRecipeHeader";
+import HomeHeader from "@/components/basic-recipes/HomeHeader";
 import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
 import {
   recipeFlavorChips,
@@ -53,11 +54,21 @@ export default function BasicRecipeContent({
 
   return (
     <div className="page recipe-page">
-      <BasicRecipeHeader
-        tabs={recipeTabs}
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-      />
+      <header className="recipe-page__header">
+        <HomeHeader />
+        <nav className="recipe-page__tabs" aria-label="레시피 탭">
+          {recipeTabs.map((tab) => (
+            <button
+              key={tab.tab_key}
+              type="button"
+              className={`recipe-page__tab ${activeTab === tab.tab_key ? "is-active" : ""}`}
+              onClick={() => onTabChange(tab.tab_key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
       <main className="page-content recipe-page__content">
         <BasicRecipeFilters

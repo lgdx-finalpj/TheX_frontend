@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import "./RecipeCreate.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";

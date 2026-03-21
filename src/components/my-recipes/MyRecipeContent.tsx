@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
+import "@/components/basic-recipes/BasicRecipe.css";
 import { useNavigate } from "react-router-dom";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
-import BasicRecipeHeader from "@/components/basic-recipes/BasicRecipeHeader";
 import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
+import HomeHeader from "@/components/basic-recipes/HomeHeader";
 import useCustomRecipes from "@/hooks/useCustomRecipes";
 import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
 import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
@@ -66,11 +67,21 @@ export default function MyRecipeContent() {
 
   return (
     <div className="page recipe-page my-recipe-page">
-      <BasicRecipeHeader
-        tabs={recipeTabs}
-        activeTab="mine"
-        onTabChange={handleTabChange}
-      />
+      <header className="recipe-page__header">
+        <HomeHeader />
+        <nav className="recipe-page__tabs" aria-label="레시피 탭">
+          {recipeTabs.map((tab) => (
+            <button
+              key={tab.tab_key}
+              type="button"
+              className={`recipe-page__tab ${tab.tab_key === "mine" ? "is-active" : ""}`}
+              onClick={() => handleTabChange(tab.tab_key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
       <main className="page-content recipe-page__content my-recipe-page__content">
         <BasicRecipeFilters
