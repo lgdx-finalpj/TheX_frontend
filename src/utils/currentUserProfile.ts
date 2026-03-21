@@ -1,10 +1,10 @@
-export interface CurrentUserProfile {
+﻿export interface CurrentUserProfile {
   user_id: string;
   user_nickname: string;
 }
 
 export const DEFAULT_CURRENT_USER_PROFILE: CurrentUserProfile = {
-  user_id: "1",
+  user_id: "3",
   user_nickname: "LHCS",
 };
 
@@ -18,8 +18,8 @@ function isCurrentUserProfile(value: unknown): value is CurrentUserProfile {
 
   const candidate = value as Record<string, unknown>;
   return (
-    typeof candidate.user_id === "string" &&
-    candidate.user_id.trim() !== "" &&
+    (typeof candidate.user_id === "string" || typeof candidate.user_id === "number") &&
+    String(candidate.user_id).trim() !== "" &&
     typeof candidate.user_nickname === "string" &&
     candidate.user_nickname.trim() !== ""
   );
@@ -37,9 +37,14 @@ export function getCurrentUserProfile(): CurrentUserProfile {
 
   try {
     const parsedValue = JSON.parse(rawValue);
-    return isCurrentUserProfile(parsedValue)
-      ? parsedValue
-      : DEFAULT_CURRENT_USER_PROFILE;
+    if (!isCurrentUserProfile(parsedValue)) {
+      return DEFAULT_CURRENT_USER_PROFILE;
+    }
+
+    return {
+      user_id: String((parsedValue as { user_id: string | number }).user_id),
+      user_nickname: parsedValue.user_nickname,
+    };
   } catch {
     return DEFAULT_CURRENT_USER_PROFILE;
   }
