@@ -1,6 +1,7 @@
 .home-screen {
   position: relative;
-  padding: 28px 16px 110px;
+  padding: 28px 16px
+    calc(var(--bottom-nav-height) + 32px + env(safe-area-inset-bottom));
 }
 
 .home-content {
