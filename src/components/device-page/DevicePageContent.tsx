@@ -8,6 +8,8 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const MAX_GROUP_NAME_LENGTH = 10;
+
 function ProductGroupIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -199,7 +201,9 @@ export default function DevicePageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const trimmedGroupName = groupName.trim();
-  const isGroupNameValid = trimmedGroupName.length >= 1;
+  const isGroupNameFilled = trimmedGroupName.length >= 1;
+  const isGroupNameWithinLimit = trimmedGroupName.length <= MAX_GROUP_NAME_LENGTH;
+  const isGroupNameValid = isGroupNameFilled && isGroupNameWithinLimit;
   const hasEnoughSelectedDevices = selectedDeviceIds.length >= 2;
   const isReadyToComplete =
     isGroupNameValid &&
@@ -240,8 +244,13 @@ export default function DevicePageContent() {
   }
 
   async function handleCompleteGrouping() {
-    if (!isGroupNameValid) {
+    if (!isGroupNameFilled) {
       setValidationMessage("그룹 이름을 입력해주세요.");
+      return;
+    }
+
+    if (!isGroupNameWithinLimit) {
+      setValidationMessage(`그룹 이름은 ${MAX_GROUP_NAME_LENGTH}자 이내로 입력해주세요.`);
       return;
     }
 
@@ -298,7 +307,9 @@ export default function DevicePageContent() {
                 <h2>제품 그룹화</h2>
                 {hasTouchedGroupName && !isGroupNameValid ? (
                   <p className="grouping-panel__helper grouping-panel__helper--error">
-                    그룹 이름은 필수 입력값이에요.
+                    {isGroupNameFilled
+                      ? `그룹 이름은 ${MAX_GROUP_NAME_LENGTH}자 이내로 입력해주세요.`
+                      : "그룹 이름은 필수 입력값이에요."}
                   </p>
                 ) : null}
               </div>
@@ -321,9 +332,12 @@ export default function DevicePageContent() {
               <span className="sr-only">그룹 이름 설정</span>
               <textarea
                 value={groupName}
-                onChange={(event) => setGroupName(event.target.value)}
+                onChange={(event) =>
+                  setGroupName(event.target.value.slice(0, MAX_GROUP_NAME_LENGTH))
+                }
                 onFocus={() => setHasTouchedGroupName(true)}
                 placeholder="제품 그룹화 이름 설정"
+                maxLength={MAX_GROUP_NAME_LENGTH}
                 rows={2}
                 aria-invalid={!isGroupNameValid}
                 disabled={isSubmitting || isLoading}
