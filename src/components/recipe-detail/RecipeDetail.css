@@ -108,7 +108,7 @@
   display: grid;
   gap: 12px;
   margin-top: 7px;
-  padding: 20px 14px;
+  padding: 20px;
 }
 
 .recipe-detail__meta-list {
@@ -154,7 +154,7 @@
 }
 
 .recipe-detail__description-box {
-  padding: 20px 14px;
+  padding: 20px;
 }
 
 .recipe-detail__description-box p {

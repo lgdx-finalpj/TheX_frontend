@@ -20,7 +20,7 @@
 }
 
 .recipe-page__header {
-  background: #ffffff;
+  background:#EEF0F4;
 }
 
 .recipe-page__tabs {
@@ -73,7 +73,7 @@
   align-items: center;
   gap: 12px;
   padding-inline: 6px;
-  margin: 5px 10px 5px 10px;
+  margin: 10px;
 }
 
 .recipe-page__mode-pill {
@@ -227,8 +227,8 @@
 }
 
 .recipe-card__title {
-  font-size: 17px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: -0.9px;
   line-height: 1.16;
   white-space: normal;
