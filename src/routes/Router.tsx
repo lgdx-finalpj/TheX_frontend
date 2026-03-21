@@ -1,42 +1,24 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import BasicRecipeDetailPage from "@/pages/BasicRecipeDetailPage";
+import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
+import DevicePage from "@/pages/DevicePage";
+import GroupedDevicePage from "@/pages/GroupedDevicePage";
 import HomePage from "@/pages/HomePage";
-import MyRecipeDetailPage from "@/pages/MyRecipeDetailPage";
-import MyRecipesPage from "@/pages/MyRecipesPage";
-import NonCoffeeRecipeCreatePage from "@/pages/NonCoffeeRecipeCreatePage";
+import LightMain from "@/pages/LightMain";
 import NotFoundPage from "@/pages/NotFoundPage";
-import PopularRecipeDetailPage from "@/pages/PopularRecipeDetailPage";
-import PopularRecipePage from "@/pages/PopularRecipePage";
-import RecipeCategorySelectionPage from "@/pages/RecipeCategorySelectionPage";
-import {
-  BASIC_RECIPE_DETAIL_ROUTE,
-  BASIC_RECIPE_ROUTE,
-  MY_RECIPE_DETAIL_ROUTE,
-  MY_RECIPE_ROUTE,
-  NON_COFFEE_RECIPE_CREATE_ROUTE,
-  POPULAR_RECIPE_DETAIL_ROUTE,
-  POPULAR_RECIPE_ROUTE,
-  RECIPE_CATEGORY_SELECTION_ROUTE,
-} from "@/routes/paths";
+import SmartRoutineMain from "@/pages/SmartRoutineMain";
+import SpeakerMain from "@/pages/SpeakerMain";
 
 export default function Router() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={BASIC_RECIPE_ROUTE} replace />} />
-      <Route path={BASIC_RECIPE_ROUTE} element={<HomePage />} />
-      <Route path={BASIC_RECIPE_DETAIL_ROUTE} element={<BasicRecipeDetailPage />} />
-      <Route path={POPULAR_RECIPE_ROUTE} element={<PopularRecipePage />} />
-      <Route path={POPULAR_RECIPE_DETAIL_ROUTE} element={<PopularRecipeDetailPage />} />
-      <Route path={MY_RECIPE_ROUTE} element={<MyRecipesPage />} />
-      <Route path={MY_RECIPE_DETAIL_ROUTE} element={<MyRecipeDetailPage />} />
-      <Route
-        path={RECIPE_CATEGORY_SELECTION_ROUTE}
-        element={<RecipeCategorySelectionPage />}
-      />
-      <Route
-        path={NON_COFFEE_RECIPE_CREATE_ROUTE}
-        element={<NonCoffeeRecipeCreatePage />}
-      />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/devices" element={<DevicePage />} />
+      <Route path="/devices/grouped" element={<GroupedDevicePage />} />
+      <Route path="/devices/coffee-machine" element={<CoffeeMachineMain />} />
+      <Route path="/devices/light" element={<LightMain />} />
+      <Route path="/devices/speaker" element={<SpeakerMain />} />
+      <Route path="/speaker" element={<Navigate to="/devices/speaker" replace />} />
+      <Route path="/smartroutine" element={<SmartRoutineMain />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

@@ -1,40 +1,62 @@
-import { useNavigate } from "react-router-dom";
-import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
-import { basicBrowseRecipes, type RecipeItem, type RecipeTabKey } from "@/mocks/basicRecipes";
+import "./HomePage.css";
+import aiIcon from "@/assets/ai_icon.png";
+import DeviceSection from "@/components/home/DeviceSection";
+import HomeHeader from "@/components/home/HomeHeader";
+import SmartRoutineSection from "@/components/home/SmartRoutineSection";
+import BottomNavigation from "@/components/navigation/BottomNavigation";
+import { useMyProductDevices } from "@/hooks/useMyProductDevices";
 import MobileLayout from "@/layouts/MobileLayout";
-import {
-  getBasicRecipeDetailPath,
-  MY_RECIPE_ROUTE,
-  POPULAR_RECIPE_ROUTE,
-} from "@/routes/paths";
+import { getDeviceDetailPath } from "@/utils/deviceRoutes";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { devices } = useMyProductDevices();
 
-  const handleTabChange = (tabKey: RecipeTabKey) => {
-    switch (tabKey) {
-      case "mine":
-        navigate(MY_RECIPE_ROUTE);
-        break;
-      case "browse":
-      default:
-        break;
+  const homeDevices = devices.map((device) => ({
+    id: device.id,
+    productCode: device.productCode,
+    name: device.name,
+    iconSrc: device.iconSrc,
+  }));
+
+  function handleOpenDevice(deviceId: number) {
+    const selectedDevice = homeDevices.find((device) => device.id === deviceId);
+    const deviceDetailPath = selectedDevice
+      ? getDeviceDetailPath(selectedDevice.productCode)
+      : undefined;
+
+    if (deviceDetailPath) {
+      navigate(deviceDetailPath);
     }
-  };
-
-  const getDetailPath = (recipe: RecipeItem) => getBasicRecipeDetailPath(recipe.recipe_id);
+  }
 
   return (
     <MobileLayout>
-      <BasicRecipeContent
-        modeLabel="기본"
-        markerAccent="top"
-        recipes={basicBrowseRecipes}
-        activeTab="browse"
-        onModeClick={() => navigate(POPULAR_RECIPE_ROUTE)}
-        onTabChange={handleTabChange}
-        getDetailPath={getDetailPath}
-      />
+      <div className="page home-screen">
+        <HomeHeader />
+
+        <main className="home-content">
+          <DeviceSection
+            devices={homeDevices}
+            onOpenDevices={() => navigate("/devices")}
+            onOpenDevice={handleOpenDevice}
+          />
+          <SmartRoutineSection
+            onOpenMoodCreate={() => navigate("/smartroutine")}
+          />
+        </main>
+
+        <button
+          type="button"
+          className="floating-assistant"
+          aria-label="AI 도우미"
+        >
+          <img className="floating-assistant__image" src={aiIcon} alt="" />
+        </button>
+
+        <BottomNavigation activeTab="home" />
+      </div>
     </MobileLayout>
   );
 }

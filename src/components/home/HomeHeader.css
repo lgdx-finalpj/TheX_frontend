@@ -1,0 +1,88 @@
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.home-header__title-group {
+  min-width: 0;
+}
+
+.home-header__title-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111111;
+  cursor: default;
+}
+
+.home-header__title {
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.home-header__title-icon {
+  width: 18px;
+  height: 18px;
+  color: rgba(17, 17, 17, 0.6);
+}
+
+.home-header__title-icon svg,
+.home-header__actions svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.home-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: default;
+  padding: 0;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.icon-button--small {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-button--interactive {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .icon-button--interactive:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.icon-button--interactive:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(56, 80, 98, 0.12);
+}
