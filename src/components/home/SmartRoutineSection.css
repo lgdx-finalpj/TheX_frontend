@@ -1,0 +1,54 @@
+.routine-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  min-width: 156px;
+  min-height: 56px;
+  padding: 13px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 20px rgba(93, 117, 131, 0.08);
+  cursor: pointer;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.routine-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffa53d, #ff7a00);
+}
+
+.routine-card__spark {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #fff5ea;
+}
+
+.routine-card__label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #202020;
+}
+
+@media (hover: hover) {
+  .routine-card:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.routine-card:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(56, 80, 98, 0.12);
+}
