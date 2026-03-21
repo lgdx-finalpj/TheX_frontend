@@ -330,7 +330,8 @@ export default function DevicePageContent() {
 
             <label className="grouping-name-box">
               <span className="sr-only">그룹 이름 설정</span>
-              <textarea
+              <input
+                type="text"
                 value={groupName}
                 onChange={(event) =>
                   setGroupName(event.target.value.slice(0, MAX_GROUP_NAME_LENGTH))
@@ -338,7 +339,6 @@ export default function DevicePageContent() {
                 onFocus={() => setHasTouchedGroupName(true)}
                 placeholder="제품 그룹화 이름 설정"
                 maxLength={MAX_GROUP_NAME_LENGTH}
-                rows={2}
                 aria-invalid={!isGroupNameValid}
                 disabled={isSubmitting || isLoading}
               />

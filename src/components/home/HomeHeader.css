@@ -22,14 +22,14 @@
 }
 
 .home-header__title {
-  font-size: 1.9rem;
+  font-size: 24px;
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.6px;
 }
 
 .home-header__title-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: rgba(17, 17, 17, 0.6);
 }
 
@@ -51,8 +51,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: 0;
   border-radius: 999px;
   background: transparent;

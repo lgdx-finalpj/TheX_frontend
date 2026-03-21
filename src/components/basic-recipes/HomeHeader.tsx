@@ -12,7 +12,7 @@ export default function HomeHeader() {
   const homeOwnerNickname = user_nickname || "사용자";
 
   return (
-    <header className="home-header">
+    <header className="home-header home-header--recipe">
       <div className="home-header__title-group">
         <button
           type="button"

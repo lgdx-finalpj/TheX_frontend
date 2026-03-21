@@ -1,20 +1,19 @@
-﻿.home-header {
+.home-header--recipe {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 12px;
-  margin-bottom: 12px;
-  padding-top: 20px;
+  margin: 0 0 24px;
+  padding-top: 28px;
   padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
 }
 
-.home-header__title-group {
+.home-header--recipe .home-header__title-group {
   min-width: 0;
 }
 
-.home-header__title-button {
+.home-header--recipe .home-header__title-button {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -25,33 +24,33 @@
   cursor: default;
 }
 
-.home-header__title {
+.home-header--recipe .home-header__title {
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.6px;
 }
 
-.home-header__title-icon {
-  width: 18px;
-  height: 18px;
+.home-header--recipe .home-header__title-icon {
+  width: 16px;
+  height: 16px;
   color: rgba(17, 17, 17, 0.6);
 }
 
-.home-header__title-icon svg,
-.home-header__actions svg {
+.home-header--recipe .home-header__title-icon svg,
+.home-header--recipe .home-header__actions svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.home-header__actions {
+.home-header--recipe .home-header__actions {
   display: flex;
   align-items: center;
   gap: 2px;
   color: rgba(17, 17, 17, 0.45);
 }
 
-.home-header .icon-button {
+.home-header--recipe .icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -71,34 +70,33 @@
     color 120ms ease;
 }
 
-.home-header .icon-button--small {
+.home-header--recipe .icon-button--small {
   width: 24px;
   height: 24px;
 }
 
-.home-header .icon-button--interactive {
+.home-header--recipe .icon-button--interactive {
   cursor: pointer;
 }
 
 @media (hover: hover) {
-  .home-header .icon-button--interactive:hover {
+  .home-header--recipe .icon-button--interactive:hover {
     transform: translateY(-1px);
   }
 }
 
-.home-header .icon-button--interactive:active {
+.home-header--recipe .icon-button--interactive:active {
   transform: translateY(1px) scale(0.98);
   box-shadow: 0 4px 12px rgba(56, 80, 98, 0.12);
 }
 
 @media (max-width: 360px) {
-  .home-header {
-    padding-top: 32px;
+  .home-header--recipe {
     margin-bottom: 18px;
+    padding-top: 24px;
   }
 
-  .home-header__title {
-    font-size: 26px;
+  .home-header--recipe .home-header__title {
+    font-size: 22px;
   }
 }
-

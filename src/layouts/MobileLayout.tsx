@@ -11,7 +11,12 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
     <div className="app-shell">
       <div
         className="mobile-frame"
-        style={{ backgroundImage: `url(${backgroundColor1})` }}
+        style={{
+          backgroundImage: `url(${backgroundColor1})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
       >
         {children}
       </div>

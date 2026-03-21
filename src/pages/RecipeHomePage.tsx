@@ -164,7 +164,7 @@ export default function RecipeHomePage() {
   };
 
   const getDetailPath = useCallback(
-    (recipe: RecipeItem) => getBasicRecipeDetailPath(recipe.recipe_id, recipe.is_coffee),
+    (recipe: RecipeItem) => getBasicRecipeDetailPath(String(recipe.recipe_id)),
     [],
   );
 

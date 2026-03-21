@@ -155,7 +155,7 @@ export default function MyRecipeContent() {
         />
         <BasicRecipeList
           recipes={isLoading || errorMessage ? [] : filteredRecipes}
-          getDetailPath={(recipe) => getMyRecipeDetailPath(recipe.recipe_id, recipe.is_coffee)}
+          getDetailPath={(recipe) => getMyRecipeDetailPath(String(recipe.recipe_id))}
           listLabel="나의 레시피 목록"
           emptyTitle={
             isLoading

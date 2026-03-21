@@ -1,6 +1,6 @@
 .recipe-category-page--selection .recipe-category-page__content {
   min-height: 100dvh;
-  padding-top: 20px;
+  padding-top: 28px;
   padding-bottom: 30px;
   padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));

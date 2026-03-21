@@ -164,7 +164,7 @@ export default function PopularRecipePage() {
   };
 
   const getDetailPath = useCallback(
-    (recipe: RecipeItem) => getPopularRecipeDetailPath(recipe.recipe_id, recipe.is_coffee),
+    (recipe: RecipeItem) => getPopularRecipeDetailPath(String(recipe.recipe_id)),
     [],
   );
 

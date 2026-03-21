@@ -1,6 +1,6 @@
 ﻿import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./NoneCoffeeRecipeCreate.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
@@ -38,8 +38,7 @@ type FieldKey = "recipe_name" | "ingredient" | "total_size" | "recipe_content";
 
 export default function NonCoffeeRecipeCreateContent() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const categoryKey = searchParams.get("categoryKey");
+  const { categoryKey } = useParams();
   const recipeCategory = useMemo(
     () =>
       categoryKey === "tea"

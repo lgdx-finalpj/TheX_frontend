@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/client";
+import apiClient from "@/api/client";
 
 type GroupIdentifier = string | number;
 
@@ -74,7 +74,7 @@ function extractGroupIdFromResponse(value: unknown): number | null {
 }
 
 export async function createProductGroup(groupName: string) {
-  const response = await apiClient.post("/api/product/create-group", {
+  const response = await apiClient.post("/product/create-group", {
     groupName,
   });
 
@@ -93,7 +93,7 @@ export async function assignProductsToGroup({
   groupId,
   productInfoIds,
 }: AssignProductsToGroupRequest) {
-  await apiClient.patch("/api/product/group", {
+  await apiClient.patch("/product/group", {
     groupId,
     productInfoIds,
   });

@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/client";
+import apiClient from "@/api/client";
 
 export interface MyProductListItem {
   productInfoId: number;
@@ -19,7 +19,7 @@ function isMyProductListItem(value: unknown): value is MyProductListItem {
 }
 
 export async function getMyProductList() {
-  const response = await apiClient.get("/api/auth/my-product-list");
+  const response = await apiClient.get("/auth/my-product-list");
 
   if (!Array.isArray(response.data)) {
     throw new Error("내 제품 목록 응답 형식이 올바르지 않습니다.");
