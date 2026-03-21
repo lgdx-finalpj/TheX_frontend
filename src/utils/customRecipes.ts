@@ -1,9 +1,8 @@
 import {
-  CURRENT_USER_ID,
-  CURRENT_USER_NICKNAME,
   type RecipeCategory,
   type RecipeItem,
 } from "@/mocks/basicRecipes";
+import { getCurrentUserProfile } from "@/utils/currentUserProfile";
 
 const CUSTOM_RECIPES_KEY = "custom-recipe-items";
 const CUSTOM_RECIPES_EVENT = "custom-recipe-items-change";
@@ -50,6 +49,7 @@ export function getCustomRecipes() {
 }
 
 export function createNonCoffeeRecipe(input: CreateNonCoffeeRecipeInput) {
+  const { user_id, user_nickname } = getCurrentUserProfile();
   const recipeId = `non_coffee_recipe_custom_${Date.now()}`;
   const customRecipe: RecipeItem = {
     recipe_id: recipeId,
@@ -61,8 +61,8 @@ export function createNonCoffeeRecipe(input: CreateNonCoffeeRecipeInput) {
     filter_label: "콜드브루",
     recipe_level: input.recipe_level.trim(),
     total_size: `${input.total_size.trim()}mL`,
-    user_id: CURRENT_USER_ID,
-    user_nickname: CURRENT_USER_NICKNAME,
+    user_id,
+    user_nickname,
     ingredient: input.ingredient.trim(),
     recipe_content: input.recipe_content.trim(),
   };

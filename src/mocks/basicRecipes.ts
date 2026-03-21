@@ -1,3 +1,8 @@
+import {
+  DEFAULT_CURRENT_USER_PROFILE,
+  getCurrentUserProfile,
+} from "@/utils/currentUserProfile";
+
 export const recipeTabs = [
   { tab_key: "browse", label: "레시피 조회" },
   { tab_key: "mine", label: "나의 레시피" },
@@ -10,8 +15,8 @@ export const recipeFlavorChips = [
   "콜드브루",
 ] as const;
 
-export const CURRENT_USER_ID = "1";
-export const CURRENT_USER_NICKNAME = "LHCS";
+export const CURRENT_USER_ID = DEFAULT_CURRENT_USER_PROFILE.user_id;
+export const CURRENT_USER_NICKNAME = DEFAULT_CURRENT_USER_PROFILE.user_nickname;
 
 export type RecipeCategory = "커피" | "스무디" | "차";
 export type RecipeSource = "basic" | "popular";
@@ -129,13 +134,15 @@ export const popularBrowseRecipes = [
 export const allRecipes = [...basicBrowseRecipes, ...popularBrowseRecipes];
 
 export function canCurrentUserShareRecipes() {
-  return CURRENT_USER_ID === "1" && CURRENT_USER_NICKNAME === "LHCS";
+  const { user_id, user_nickname } = getCurrentUserProfile();
+  return user_id.trim() !== "" && user_nickname.trim() !== "";
 }
 
 export function isRecipeOwnedByCurrentUser(recipe: RecipeItem) {
+  const { user_id, user_nickname } = getCurrentUserProfile();
   return (
-    recipe.user_id === CURRENT_USER_ID &&
-    recipe.user_nickname === CURRENT_USER_NICKNAME
+    recipe.user_id === user_id &&
+    recipe.user_nickname === user_nickname
   );
 }
 
@@ -143,6 +150,8 @@ export function getSharedPopularRecipes(
   sharedRecipeIds: ReadonlyArray<string>,
   customRecipes: ReadonlyArray<RecipeItem> = [],
 ) {
+  const { user_id, user_nickname } = getCurrentUserProfile();
+
   if (!canCurrentUserShareRecipes()) {
     return [] as RecipeItem[];
   }
@@ -155,11 +164,11 @@ export function getSharedPopularRecipes(
     )
     .map((recipe) => ({
       ...recipe,
-      recipe_id: `shared_${CURRENT_USER_ID}_${recipe.recipe_id}`,
+      recipe_id: `shared_${user_id}_${recipe.recipe_id}`,
       recipe_type: "인기",
       recipe_source: "popular" as const,
-      user_id: CURRENT_USER_ID,
-      user_nickname: CURRENT_USER_NICKNAME,
+      user_id,
+      user_nickname,
     }));
 }
 
