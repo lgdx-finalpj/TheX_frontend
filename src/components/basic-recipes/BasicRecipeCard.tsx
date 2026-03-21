@@ -1,30 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import coffeeCupIcon from "@/assets/icon_image/커피잔 아이콘.png";
 import starIcon from "@/assets/icon_image/별 아이콘.png";
 import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중 팝업창.png";
-import useHiddenMyRecipeIds from "@/hooks/useHiddenMyRecipeIds";
-import useSavedRecipeIds from "@/hooks/useSavedRecipeIds";
-import useSharedRecipeIds from "@/hooks/useSharedRecipeIds";
-import {
-  canCurrentUserShareRecipes,
-  isRecipeOwnedByCurrentUser,
-  type RecipeItem,
-} from "@/mocks/basicRecipes";
-import {
-  hideMyRecipe,
-  removeSavedRecipe,
-  removeSharedRecipe,
-  saveRecipe,
-  shareRecipe,
-} from "@/utils/savedRecipes";
+import type { RecipeItem } from "@/types/recipe";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
   getDetailPath: (recipe: RecipeItem) => string;
   menuVariant?: "default" | "mine";
+  onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
+  isActionPending?: boolean;
+  isSaved?: boolean;
+  isShared?: boolean;
+  currentUserId?: number;
 }
 
 type ExtractStatus = "idle" | "extracting" | "completed";
@@ -33,23 +25,29 @@ export default function BasicRecipeCard({
   recipe,
   getDetailPath,
   menuVariant = "default",
+  onSaveRecipe,
+  onToggleShareRecipe,
+  isActionPending = false,
+  isSaved = false,
+  isShared = false,
+  currentUserId,
 }: BasicRecipeCardProps) {
   const navigate = useNavigate();
-  const savedRecipeIds = useSavedRecipeIds();
-  const hiddenMyRecipeIds = useHiddenMyRecipeIds();
-  const sharedRecipeIds = useSharedRecipeIds();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [extractStatus, setExtractStatus] = useState<ExtractStatus>("idle");
+  const [actionErrorMessage, setActionErrorMessage] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const isSaved =
-    savedRecipeIds.includes(recipe.recipe_id) &&
-    !hiddenMyRecipeIds.includes(recipe.recipe_id);
-  const isOwnedByCurrentUser = isRecipeOwnedByCurrentUser(recipe);
-  const isShared =
-    isOwnedByCurrentUser && sharedRecipeIds.includes(recipe.recipe_id);
+  const isOwnedByCurrentUser =
+    typeof currentUserId === "number" &&
+    typeof recipe.user_id === "number" &&
+    currentUserId === recipe.user_id;
   const displayRecipeName = recipe.user_nickname
     ? `${recipe.user_nickname}님의 ${recipe.recipe_name}`
     : recipe.recipe_name;
+  const showShareAction =
+    Boolean(onToggleShareRecipe) &&
+    isOwnedByCurrentUser &&
+    menuVariant === "default";
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -97,23 +95,43 @@ export default function BasicRecipeCard({
     };
   }, [extractStatus]);
 
-  const handleSaveClick = () => {
-    saveRecipe(recipe.recipe_id);
-  };
-
-  const handleDeleteClick = () => {
-    removeSavedRecipe(recipe.recipe_id);
-    removeSharedRecipe(recipe.recipe_id);
-    hideMyRecipe(recipe.recipe_id);
-    setIsMenuOpen(false);
-  };
-
-  const handleShareClick = () => {
-    if (!canCurrentUserShareRecipes() || !isOwnedByCurrentUser) {
+  const handleSaveClick = async () => {
+    if (!onSaveRecipe || isActionPending) {
       return;
     }
 
-    shareRecipe(recipe.recipe_id);
+    setActionErrorMessage(null);
+
+    try {
+      await onSaveRecipe(recipe);
+      setIsMenuOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "저장 중 오류가 발생했습니다.";
+      setActionErrorMessage(message);
+    }
+  };
+
+  const handleShareClick = async () => {
+    if (!onToggleShareRecipe || isActionPending) {
+      return;
+    }
+
+    if (!isOwnedByCurrentUser) {
+      setActionErrorMessage("본인 레시피만 공유할 수 있습니다.");
+      return;
+    }
+
+    setActionErrorMessage(null);
+
+    try {
+      await onToggleShareRecipe(recipe);
+      setIsMenuOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "공유 처리 중 오류가 발생했습니다.";
+      setActionErrorMessage(message);
+    }
   };
 
   const handleExtractClick = () => {
@@ -121,9 +139,31 @@ export default function BasicRecipeCard({
     setExtractStatus("extracting");
   };
 
+  const handleMoveToDetail = () => {
+    navigate(getDetailPath(recipe));
+  };
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleMoveToDetail();
+    }
+  };
+
+  const handleNotReadyClick = (actionName: string) => {
+    setActionErrorMessage(`${actionName} 기능은 준비 중입니다.`);
+  };
+
   return (
     <>
-      <article className="recipe-card">
+      <article
+        className="recipe-card recipe-card--clickable"
+        role="button"
+        tabIndex={0}
+        aria-label={`${displayRecipeName} 상세`}
+        onClick={handleMoveToDetail}
+        onKeyDown={handleCardKeyDown}
+      >
         <div className="recipe-card__info">
           <img
             src={coffeeCupIcon}
@@ -134,7 +174,11 @@ export default function BasicRecipeCard({
           <strong className="recipe-card__title">{displayRecipeName}</strong>
         </div>
 
-        <div className="recipe-card__actions">
+        <div
+          className="recipe-card__actions"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
           <div
             className="recipe-card__score"
             aria-label={`레시피 저장 수 ${recipe.save_count}`}
@@ -146,7 +190,7 @@ export default function BasicRecipeCard({
             type="button"
             className="icon-button"
             aria-label={`${displayRecipeName} 상세`}
-            onClick={() => navigate(getDetailPath(recipe))}
+            onClick={handleMoveToDetail}
           >
             <img src={chevronRightIcon} alt="" aria-hidden="true" />
           </button>
@@ -156,6 +200,7 @@ export default function BasicRecipeCard({
               className="icon-button"
               aria-label={`${displayRecipeName} 옵션`}
               aria-expanded={isMenuOpen}
+              disabled={isActionPending}
               onClick={() => setIsMenuOpen((currentOpen) => !currentOpen)}
             >
               <img src={moreIcon} alt="" aria-hidden="true" />
@@ -175,6 +220,7 @@ export default function BasicRecipeCard({
                       type="button"
                       className="recipe-card__menu-item"
                       role="menuitem"
+                      onClick={() => handleNotReadyClick("레시피 수정")}
                     >
                       레시피 수정
                     </button>
@@ -182,20 +228,23 @@ export default function BasicRecipeCard({
                       type="button"
                       className="recipe-card__menu-item"
                       role="menuitem"
-                      onClick={handleDeleteClick}
+                      onClick={() => handleNotReadyClick("레시피 삭제")}
                     >
                       레시피 삭제
                     </button>
-                    <button
-                      type="button"
-                      className={`recipe-card__menu-item ${
-                        isShared ? "is-shared" : ""
-                      }`}
-                      role="menuitem"
-                      onClick={handleShareClick}
-                    >
-                      {isShared ? "공유됨" : "레시피 공유"}
-                    </button>
+                    {isOwnedByCurrentUser ? (
+                      <button
+                        type="button"
+                        className={`recipe-card__menu-item ${
+                          isShared ? "is-shared" : ""
+                        }`}
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={handleShareClick}
+                      >
+                        {isShared ? "공유 취소" : "레시피 공유"}
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       className="recipe-card__menu-item"
@@ -207,16 +256,31 @@ export default function BasicRecipeCard({
                   </>
                 ) : (
                   <>
-                    <button
-                      type="button"
-                      className={`recipe-card__menu-item ${
-                        isSaved ? "is-saved" : ""
-                      }`}
-                      role="menuitem"
-                      onClick={handleSaveClick}
-                    >
-                      {isSaved ? "저장됨" : "레시피 저장"}
-                    </button>
+                    {showShareAction ? (
+                      <button
+                        type="button"
+                        className={`recipe-card__menu-item ${
+                          isShared ? "is-shared" : ""
+                        }`}
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={handleShareClick}
+                      >
+                        {isShared ? "공유 취소" : "레시피 공유"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className={`recipe-card__menu-item ${
+                          isSaved ? "is-saved" : ""
+                        }`}
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={handleSaveClick}
+                      >
+                        {isSaved ? "저장됨" : "레시피 저장"}
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="recipe-card__menu-item"
@@ -227,6 +291,10 @@ export default function BasicRecipeCard({
                     </button>
                   </>
                 )}
+
+                {actionErrorMessage ? (
+                  <p className="recipe-card__error-message">{actionErrorMessage}</p>
+                ) : null}
               </div>
             ) : null}
           </div>
@@ -251,3 +319,4 @@ export default function BasicRecipeCard({
     </>
   );
 }
+

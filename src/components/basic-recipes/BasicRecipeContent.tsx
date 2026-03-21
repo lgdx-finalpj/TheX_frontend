@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import "./BasicRecipe.css";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
 import HomeHeader from "@/components/basic-recipes/HomeHeader";
@@ -10,7 +10,7 @@ import {
   type RecipeItem,
   type RecipeModeAccent,
   type RecipeTabKey,
-} from "@/mocks/basicRecipes";
+} from "@/types/recipe";
 
 interface BasicRecipeContentProps {
   modeLabel: string;
@@ -21,6 +21,14 @@ interface BasicRecipeContentProps {
   onTabChange: (tabKey: RecipeTabKey) => void;
   getDetailPath: (recipe: RecipeItem) => string;
   menuVariant?: "default" | "mine";
+  isLoading?: boolean;
+  errorMessage?: string | null;
+  onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
+  pendingRecipeId?: number | null;
+  savedRecipeIdSet?: ReadonlySet<number>;
+  sharedRecipeIdSet?: ReadonlySet<number>;
+  currentUserId?: number;
 }
 
 export default function BasicRecipeContent({
@@ -32,6 +40,14 @@ export default function BasicRecipeContent({
   onTabChange,
   getDetailPath,
   menuVariant = "default",
+  isLoading = false,
+  errorMessage = null,
+  onSaveRecipe,
+  onToggleShareRecipe,
+  pendingRecipeId,
+  savedRecipeIdSet,
+  sharedRecipeIdSet,
+  currentUserId,
 }: BasicRecipeContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
@@ -51,6 +67,17 @@ export default function BasicRecipeContent({
   const handleFlavorToggle = (chip: RecipeFlavor) => {
     setSelectedFlavor((currentFlavor) => (currentFlavor === chip ? null : chip));
   };
+
+  const emptyTitle = isLoading
+    ? "목록을 불러오는 중입니다."
+    : errorMessage
+      ? "목록 조회에 실패했습니다."
+      : "검색 결과가 없습니다.";
+  const emptyDescription = isLoading
+    ? "잠시만 기다려주세요."
+    : errorMessage
+      ? errorMessage
+      : "다른 키워드나 필터로 다시 찾아보세요.";
 
   return (
     <div className="page recipe-page">
@@ -82,12 +109,18 @@ export default function BasicRecipeContent({
           onFlavorToggle={handleFlavorToggle}
         />
         <BasicRecipeList
-          recipes={filteredRecipes}
+          recipes={isLoading || errorMessage ? [] : filteredRecipes}
           getDetailPath={getDetailPath}
           listLabel={`${modeLabel} 레시피 목록`}
-          emptyTitle="검색 결과가 없습니다."
-          emptyDescription="다른 키워드나 필터로 다시 찾아보세요."
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
           menuVariant={menuVariant}
+          onSaveRecipe={onSaveRecipe}
+          onToggleShareRecipe={onToggleShareRecipe}
+          pendingRecipeId={pendingRecipeId}
+          savedRecipeIdSet={savedRecipeIdSet}
+          sharedRecipeIdSet={sharedRecipeIdSet}
+          currentUserId={currentUserId}
         />
       </main>
     </div>
