@@ -1,10 +1,10 @@
-.home-header {
+﻿.home-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
-  padding-top: 40px;
+  padding-top: 20px;
   padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
 }
@@ -25,9 +25,9 @@
 }
 
 .home-header__title {
-  font-size: 1.9rem;
+  font-size: 30px;
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.6px;
 }
 
 .home-header__title-icon {
@@ -97,6 +97,7 @@
   }
 
   .home-header__title {
-    font-size: 1.65rem;
+    font-size: 26px;
   }
 }
+

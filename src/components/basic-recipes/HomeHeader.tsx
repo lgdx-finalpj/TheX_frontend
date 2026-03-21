@@ -1,4 +1,4 @@
-import "./HomeHeader.css";
+﻿import "./HomeHeader.css";
 import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
 import {
   BellIcon,
@@ -9,7 +9,7 @@ import {
 
 export default function HomeHeader() {
   const { user_nickname } = useCurrentUserProfile();
-  const homeOwnerNickname = user_nickname || "홈";
+  const homeOwnerNickname = user_nickname || "사용자";
 
   return (
     <header className="home-header">
