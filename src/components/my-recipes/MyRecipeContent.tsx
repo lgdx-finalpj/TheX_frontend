@@ -42,7 +42,7 @@ export default function MyRecipeContent() {
 
     try {
       const items = await fetchMyRecipesWithDetails();
-      setRecipes(items);
+      setRecipes([...items].reverse());
     } catch (error) {
       setErrorMessage(mapApiErrorMessage(error, "나의 레시피 목록을 불러오지 못했습니다."));
     } finally {

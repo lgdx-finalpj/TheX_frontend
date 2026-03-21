@@ -1,11 +1,13 @@
 ﻿import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import coffeeCupIcon from "@/assets/icon_image/커피잔 아이콘.png";
+import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
+import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
+import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
 import starIcon from "@/assets/icon_image/별 아이콘.png";
 import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
-import extractPopupImage from "@/assets/pop_up_window_image/레시피 추출 중 팝업창.png";
-import type { RecipeItem } from "@/types/recipe";
+import duoboMachineImage from "@/assets/듀오보.png";
+import type { RecipeCategory, RecipeItem } from "@/types/recipe";
 
 interface BasicRecipeCardProps {
   recipe: RecipeItem;
@@ -19,7 +21,13 @@ interface BasicRecipeCardProps {
   currentUserId?: number;
 }
 
-type ExtractStatus = "idle" | "extracting" | "completed";
+type ExtractStatus = "idle" | "extracting";
+
+const categoryIconMap: Record<RecipeCategory, string> = {
+  COFFEE: coffeeCategoryImage,
+  SMOOTHIE: smoothieCategoryImage,
+  TEA: teaCategoryImage,
+};
 
 export default function BasicRecipeCard({
   recipe,
@@ -48,6 +56,8 @@ export default function BasicRecipeCard({
     Boolean(onToggleShareRecipe) &&
     isOwnedByCurrentUser &&
     menuVariant === "default";
+  const recipeCategoryIcon =
+    categoryIconMap[recipe.recipe_category] ?? coffeeCategoryImage;
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -72,23 +82,9 @@ export default function BasicRecipeCard({
       return undefined;
     }
 
-    const completeTimer = window.setTimeout(() => {
-      setExtractStatus("completed");
-    }, 2000);
-
-    return () => {
-      window.clearTimeout(completeTimer);
-    };
-  }, [extractStatus]);
-
-  useEffect(() => {
-    if (extractStatus !== "completed") {
-      return undefined;
-    }
-
     const resetTimer = window.setTimeout(() => {
       setExtractStatus("idle");
-    }, 1000);
+    }, 2500);
 
     return () => {
       window.clearTimeout(resetTimer);
@@ -136,6 +132,9 @@ export default function BasicRecipeCard({
 
   const handleExtractClick = () => {
     setIsMenuOpen(false);
+    if (!recipe.is_coffee) {
+      return;
+    }
     setExtractStatus("extracting");
   };
 
@@ -157,7 +156,7 @@ export default function BasicRecipeCard({
   return (
     <>
       <article
-        className="recipe-card recipe-card--clickable"
+        className={`recipe-card recipe-card--clickable ${isMenuOpen ? "is-menu-open" : ""}`}
         role="button"
         tabIndex={0}
         aria-label={`${displayRecipeName} 상세`}
@@ -166,7 +165,7 @@ export default function BasicRecipeCard({
       >
         <div className="recipe-card__info">
           <img
-            src={coffeeCupIcon}
+            src={recipeCategoryIcon}
             alt=""
             aria-hidden="true"
             className="recipe-card__icon"
@@ -301,19 +300,17 @@ export default function BasicRecipeCard({
         </div>
       </article>
 
-      {extractStatus !== "idle" ? (
+      {extractStatus === "extracting" ? (
         <div className="recipe-extract-overlay" role="dialog" aria-modal="true">
-          {extractStatus === "extracting" ? (
+          <div className="recipe-extract-overlay__panel">
             <img
-              src={extractPopupImage}
-              alt={`${displayRecipeName} 추출 중`}
-              className="recipe-extract-overlay__image"
+              src={duoboMachineImage}
+              alt=""
+              aria-hidden="true"
+              className="recipe-extract-overlay__machine-image"
             />
-          ) : (
-            <div className="recipe-extract-overlay__complete">
-              <strong>레시피 추출 완료</strong>
-            </div>
-          )}
+            <p className="recipe-extract-overlay__text">{`${recipe.recipe_name}\n추출중`}</p>
+          </div>
         </div>
       ) : null}
     </>
