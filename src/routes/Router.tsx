@@ -1,12 +1,12 @@
+import { Navigate, Route, Routes } from "react-router-dom";
 import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
 import DevicePage from "@/pages/DevicePage";
 import GroupedDevicePage from "@/pages/GroupedDevicePage";
 import HomePage from "@/pages/HomePage";
 import LightMain from "@/pages/LightMain";
 import NotFoundPage from "@/pages/NotFoundPage";
-import SpeakerMain from "@/pages/SpeakerMain";
 import SmartRoutineMain from "@/pages/SmartRoutineMain";
-import { Navigate, Route, Routes } from "react-router-dom";
+import SpeakerMain from "@/pages/SpeakerMain";
 
 export default function Router() {
   return (

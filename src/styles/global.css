@@ -28,6 +28,16 @@
   box-sizing: border-box;
 }
 
+:root {
+  color: #111111;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  line-height: 1.4;
+  font-weight: 400;
+  background: #d6d7db;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 html,
 body,
 #root {
