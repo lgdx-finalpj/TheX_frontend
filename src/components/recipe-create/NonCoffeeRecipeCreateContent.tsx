@@ -1,14 +1,18 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import "./NoneCoffeeRecipeCreate.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
-import { createNonCoffeeRecipe } from "@/utils/customRecipes";
-import { saveRecipe } from "@/utils/savedRecipes";
+import {
+  createNoneCoffeeRecipeApi,
+  mapApiErrorMessage,
+} from "@/api/recipeApi";
+import type { RecipeLevel } from "@/types/recipe";
 
 const categoryMap = {
-  smoothie: "스무디",
-  tea: "차",
+  smoothie: "SMOOTHIE",
+  tea: "TEA",
 } as const;
 
 const recipeLevelOptions = ["쉬움", "보통", "어려움"] as const;
@@ -19,14 +23,14 @@ const nonCoffeeExamples = {
     ingredient: "블루베리 100g, 우유 120ml, 얼음, 꿀",
     total_size: "220",
     recipe_content:
-      "1. 블루베리를 깨끗한 물에 씻어 준비한다.\n2. 믹서기에 블루베리 100g 등 준비물을 전부 넣는다.\n3. 기호에 따라 꿀 또는 시럽 1큰술을 추가한다.\n4. 믹서기로 약 30초 정도 갈아 스무디 상태로 만든다.\n5. 완성된 블루베리 스무디를 컵에 담아 마신다.",
+      "1. 재료를 준비합니다.\n2. 믹서기에 재료를 넣고 갈아줍니다.\n3. 컵에 담아 완성합니다.",
   },
   tea: {
     recipe_name: "유자차 홈카페 버전",
-    ingredient: "유자청 30g, 따뜻한 물 180ml, 레몬 슬라이스",
+    ingredient: "유자청 30g, 뜨거운 물 180ml",
     total_size: "180",
     recipe_content:
-      "1. 컵에 유자청 30g을 넣는다.\n2. 따뜻한 물 180ml를 천천히 붓는다.\n3. 유자청이 잘 풀리도록 가볍게 저어준다.\n4. 기호에 따라 레몬 슬라이스를 올린다.\n5. 향이 살아 있을 때 따뜻하게 즐긴다.",
+      "1. 컵에 유자청을 넣습니다.\n2. 뜨거운 물을 붓고 잘 저어줍니다.\n3. 기호에 맞게 완성합니다.",
   },
 } as const;
 
@@ -34,7 +38,8 @@ type FieldKey = "recipe_name" | "ingredient" | "total_size" | "recipe_content";
 
 export default function NonCoffeeRecipeCreateContent() {
   const navigate = useNavigate();
-  const { categoryKey } = useParams();
+  const [searchParams] = useSearchParams();
+  const categoryKey = searchParams.get("categoryKey");
   const recipeCategory = useMemo(
     () =>
       categoryKey === "tea"
@@ -52,6 +57,8 @@ export default function NonCoffeeRecipeCreateContent() {
   const [totalSize, setTotalSize] = useState("");
   const [recipeLevel, setRecipeLevel] = useState("");
   const [recipeContent, setRecipeContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(null);
 
   if (!recipeCategory) {
     return null;
@@ -67,24 +74,43 @@ export default function NonCoffeeRecipeCreateContent() {
   const getPlaceholder = (field: FieldKey, example: string) =>
     focusedField === field ? "" : example;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isFormValid) {
+    if (!isFormValid || isSubmitting) {
       return;
     }
 
-    const recipe = createNonCoffeeRecipe({
-      recipe_name: recipeName,
-      ingredient,
-      total_size: totalSize,
-      recipe_level: recipeLevel,
-      recipe_content: recipeContent,
-      recipe_category: recipeCategory,
-    });
+    setIsSubmitting(true);
+    setSubmitErrorMessage(null);
 
-    saveRecipe(recipe.recipe_id);
-    navigate(MY_RECIPE_ROUTE);
+    const normalizedRecipeLevelMap: Record<string, RecipeLevel> = {
+      쉬움: "EASY",
+      보통: "NORMAL",
+      어려움: "HARD",
+    };
+    const normalizedLevel =
+      normalizedRecipeLevelMap[recipeLevel] ?? ("EASY" as RecipeLevel);
+    const parsedTotalSize = Number(totalSize);
+
+    try {
+      await createNoneCoffeeRecipeApi({
+        recipeName: recipeName.trim(),
+        recipeCategory,
+        ingredient: ingredient.trim(),
+        recipeContent: recipeContent.trim(),
+        totalSize: Number.isNaN(parsedTotalSize) ? 0 : parsedTotalSize,
+        recipeLevel: normalizedLevel,
+      });
+
+      navigate(MY_RECIPE_ROUTE);
+    } catch (error) {
+      setSubmitErrorMessage(
+        mapApiErrorMessage(error, "레시피 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -189,10 +215,14 @@ export default function NonCoffeeRecipeCreateContent() {
           <button
             type="submit"
             className="recipe-create-form__submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
           >
-            저장
+            {isSubmitting ? "등록 중..." : "등록"}
           </button>
+
+          {submitErrorMessage ? (
+            <p className="recipe-create-form__error">{submitErrorMessage}</p>
+          ) : null}
         </form>
       </main>
     </div>

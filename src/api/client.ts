@@ -5,9 +5,12 @@ const configuredBaseUrl =
     ? import.meta.env.VITE_API_BASE_URL.trim()
     : "";
 
-export const apiClient = axios.create({
-  baseURL: configuredBaseUrl || undefined,
+const apiClient = axios.create({
+  baseURL: configuredBaseUrl || "/api",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+export default apiClient;

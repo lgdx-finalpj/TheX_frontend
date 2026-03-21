@@ -1,15 +1,67 @@
+﻿import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import RecipeDetailContent from "@/components/recipe-detail/RecipeDetailContent";
 import MobileLayout from "@/layouts/MobileLayout";
-import { basicBrowseRecipes } from "@/mocks/basicRecipes";
+import { fetchRecipeDetail, mapApiErrorMessage, mapRecipeDetailForView } from "@/api/recipeApi";
+import type { RecipeItem } from "@/types/recipe";
 import NotFoundPage from "@/pages/NotFoundPage";
 import { BASIC_RECIPE_ROUTE } from "@/routes/paths";
-import { useParams } from "react-router-dom";
 
 export default function BasicRecipeDetailPage() {
   const { recipeId } = useParams();
-  const recipe = basicBrowseRecipes.find((item) => item.recipe_id === recipeId);
+  const [searchParams] = useSearchParams();
+  const [recipe, setRecipe] = useState<RecipeItem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  if (!recipe) {
+  useEffect(() => {
+    if (!recipeId) {
+      setErrorMessage("레시피 ID가 없습니다.");
+      setIsLoading(false);
+      return;
+    }
+
+    const recipeIdNumber = Number(recipeId);
+    const isCoffee = searchParams.get("isCoffee") !== "false";
+
+    if (Number.isNaN(recipeIdNumber)) {
+      setErrorMessage("유효하지 않은 레시피 ID입니다.");
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchDetail = async () => {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const detail = await fetchRecipeDetail(recipeIdNumber, isCoffee);
+        setRecipe(mapRecipeDetailForView(detail, isCoffee));
+      } catch (error) {
+        setErrorMessage(mapApiErrorMessage(error, "레시피 상세를 불러오지 못했습니다."));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchDetail();
+  }, [recipeId, searchParams]);
+
+  if (isLoading) {
+    return (
+      <MobileLayout>
+        <div className="page recipe-page">
+          <main className="page-content recipe-page__content">
+            <section className="recipe-page__empty">
+              <strong>레시피를 불러오는 중입니다.</strong>
+            </section>
+          </main>
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  if (!recipe || errorMessage) {
     return <NotFoundPage />;
   }
 

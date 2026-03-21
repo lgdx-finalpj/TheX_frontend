@@ -4,17 +4,17 @@ import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
 import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
+  fetchBasicRecipes,
   fetchMyRecipesWithDetails,
-  fetchPopularRecipes,
   mapApiErrorMessage,
   saveRecipeApi,
   toggleRecipeShareApi,
 } from "@/api/recipeApi";
 import type { RecipeItem, RecipeTabKey } from "@/types/recipe";
 import {
-  BASIC_RECIPE_ROUTE,
-  getPopularRecipeDetailPath,
+  getBasicRecipeDetailPath,
   MY_RECIPE_ROUTE,
+  POPULAR_RECIPE_ROUTE,
 } from "@/routes/paths";
 
 function mergeRecipesById(baseRecipes: RecipeItem[], extraRecipes: RecipeItem[]) {
@@ -35,7 +35,7 @@ function mergeRecipesById(baseRecipes: RecipeItem[], extraRecipes: RecipeItem[])
   return Array.from(recipeById.values());
 }
 
-export default function PopularRecipePage() {
+export default function RecipeHomePage() {
   const navigate = useNavigate();
   const { user_id } = useCurrentUserProfile();
   const currentUserId = useMemo(() => {
@@ -51,32 +51,32 @@ export default function PopularRecipePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingRecipeId, setPendingRecipeId] = useState<number | null>(null);
 
-  const refreshPopularRecipes = useCallback(async () => {
+  const refreshBasicRecipes = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const [popularRecipes, myRecipes] = await Promise.all([
-        fetchPopularRecipes(),
+      const [basicRecipes, myRecipes] = await Promise.all([
+        fetchBasicRecipes(),
         fetchMyRecipesWithDetails(),
       ]);
 
       const sharedMyRecipes = myRecipes.filter((recipe) => recipe.is_shared);
 
-      setBaseRecipeIdSet(new Set(popularRecipes.map((recipe) => recipe.recipe_id)));
-      setRecipes(mergeRecipesById(popularRecipes, sharedMyRecipes));
+      setBaseRecipeIdSet(new Set(basicRecipes.map((recipe) => recipe.recipe_id)));
+      setRecipes(mergeRecipesById(basicRecipes, sharedMyRecipes));
       setSavedRecipeIdSet(new Set(myRecipes.map((recipe) => recipe.recipe_id)));
       setSharedRecipeIdSet(new Set(sharedMyRecipes.map((recipe) => recipe.recipe_id)));
     } catch (error) {
-      setErrorMessage(mapApiErrorMessage(error, "인기 레시피를 불러오지 못했습니다."));
+      setErrorMessage(mapApiErrorMessage(error, "기본 레시피를 불러오지 못했습니다."));
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    void refreshPopularRecipes();
-  }, [refreshPopularRecipes]);
+    void refreshBasicRecipes();
+  }, [refreshBasicRecipes]);
 
   const handleTabChange = (tabKey: RecipeTabKey) => {
     switch (tabKey) {
@@ -164,18 +164,18 @@ export default function PopularRecipePage() {
   };
 
   const getDetailPath = useCallback(
-    (recipe: RecipeItem) => getPopularRecipeDetailPath(recipe.recipe_id, recipe.is_coffee),
+    (recipe: RecipeItem) => getBasicRecipeDetailPath(recipe.recipe_id, recipe.is_coffee),
     [],
   );
 
   return (
     <MobileLayout>
       <BasicRecipeContent
-        modeLabel="인기"
-        markerAccent="bottom"
+        modeLabel="기본"
+        markerAccent="top"
         recipes={recipes}
         activeTab="browse"
-        onModeClick={() => navigate(BASIC_RECIPE_ROUTE)}
+        onModeClick={() => navigate(POPULAR_RECIPE_ROUTE)}
         onTabChange={handleTabChange}
         getDetailPath={getDetailPath}
         isLoading={isLoading}
@@ -190,3 +190,4 @@ export default function PopularRecipePage() {
     </MobileLayout>
   );
 }
+

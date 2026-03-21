@@ -4,7 +4,8 @@ import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const proxyTarget = env.VITE_API_PROXY_TARGET?.trim();
+  const proxyTarget =
+    env.VITE_API_PROXY_TARGET?.trim() || "http://13.209.166.92";
 
   return {
     plugins: [react()],
@@ -13,15 +14,13 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
-    server: proxyTarget
-      ? {
-          proxy: {
-            "/api": {
-              target: proxyTarget,
-              changeOrigin: true,
-            },
-          },
-        }
-      : undefined,
+    server: {
+      proxy: {
+        "/api": {
+          target: proxyTarget,
+          changeOrigin: true,
+        },
+      },
+    },
   };
 });

@@ -1,5 +1,5 @@
-import searchIcon from "@/assets/icon_image/돋보기 아이콘.png";
-import type { RecipeFlavor, RecipeModeAccent } from "@/mocks/basicRecipes";
+﻿import searchIcon from "@/assets/icon_image/돋보기 아이콘.png";
+import type { RecipeFlavor, RecipeModeAccent } from "@/types/recipe";
 
 interface BasicRecipeFiltersProps {
   modeLabel?: string;
