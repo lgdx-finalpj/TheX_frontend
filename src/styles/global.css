@@ -5,13 +5,13 @@
 }
 
 @font-face {
-  font-family: "LG Smart";
+  font-family: "MOTU LG Smart_H";
   src:
-    local("LG Smart UI"),
-    local("LG Smart UI Regular"),
-    local("LG_Smart_UI-Regular"),
-    local("LG Smart UI Light"),
-    local("LG_Smart_UI-Light");
+    local("MOTU LG Smart_H"),
+    local("LG Smart_H"),
+    url("/fonts/LGSmHaL.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -20,8 +20,31 @@
   src:
     local("MOTU LG Smart_H"),
     local("LG Smart_H"),
-    local("LG Smart UI Light"),
-    local("LG Smart UI");
+    url("/fonts/LGSmHaR.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MOTU LG Smart_H";
+  src:
+    local("MOTU LG Smart_H SemiBold"),
+    local("LG Smart_H SemiBold"),
+    url("/fonts/LGSmHaSB.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MOTU LG Smart_H";
+  src:
+    local("MOTU LG Smart_H Bold"),
+    local("LG Smart_H Bold"),
+    url("/fonts/LGSmHaB.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -54,8 +77,6 @@ html {
 
 body {
   font-family:
-    "LG Smart",
-    "LG Smart UI",
     "MOTU LG Smart_H",
     "Malgun Gothic",
     sans-serif;

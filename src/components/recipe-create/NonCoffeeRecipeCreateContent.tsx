@@ -1,13 +1,12 @@
 ﻿import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "./RecipeCreate.css";
+import "./NoneCoffeeRecipeCreate.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
 import {
   createNoneCoffeeRecipeApi,
   mapApiErrorMessage,
-  saveRecipeApi,
 } from "@/api/recipeApi";
 import type { RecipeLevel } from "@/types/recipe";
 
@@ -95,18 +94,13 @@ export default function NonCoffeeRecipeCreateContent() {
     const parsedTotalSize = Number(totalSize);
 
     try {
-      const createdRecipe = await createNoneCoffeeRecipeApi({
+      await createNoneCoffeeRecipeApi({
         recipeName: recipeName.trim(),
         recipeCategory,
         ingredient: ingredient.trim(),
         recipeContent: recipeContent.trim(),
         totalSize: Number.isNaN(parsedTotalSize) ? 0 : parsedTotalSize,
         recipeLevel: normalizedLevel,
-      });
-
-      await saveRecipeApi({
-        recipeId: createdRecipe.recipeId,
-        recipeCategory: createdRecipe.recipeCategory,
       });
 
       navigate(MY_RECIPE_ROUTE);

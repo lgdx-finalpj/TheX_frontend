@@ -1,5 +1,5 @@
 ﻿import { useNavigate } from "react-router-dom";
-import "./RecipeCreate.css";
+import "./RecipeCategorySelection.css";
 import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
@@ -31,7 +31,7 @@ export default function RecipeCategorySelectionContent() {
   const navigate = useNavigate();
 
   return (
-    <div className="page recipe-category-page">
+    <div className="page recipe-category-page recipe-category-page--selection">
       <main className="page-content recipe-category-page__content">
         <div className="recipe-category-page__top">
           <button
