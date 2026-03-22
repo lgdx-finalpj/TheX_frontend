@@ -1,59 +1,208 @@
+import {
+  fetchSharedMoodCustomList,
+  shareMoodCustom,
+  type MoodCustomListResponseDTO,
+} from "@/api/moodCustomApi";
+import { getApiErrorMessage } from "@/api/httpClient";
 import SmartRoutineHeader from "@/components/SmartRoutineHeader";
 import MoodExecutionModal from "@/components/smartRoutine/MoodExecutionModal";
 import MineTabSection from "@/components/smartRoutine/MineTabSection";
 import RecommendTabSection from "@/components/smartRoutine/RecommendTabSection";
 import MobileLayout from "@/layouts/MobileLayout";
-import { recommendedMoodCustomsMock } from "@/pages/smartRoutineMainPage.mocks";
 import { getExecutionModalItems } from "@/pages/smartRoutineMainPage.utils";
 import type { SavedMoodCustom } from "@/state/moodCustom.types";
 import { useMoodCustomDraft } from "@/state/useMoodCustomDraft";
-import { useMemo, useState } from "react";
+import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./SmartRoutineShared.css";
 import "./SmartRoutineMainPage.css";
 
+function inferColorsetId(item: MoodCustomListResponseDTO) {
+  const speakerType = item.customProduct?.speakerCustom?.musicType;
+
+  if (speakerType === "REST") {
+    return "#5A48C2";
+  }
+
+  if (speakerType === "FOCUSING") {
+    return "#1E4F3D";
+  }
+
+  if (speakerType === "MOVIE") {
+    return "#3B3E73";
+  }
+
+  return "#A36D00";
+}
+
+function mapSharedMoodItemToRecommended(
+  item: MoodCustomListResponseDTO,
+): RecommendedMoodCustomRecord {
+  const customProduct = item.customProduct ?? {};
+  const products: RecommendedMoodCustomRecord["custom_product"] = [];
+
+  if (customProduct.coffeeCustom) {
+    const coffee = customProduct.coffeeCustom;
+    const recipeName = coffee.recipeName?.trim() || "Coffee";
+    products.push({
+      product_type: "coffee_machine",
+      summary: `${recipeName} - ${coffee.capsuleTemp}`,
+    });
+  }
+
+  if (customProduct.lightCustom) {
+    const light = customProduct.lightCustom;
+    products.push({
+      product_type: "light",
+      summary: `${light.lightColor}, ${light.lightBright}%`,
+    });
+  }
+
+  if (customProduct.speakerCustom) {
+    const speaker = customProduct.speakerCustom;
+    products.push({
+      product_type: "speaker",
+      summary: `${speaker.musicType}, ${speaker.volume}%`,
+    });
+  }
+
+  return {
+    mood_id: String(item.moodId),
+    user_id: "unknown",
+    colorset_id: inferColorsetId(item),
+    mood_name: item.moodName,
+    custom_product: products,
+    is_shared: true,
+    save_count: 0,
+  };
+}
+
+function prioritizeMoodById<T extends { mood_id: string }>(
+  items: T[],
+  prioritizedMoodId: string | null,
+) {
+  if (!prioritizedMoodId) {
+    return items;
+  }
+
+  const targetIndex = items.findIndex((item) => item.mood_id === prioritizedMoodId);
+  if (targetIndex <= 0) {
+    return items;
+  }
+
+  const prioritizedItem = items[targetIndex];
+  return [
+    prioritizedItem,
+    ...items.slice(0, targetIndex),
+    ...items.slice(targetIndex + 1),
+  ];
+}
+
 export default function SmartRoutineMainPage() {
   const navigate = useNavigate();
-  const { savedMoodCustoms } = useMoodCustomDraft();
+  const {
+    savedMoodCustoms,
+    isSavedMoodCustomsLoading,
+    savedMoodCustomsError,
+    refreshSavedMoodCustoms,
+  } = useMoodCustomDraft();
   const [activeTab, setActiveTab] = useState<"mine" | "recommend">("mine");
   const [openedMenuMoodId, setOpenedMenuMoodId] = useState<string | null>(null);
-  const [sharedMoodIds, setSharedMoodIds] = useState<string[]>([]);
   const [bookmarkedMoodIds, setBookmarkedMoodIds] = useState<string[]>([]);
   const [runningMoodCustom, setRunningMoodCustom] = useState<SavedMoodCustom | null>(
     null,
   );
+  const [isSharingMoodId, setIsSharingMoodId] = useState<string | null>(null);
+  const [shareMoodError, setShareMoodError] = useState<string | null>(null);
+  const [recommendedMoodCustoms, setRecommendedMoodCustoms] = useState<
+    RecommendedMoodCustomRecord[]
+  >([]);
+  const [recentSharedMoodId, setRecentSharedMoodId] = useState<string | null>(null);
+  const [isRecommendedMoodCustomsLoading, setIsRecommendedMoodCustomsLoading] =
+    useState(false);
+  const [recommendedMoodCustomsError, setRecommendedMoodCustomsError] = useState<
+    string | null
+  >(null);
 
-  const recommendedMoodCustoms = useMemo(
-    () =>
-      recommendedMoodCustomsMock.filter(
-        (moodCustom) =>
-          moodCustom.is_shared === true && moodCustom.custom_product.length >= 2,
-      ),
-    [],
+  const refreshSharedMoodCustoms = useCallback(async () => {
+    setIsRecommendedMoodCustomsLoading(true);
+    setRecommendedMoodCustomsError(null);
+
+    try {
+      const response = await fetchSharedMoodCustomList();
+      setRecommendedMoodCustoms(response.map(mapSharedMoodItemToRecommended));
+    } catch (error) {
+      setRecommendedMoodCustomsError(
+        getApiErrorMessage(error, "Failed to load recommended mood customs."),
+      );
+    } finally {
+      setIsRecommendedMoodCustomsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshSharedMoodCustoms();
+  }, [refreshSharedMoodCustoms]);
+
+  const sortedSavedMoodCustoms = useMemo(
+    () => prioritizeMoodById(savedMoodCustoms, recentSharedMoodId),
+    [recentSharedMoodId, savedMoodCustoms],
   );
 
   const bookmarkedRecommendedMoodCustoms = recommendedMoodCustoms.filter(
     (moodCustom) => bookmarkedMoodIds.includes(moodCustom.mood_id),
   );
 
-  const sharedSavedMoodCustoms = savedMoodCustoms.filter((moodCustom) =>
-    sharedMoodIds.includes(moodCustom.mood_id),
+  const savedMoodIdSet = useMemo(
+    () => new Set(sortedSavedMoodCustoms.map((moodCustom) => moodCustom.mood_id)),
+    [sortedSavedMoodCustoms],
+  );
+
+  const sharedSavedMoodCustoms = sortedSavedMoodCustoms.filter((moodCustom) =>
+    recommendedMoodCustoms.some((shared) => shared.mood_id === moodCustom.mood_id),
+  );
+
+  const recommendedOnlyMoodCustoms = recommendedMoodCustoms.filter(
+    (moodCustom) => !savedMoodIdSet.has(moodCustom.mood_id),
   );
 
   const runningMoodItems = runningMoodCustom
     ? getExecutionModalItems(runningMoodCustom)
     : [];
+
   const handleTabChange = (tab: "mine" | "recommend") => {
     setActiveTab(tab);
     setOpenedMenuMoodId(null);
   };
 
-  const handleShareMood = (moodId: string) => {
-    setSharedMoodIds((current) =>
-      current.includes(moodId) ? current : [...current, moodId],
-    );
-    setOpenedMenuMoodId(null);
+  const handleShareMood = async (moodId: string) => {
+    if (isSharingMoodId) {
+      return;
+    }
+
+    const numericMoodId = Number(moodId);
+    if (!Number.isFinite(numericMoodId)) {
+      setShareMoodError("Invalid mood id for share.");
+      setOpenedMenuMoodId(null);
+      return;
+    }
+
+    setIsSharingMoodId(moodId);
+    setShareMoodError(null);
+
+    try {
+      await shareMoodCustom(numericMoodId);
+      await refreshSavedMoodCustoms();
+      await refreshSharedMoodCustoms();
+      setRecentSharedMoodId(moodId);
+    } catch (error) {
+      setShareMoodError(getApiErrorMessage(error, "Failed to share mood custom."));
+    } finally {
+      setIsSharingMoodId(null);
+      setOpenedMenuMoodId(null);
+    }
   };
 
   const handleExecuteMood = (moodId: string) => {
@@ -86,7 +235,7 @@ export default function SmartRoutineMainPage() {
       <div className="page smart-routine-page">
         <SmartRoutineHeader title="스마트 루틴" backTo="/" showActions />
 
-        <nav className="smart-routine-tabs" aria-label="스마트 루틴 탭">
+        <nav className="smart-routine-tabs" aria-label="Smart routine tabs">
           <button
             type="button"
             className={`smart-routine-tab ${activeTab === "mine" ? "active" : ""}`}
@@ -107,13 +256,15 @@ export default function SmartRoutineMainPage() {
 
         {activeTab === "mine" ? (
           <MineTabSection
-            savedMoodCustoms={savedMoodCustoms}
+            savedMoodCustoms={sortedSavedMoodCustoms}
             bookmarkedRecommendedMoodCustoms={bookmarkedRecommendedMoodCustoms}
             bookmarkedMoodIds={bookmarkedMoodIds}
             openedMenuMoodId={openedMenuMoodId}
             runningMoodCustomId={runningMoodCustom?.mood_id ?? null}
             onMoodMenuToggle={handleMoodMenuToggle}
-            onShareMood={handleShareMood}
+            onShareMood={(moodId) => {
+              void handleShareMood(moodId);
+            }}
             onExecuteMood={handleExecuteMood}
             onBookmarkToggle={handleBookmarkToggle}
             onCreateMoodCustom={() => navigate("/smartroutine/create")}
@@ -121,7 +272,7 @@ export default function SmartRoutineMainPage() {
         ) : (
           <RecommendTabSection
             sharedSavedMoodCustoms={sharedSavedMoodCustoms}
-            recommendedMoodCustoms={recommendedMoodCustoms}
+            recommendedMoodCustoms={recommendedOnlyMoodCustoms}
             bookmarkedMoodIds={bookmarkedMoodIds}
             onBookmarkToggle={handleBookmarkToggle}
           />
@@ -133,6 +284,15 @@ export default function SmartRoutineMainPage() {
             onClose={() => setRunningMoodCustom(null)}
           />
         ) : null}
+        {isSavedMoodCustomsLoading ? <p>Loading your moods...</p> : null}
+        {savedMoodCustomsError ? (
+          <p role="alert">{savedMoodCustomsError}</p>
+        ) : null}
+        {isRecommendedMoodCustomsLoading ? <p>Loading recommended moods...</p> : null}
+        {recommendedMoodCustomsError ? (
+          <p role="alert">{recommendedMoodCustomsError}</p>
+        ) : null}
+        {shareMoodError ? <p role="alert">{shareMoodError}</p> : null}
       </div>
     </MobileLayout>
   );

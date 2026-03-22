@@ -10,6 +10,23 @@ import type {
 } from "@/types/smartRoutine";
 import type { MoodOptionId, SavedMoodCustom } from "@/state/moodCustom.types";
 
+const productTypeLabelMap: Record<string, string> = {
+  coffee_machine: "커피머신",
+  light: "조명",
+  speaker: "스피커",
+};
+
+function toProductSettingLabel(productType: string, summary: string) {
+  const productLabel = productTypeLabelMap[productType] ?? productType;
+  const trimmedSummary = summary.trim();
+
+  if (trimmedSummary.startsWith(`${productLabel} -`)) {
+    return trimmedSummary;
+  }
+
+  return `${productLabel} - ${trimmedSummary}`;
+}
+
 function hexToRgba(hexColor: string, opacity: number) {
   const sanitized = hexColor.replace("#", "");
   const red = Number.parseInt(sanitized.slice(0, 2), 16);
@@ -70,7 +87,7 @@ export function getMoodTheme(selectedMoodId: MoodOptionId): MoodCardTheme {
 export function toSavedMoodItems(moodCustom: SavedMoodCustom): MoodRoutineCardItem[] {
   return moodCustom.custom_product.map((product) => ({
     key: product.product_type,
-    label: product.summary,
+    label: toProductSettingLabel(product.product_type, product.summary),
   }));
 }
 
@@ -79,7 +96,7 @@ export function toRecommendedMoodItems(
 ): MoodRoutineCardItem[] {
   return moodCustom.custom_product.map((product) => ({
     key: `${moodCustom.mood_id}-${product.product_type}`,
-    label: product.summary,
+    label: toProductSettingLabel(product.product_type, product.summary),
   }));
 }
 

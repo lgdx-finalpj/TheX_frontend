@@ -165,18 +165,19 @@
 }
 
 .saved-mood-badge {
-  min-width: 54px;
-  padding: 6px 14px;
+  min-width: 50px;
+  padding: 6px;
   border-radius: 999px;
   text-align: center;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .saved-mood-title {
   flex: 1;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
 }
 
 .saved-mood-more {
@@ -244,8 +245,8 @@
 }
 
 .saved-mood-my-chip {
-  min-width: 48px;
-  height: 32px;
+  min-width: 40px;
+  height: 27px;
   border-radius: 999px;
   background: #ffffff;
   color: #111111;
@@ -253,7 +254,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 14px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -304,12 +305,12 @@
   border-radius: 14px;
   padding: 12px 14px;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
 }
 
 .smart-routine-recommend-body {
-  padding: 10px 16px 28px;
+  padding: 18px 24px 120px;
 }
 
 .recommend-card-list {

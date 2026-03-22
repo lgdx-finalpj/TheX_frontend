@@ -32,8 +32,8 @@ export const moodColorsetMock: MoodColorsetRecord[] = [
 
 export const recommendedMoodCustomsMock: RecommendedMoodCustomRecord[] = [
   {
-    mood_id: "mood-8f21a7",
-    user_id: "user3141592",
+    mood_id: "9001",
+    user_id: "101",
     colorset_id: "#A36D00",
     mood_name: "홈카페",
     custom_product: [
@@ -45,8 +45,8 @@ export const recommendedMoodCustomsMock: RecommendedMoodCustomRecord[] = [
     save_count: 87,
   },
   {
-    mood_id: "mood-5b93ce",
-    user_id: "user2718281",
+    mood_id: "9002",
+    user_id: "102",
     colorset_id: "#5A48C2",
     mood_name: "휴식",
     custom_product: [
@@ -58,8 +58,8 @@ export const recommendedMoodCustomsMock: RecommendedMoodCustomRecord[] = [
     save_count: 64,
   },
   {
-    mood_id: "mood-c71d42",
-    user_id: "user1618033",
+    mood_id: "9003",
+    user_id: "103",
     colorset_id: "#1E4F3D",
     mood_name: "집중 모드",
     custom_product: [

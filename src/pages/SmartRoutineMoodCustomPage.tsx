@@ -49,7 +49,7 @@ function StepCard({ label, value, variant, onClick, onClear }: StepCardProps) {
           <button
             type="button"
             className="mood-custom-clear-button"
-            aria-label={`${label} 초기화`}
+            aria-label={`${label} clear`}
             onClick={onClear}
           >
             <CloseIcon />
@@ -65,6 +65,8 @@ export default function SmartRoutineMoodCustomPage() {
   const {
     draft,
     applyDraft,
+    isApplyingDraft,
+    applyDraftError,
     clearMoodName,
     clearSelectedMood,
     removeProduct,
@@ -84,13 +86,18 @@ export default function SmartRoutineMoodCustomPage() {
     configuredProducts.length > 0 &&
     configuredProducts.length === selectedProducts.length;
 
+  const handleApply = async () => {
+    const applied = await applyDraft();
+
+    if (applied) {
+      navigate("/smartroutine");
+    }
+  };
+
   return (
     <MobileLayout>
       <div className="page smart-routine-page mood-custom-page">
-        <SmartRoutineHeader
-          title="무드 커스텀하기"
-          backTo="/smartroutine/create"
-        />
+        <SmartRoutineHeader title="무드 커스텀하기" backTo="/smartroutine/create" />
 
         <main className="mood-custom-overview">
           <StepCard
@@ -106,9 +113,7 @@ export default function SmartRoutineMoodCustomPage() {
             value={selectedMood?.label ?? "무드 추가"}
             variant={selectedMood ? "selected" : hasMoodName ? "idle" : "locked"}
             onClick={
-              hasMoodName
-                ? () => navigate("/smartroutine/mood-custom/mood")
-                : undefined
+              hasMoodName ? () => navigate("/smartroutine/mood-custom/mood") : undefined
             }
             onClear={selectedMood ? clearSelectedMood : undefined}
           />
@@ -118,17 +123,12 @@ export default function SmartRoutineMoodCustomPage() {
 
             <div className="mood-custom-step-list">
               {selectedProducts.map((product) => (
-                <div
-                  key={product.product_type}
-                  className="mood-custom-step-card selected"
-                >
+                <div key={product.product_type} className="mood-custom-step-card selected">
                   <button
                     type="button"
                     className="mood-custom-step-main clickable"
                     onClick={() =>
-                      navigate(
-                        `/smartroutine/mood-custom/products/${product.product_type}`,
-                      )
+                      navigate(`/smartroutine/mood-custom/products/${product.product_type}`)
                     }
                   >
                     <span>{product.product_label}</span>
@@ -137,7 +137,7 @@ export default function SmartRoutineMoodCustomPage() {
                   <button
                     type="button"
                     className="mood-custom-clear-button"
-                    aria-label={`${product.product_label} 삭제`}
+                    aria-label={`${product.product_label} remove`}
                     onClick={() => removeProduct(product.product_type)}
                   >
                     <CloseIcon />
@@ -163,17 +163,12 @@ export default function SmartRoutineMoodCustomPage() {
 
             <div className="mood-custom-step-list">
               {configuredProducts.map((product) => (
-                <div
-                  key={product.product_type}
-                  className="mood-custom-step-card selected"
-                >
+                <div key={product.product_type} className="mood-custom-step-card selected">
                   <button
                     type="button"
                     className="mood-custom-step-main clickable"
                     onClick={() =>
-                      navigate(
-                        `/smartroutine/mood-custom/products/${product.product_type}`,
-                      )
+                      navigate(`/smartroutine/mood-custom/products/${product.product_type}`)
                     }
                   >
                     <span>{product.summary}</span>
@@ -182,7 +177,7 @@ export default function SmartRoutineMoodCustomPage() {
                   <button
                     type="button"
                     className="mood-custom-clear-button"
-                    aria-label={`${product.product_label} 설정 삭제`}
+                    aria-label={`${product.product_label} clear`}
                     onClick={() => clearProductConfig(product.product_type)}
                   >
                     <CloseIcon />
@@ -220,19 +215,23 @@ export default function SmartRoutineMoodCustomPage() {
           </section>
 
           {canApply ? (
-            <button
-              type="button"
-              className="mood-apply-button"
-              onClick={() => {
-                const applied = applyDraft();
-
-                if (applied) {
-                  navigate("/smartroutine");
-                }
-              }}
-            >
-              적용
-            </button>
+            <>
+              <button
+                type="button"
+                className="mood-apply-button"
+                disabled={isApplyingDraft}
+                onClick={() => {
+                  void handleApply();
+                }}
+              >
+                {isApplyingDraft ? "저장중..." : "저장"}
+              </button>
+              {applyDraftError ? (
+                <p role="alert" className="mood-action-feedback-error">
+                  {applyDraftError}
+                </p>
+              ) : null}
+            </>
           ) : null}
         </main>
       </div>
