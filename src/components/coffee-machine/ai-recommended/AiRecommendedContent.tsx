@@ -5,8 +5,9 @@ import thermometerIcon from "@/assets/icon_image/온도계 아이콘.png";
 import optionIcon from "@/assets/icon_image/옵션 아이콘.png";
 import beanIcon from "@/assets/icon_image/원두 아이콘.png";
 import bellIcon from "@/assets/icon_image/종모양 아이콘.png";
-import keyboardArrowLeftIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
 import keyboardArrowDownIcon from "@/assets/icon_image/keyboard_arrow_down 아이콘.png";
+import "@/components/device-detail/DeviceCommon.css";
+import "./AiRecommendedContent.css";
 
 interface AiRecommendedContentProps {
   onBackClick?: () => void;
@@ -50,8 +51,13 @@ export default function AiRecommendedContent({ onBackClick }: AiRecommendedConte
         </header>
 
         <section className="ai-recommended-titlebar">
-          <button className="ai-recommended-titlebar__back" type="button" onClick={onBackClick} aria-label="이전으로">
-            <img className="ai-recommended-titlebar__back-image" src={keyboardArrowLeftIcon} alt="" />
+          <button
+            className="ai-recommended-titlebar__back back-button"
+            type="button"
+            onClick={onBackClick}
+            aria-label="이전으로"
+          >
+            <span aria-hidden="true">&lt;</span>
           </button>
           <h1 className="ai-recommended-titlebar__title">AI 추천 레시피 조회</h1>
         </section>
