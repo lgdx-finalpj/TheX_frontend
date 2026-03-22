@@ -1,0 +1,268 @@
+﻿import apiClient from "@/api/client";
+import type {
+  CapsuleTemp,
+  RecipeCategory,
+  RecipeFlavor,
+  RecipeItem,
+  RecipeLevel,
+  RecipeType,
+} from "@/types/recipe";
+
+interface CoffeeRecipeListResponse {
+  totalCount: number;
+  recipes: CoffeeBasicRecipeListItemResponse[];
+}
+
+interface CoffeeBasicRecipeListItemResponse {
+  recipeId: number;
+  recipeName: string;
+  recipeCategory: RecipeCategory;
+  saveCount: number;
+}
+
+interface CoffeePopularRecipeListResponse {
+  totalCount: number;
+  recipes: CoffeePopularRecipeListItemResponse[];
+}
+
+interface CoffeePopularRecipeListItemResponse {
+  recipeId: number;
+  userNickname: string;
+  recipeName: string;
+  recipeCategory: RecipeCategory;
+  saveCount: number;
+}
+
+interface MyRecipeListResponseItem {
+  recipeId: number;
+  isCoffee: boolean;
+  recipeName: string;
+}
+
+export interface CoffeeRecipeDetailResponse {
+  recipeId: number;
+  recipeType: RecipeType;
+  userId?: number;
+  userNickname?: string;
+  recipeName: string;
+  recipeCategory: RecipeCategory;
+  capsule1Id?: number | null;
+  capsule1Name?: string | null;
+  capsule2Id?: number | null;
+  capsule2Name?: string | null;
+  capsuleTemp?: CapsuleTemp | null;
+  capsule1Size?: number | null;
+  capsule2Size?: number | null;
+  capsule1Step1?: number | null;
+  capsule2Step2?: number | null;
+  capsule1Step3?: number | null;
+  capsule2Step4?: number | null;
+  ingredient?: string | null;
+  recipeContent?: string | null;
+  totalSize?: number | null;
+  addObj?: string | null;
+  recipeMemo?: string | null;
+  isExtract?: boolean;
+  recipeLevel?: RecipeLevel | null;
+  isShared?: boolean;
+  saveCount?: number;
+}
+
+interface CoffeeRecipeSaveRequest {
+  recipeId: number;
+  recipeCategory: RecipeCategory;
+}
+
+interface CoffeeRecipeSaveResponse {
+  userRecipeId: number;
+  userId: number;
+  recipeId: string;
+  isCoffee: boolean;
+}
+
+export interface NoneCoffeeCreateRequest {
+  recipeName: string;
+  recipeCategory: Exclude<RecipeCategory, "COFFEE">;
+  ingredient: string;
+  recipeContent: string;
+  totalSize: number;
+  recipeLevel: RecipeLevel;
+}
+
+interface CoffeeRecipeCustomizeResponse {
+  recipeId: number;
+  userId: number;
+  recipeType: RecipeType;
+  recipeName: string;
+  recipeCategory: RecipeCategory;
+  isExtract: boolean;
+  isShared: boolean;
+  saveCount: number;
+}
+
+interface CoffeeRecipeShareToggleResponse {
+  recipeId: number;
+  recipeType: RecipeType;
+  isShared: boolean;
+}
+
+const flavorMatchers: ReadonlyArray<{ keyword: string; label: RecipeFlavor }> = [
+  { keyword: "아메리카노", label: "아메리카노" },
+  { keyword: "라떼", label: "라떼" },
+  { keyword: "카푸치노", label: "카푸치노" },
+];
+
+function getFilterLabel(recipeName: string): RecipeFlavor {
+  const lowerName = recipeName.toLowerCase();
+  const found = flavorMatchers.find((item) =>
+    lowerName.includes(item.keyword.toLowerCase()),
+  );
+
+  return found?.label ?? "콜드브루";
+}
+
+function mapRecipeDetailToItem(
+  detail: CoffeeRecipeDetailResponse,
+  fallbackIsCoffee: boolean,
+): RecipeItem {
+  const recipeType = detail.recipeType ?? (fallbackIsCoffee ? "COFFEE" : "NONE_COFFEE");
+  const capsuleTotalSize = (detail.capsule1Size ?? 0) + (detail.capsule2Size ?? 0);
+  const totalSize = detail.totalSize ?? (capsuleTotalSize > 0 ? capsuleTotalSize : undefined);
+
+  return {
+    recipe_id: detail.recipeId,
+    recipe_name: detail.recipeName,
+    save_count: detail.saveCount ?? 0,
+    recipe_type: recipeType,
+    recipe_category: detail.recipeCategory,
+    filter_label: getFilterLabel(detail.recipeName),
+    recipe_level: detail.recipeLevel ?? undefined,
+    user_id: detail.userId ?? undefined,
+    user_nickname: detail.userNickname ?? undefined,
+    capsule_temp1: detail.capsuleTemp ?? undefined,
+    ingredient: detail.ingredient ?? undefined,
+    total_size: totalSize,
+    recipe_memo: detail.recipeMemo ?? undefined,
+    recipe_content: detail.recipeContent ?? undefined,
+    is_shared: detail.isShared ?? false,
+    is_coffee: recipeType === "COFFEE",
+  };
+}
+
+export function mapApiErrorMessage(error: unknown, fallbackMessage: string) {
+  if (typeof error !== "object" || !error) {
+    return fallbackMessage;
+  }
+
+  const maybeError = error as {
+    response?: { data?: { msg?: string; detail?: string; code?: string } };
+    message?: string;
+  };
+  const responseData = maybeError.response?.data;
+
+  if (responseData?.code === "4001_DATA_ALREADY_EXIST") {
+    return "이미 처리된 요청입니다.";
+  }
+
+  return responseData?.msg ?? responseData?.detail ?? maybeError.message ?? fallbackMessage;
+}
+
+export async function fetchBasicRecipes() {
+  const response = await apiClient.get<CoffeeRecipeListResponse>("/coffee/recipes/basic");
+
+  return response.data.recipes.map<RecipeItem>((item) => ({
+    recipe_id: item.recipeId,
+    recipe_name: item.recipeName,
+    save_count: item.saveCount,
+    recipe_type: "COFFEE",
+    recipe_category: item.recipeCategory,
+    filter_label: getFilterLabel(item.recipeName),
+    is_coffee: true,
+  }));
+}
+
+export async function fetchPopularRecipes() {
+  const response = await apiClient.get<CoffeePopularRecipeListResponse>(
+    "/coffee/recipes/popular",
+  );
+
+  return response.data.recipes.map<RecipeItem>((item) => ({
+    recipe_id: item.recipeId,
+    recipe_name: item.recipeName,
+    save_count: item.saveCount,
+    recipe_type: item.recipeCategory === "COFFEE" ? "COFFEE" : "NONE_COFFEE",
+    recipe_category: item.recipeCategory,
+    filter_label: getFilterLabel(item.recipeName),
+    user_nickname: item.userNickname,
+    is_coffee: item.recipeCategory === "COFFEE",
+  }));
+}
+
+export async function fetchMyRecipeList() {
+  const response = await apiClient.get<MyRecipeListResponseItem[]>("/auth/my-recipe-list");
+  return response.data;
+}
+
+export async function fetchRecipeDetail(recipeId: number, isCoffee: boolean) {
+  const response = await apiClient.get<CoffeeRecipeDetailResponse>(
+    `/coffee/recipes/${recipeId}`,
+    { params: { isCoffee } },
+  );
+
+  return response.data;
+}
+
+export async function fetchMyRecipesWithDetails() {
+  const myRecipes = await fetchMyRecipeList();
+  const detailPromises: Array<Promise<RecipeItem>> = myRecipes.map((recipe) =>
+    fetchRecipeDetail(recipe.recipeId, recipe.isCoffee)
+      .then((detail) => mapRecipeDetailToItem(detail, recipe.isCoffee))
+      .catch(
+        (): RecipeItem => ({
+          recipe_id: recipe.recipeId,
+          recipe_name: recipe.recipeName,
+          save_count: 0,
+          recipe_type: recipe.isCoffee
+            ? ("COFFEE" as RecipeType)
+            : ("NONE_COFFEE" as RecipeType),
+          recipe_category: recipe.isCoffee
+            ? ("COFFEE" as RecipeCategory)
+            : ("SMOOTHIE" as RecipeCategory),
+          filter_label: getFilterLabel(recipe.recipeName),
+          is_shared: false,
+          is_coffee: recipe.isCoffee,
+        }),
+      ),
+  );
+
+  return Promise.all(detailPromises);
+}
+
+export async function saveRecipeApi(input: CoffeeRecipeSaveRequest) {
+  const response = await apiClient.post<CoffeeRecipeSaveResponse>(
+    "/coffee/recipes/save",
+    input,
+  );
+  return response.data;
+}
+
+export async function toggleRecipeShareApi(recipeId: number, recipeCategory: RecipeCategory) {
+  const response = await apiClient.patch<CoffeeRecipeShareToggleResponse>(
+    `/coffee/recipes/${recipeId}/share`,
+    undefined,
+    { params: { recipeCategory } },
+  );
+  return response.data;
+}
+
+export async function createNoneCoffeeRecipeApi(input: NoneCoffeeCreateRequest) {
+  const response = await apiClient.post<CoffeeRecipeCustomizeResponse>(
+    "/coffee/recipes/customize/none-coffee",
+    input,
+  );
+  return response.data;
+}
+
+export function mapRecipeDetailForView(detail: CoffeeRecipeDetailResponse, isCoffee: boolean) {
+  return mapRecipeDetailToItem(detail, isCoffee);
+}

@@ -1,0 +1,26 @@
+.placeholder-page {
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.placeholder-page__content {
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+}
+
+.placeholder-page__eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(17, 17, 17, 0.62);
+}
+
+.placeholder-page h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: #111111;
+}

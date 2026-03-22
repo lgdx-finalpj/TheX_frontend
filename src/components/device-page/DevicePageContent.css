@@ -1,0 +1,199 @@
+.device-page__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grouping-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #141414;
+  box-shadow: 0 8px 18px rgba(93, 117, 131, 0.08);
+  cursor: pointer;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.grouping-toggle--active {
+  background: #405474;
+  color: #ffffff;
+}
+
+.grouping-toggle__icon {
+  width: 22px;
+  height: 22px;
+}
+
+.grouping-toggle__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.grouping-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grouping-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.grouping-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.grouping-panel__header h2 {
+  margin: 0;
+  color: #141414;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.grouping-panel__complete-button {
+  padding: 7px 12px;
+  border: 1px solid rgba(64, 84, 116, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #141414;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.grouping-panel__complete-button--disabled {
+  background: rgba(226, 232, 240, 0.82);
+  color: rgba(20, 20, 20, 0.42);
+  box-shadow: none;
+}
+
+.grouping-name-box input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #141414;
+  outline: none;
+  box-shadow: 0 8px 18px rgba(93, 117, 131, 0.06);
+}
+
+.grouping-name-box input::placeholder {
+  color: rgba(20, 20, 20, 0.55);
+}
+
+.grouping-name-box input[aria-invalid="true"] {
+  box-shadow:
+    inset 0 0 0 1px rgba(217, 78, 78, 0.26),
+    0 8px 18px rgba(93, 117, 131, 0.06);
+}
+
+.grouping-panel__helper {
+  margin: -4px 0 0;
+  color: rgba(20, 20, 20, 0.6);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.grouping-panel__helper--error {
+  color: #b93b3b;
+}
+
+.validation-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(27, 39, 53, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+.validation-modal {
+  width: 100%;
+  max-width: 300px;
+  padding: 22px 20px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 36px rgba(56, 80, 98, 0.16);
+  text-align: center;
+}
+
+.validation-modal__eyebrow {
+  margin: 0 0 8px;
+  color: rgba(49, 90, 123, 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.validation-modal h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.validation-modal__message {
+  margin: 10px 0 18px;
+  color: rgba(20, 20, 20, 0.72);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.validation-modal__confirm {
+  min-width: 96px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #405474;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(64, 84, 116, 0.18);
+}
+
+@media (hover: hover) {
+  .grouping-toggle:hover,
+  .grouping-panel__complete-button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.grouping-toggle:active,
+.grouping-panel__complete-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(56, 80, 98, 0.12);
+}

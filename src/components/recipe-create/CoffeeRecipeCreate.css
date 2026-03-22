@@ -1,0 +1,15 @@
+.coffee-recipe-create-page__content {
+  min-height: 100dvh;
+  padding-top: 24px;
+  padding-bottom: 40px;
+  padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
+  background: #eef0f4;
+}
+
+@media (max-width: 360px) {
+  .coffee-recipe-create-page__content {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px));
+    padding-right: calc(12px + env(safe-area-inset-right, 0px));
+  }
+}
