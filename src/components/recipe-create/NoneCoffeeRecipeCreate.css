@@ -1,0 +1,275 @@
+.recipe-create-page__content {
+  min-height: 100dvh;
+  padding-top: 28px;
+  padding-bottom: 30px;
+  padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
+  background: #edf0f6;
+}
+
+.recipe-create-page .recipe-category-page__top {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.recipe-create-page .recipe-category-page__top h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -2px;
+}
+
+.recipe-create-page .recipe-category-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.recipe-create-page .recipe-category-page__back-icon {
+  width: 30px;
+  height: 30px;
+  color: #747c89;
+}
+
+.recipe-create-page .recipe-category-page__intro {
+  margin: 10px;
+}
+
+.recipe-create-page .recipe-category-page__intro strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.9px;
+  line-height: 1.16;
+  word-break: keep-all;
+}
+
+.recipe-create-page .recipe-category-page__intro p {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: -0.6px;
+  line-height: 1.34;
+  color: #2f3845;
+  word-break: keep-all;
+}
+
+.recipe-create-page .recipe-create-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.recipe-create-page .recipe-create-form__card {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.recipe-create-page .recipe-create-form__card--textarea {
+  gap: 10px;
+}
+
+.recipe-create-page .recipe-create-form__label {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.recipe-create-page .recipe-create-form__card input,
+.recipe-create-page .recipe-create-form__card textarea,
+.recipe-create-page .recipe-create-form__inline-field {
+  width: 100%;
+  border: 1.5px solid #e0ddd8;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #111111;
+}
+
+.recipe-create-page .recipe-create-form__card input,
+.recipe-create-page .recipe-create-form__inline-field {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+
+.recipe-create-page .recipe-create-form__card textarea {
+  min-height: 88px;
+  padding: 14px 16px;
+  resize: none;
+  border: 1.5px solid #e0ddd8;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+  outline: 0;
+}
+
+.recipe-create-page
+  .recipe-create-form__card:not(.recipe-create-form__card--textarea)
+  textarea {
+  min-height: 44px;
+  height: auto;
+  field-sizing: content;
+  overflow: hidden;
+}
+
+.recipe-create-page .recipe-create-form__card--textarea textarea {
+  min-height: calc(3 * 1.3em + 28px);
+  height: auto;
+  field-sizing: content;
+  overflow: hidden;
+}
+
+.recipe-create-page .recipe-create-form__card input::placeholder,
+.recipe-create-page .recipe-create-form__card textarea::placeholder {
+  color: #a7acb4;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  opacity: 1;
+}
+
+.recipe-create-page .recipe-create-form__inline-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px 0 16px;
+  border: 1.5px solid #e0ddd8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.recipe-create-page .recipe-create-form__inline-field input {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.recipe-create-page .recipe-create-form__inline-field span {
+  flex-shrink: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.recipe-create-page .recipe-create-form__level-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border: 1.5px solid #e0ddd8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.recipe-create-page .recipe-create-form__level-option {
+  min-height: 34px;
+  border-radius: 10px;
+  background: #f7f3ee;
+  color: #7f858d;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.recipe-create-page .recipe-create-form__level-option.is-active {
+  background: #9d7f64;
+  color: #ffffff;
+}
+
+.recipe-create-page .recipe-create-form__submit {
+  min-height: 46px;
+  margin-top: 2px;
+  border-radius: 14px;
+  background: #d7cabd;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.recipe-create-page .recipe-create-form__submit:disabled {
+  opacity: 0.7;
+}
+
+.recipe-create-page .recipe-create-form__error {
+  margin: 0 2px;
+  color: #c94242;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+
+@media (max-width: 360px) {
+  .recipe-create-page__content {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px));
+    padding-right: calc(12px + env(safe-area-inset-right, 0px));
+  }
+
+  .recipe-create-page .recipe-category-page__top h1 {
+    font-size: 19.6px;
+  }
+
+  .recipe-create-page .recipe-category-page__intro strong {
+    font-size: 20px;
+  }
+
+  .recipe-create-page .recipe-category-page__intro p {
+    font-size: 14px;
+  }
+
+  .recipe-create-page .recipe-create-form {
+    margin-top: 12px;
+    gap: 9px;
+  }
+
+  .recipe-create-page .recipe-create-form__card {
+    padding: 12px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+
+  .recipe-create-page .recipe-create-form__card input,
+  .recipe-create-page .recipe-create-form__inline-field {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .recipe-create-page .recipe-create-form__card textarea {
+    min-height: calc(3 * 1.3em + 24px);
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .recipe-create-page .recipe-create-form__level-toggle {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .recipe-create-page .recipe-create-form__level-option {
+    min-height: 32px;
+    font-size: 12.5px;
+  }
+
+  .recipe-create-page .recipe-create-form__submit {
+    min-height: 42px;
+    font-size: 13px;
+  }
+}

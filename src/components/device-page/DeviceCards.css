@@ -1,0 +1,131 @@
+.device-page-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.device-page-card {
+  display: flex;
+  min-height: 128px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 18px 16px 16px;
+  border: 0;
+  border-radius: 14px;
+  text-align: left;
+  box-shadow: 0 8px 18px rgba(93, 117, 131, 0.07);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.device-page-card--selectable,
+.device-page-card--interactive,
+.device-page-card--add {
+  transform: translateY(0) scale(1);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.device-page-card--selectable,
+.device-page-card--interactive {
+  cursor: pointer;
+}
+
+.device-page-card--off {
+  background: rgba(207, 207, 207, 0.7);
+  color: #141414;
+}
+
+.device-page-card--on {
+  background: rgba(255, 255, 255, 0.7);
+  color: #141414;
+}
+
+.device-page-card--selected {
+  background: #405474;
+  color: #ffffff;
+}
+
+.device-page-card__visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+}
+
+.device-page-card__image {
+  display: block;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.device-page-card__name {
+  font-size: 1.03rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.device-page-card__status {
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.device-page-card__status--off {
+  color: #000000;
+}
+
+.device-page-card__status--on {
+  color: #009630;
+}
+
+.device-page-card__status--selected-on {
+  color: #ffe236;
+}
+
+.device-page-card__status--selected-off {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.device-page-card--add {
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  color: #4f42ff;
+  cursor: default;
+}
+
+.device-page-card__add-icon {
+  font-size: 1.9rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.device-page-card__add-label {
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@media (hover: hover) {
+  .device-page-card--selectable:hover,
+  .device-page-card--interactive:hover,
+  .device-page-card--add:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.device-page-card--selectable:active,
+.device-page-card--interactive:active,
+.device-page-card--add:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(56, 80, 98, 0.12);
+}

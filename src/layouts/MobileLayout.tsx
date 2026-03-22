@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
 import "./MobileLayout.css";
+import type { ReactNode } from "react";
+import backgroundColor1 from "@/assets/bg_color/background_color1.png";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -8,7 +9,17 @@ interface MobileLayoutProps {
 export default function MobileLayout({ children }: MobileLayoutProps) {
   return (
     <div className="app-shell">
-      <div className="mobile-frame">{children}</div>
+      <div
+        className="mobile-frame"
+        style={{
+          backgroundImage: `url(${backgroundColor1})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

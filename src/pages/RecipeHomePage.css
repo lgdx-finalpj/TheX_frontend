@@ -1,0 +1,30 @@
+﻿.recipe-home-page {
+  gap: 18px;
+  padding-bottom: 20px;
+}
+
+.recipe-home-page__spacer {
+  width: 34px;
+  height: 34px;
+}
+
+.recipe-home-card {
+  padding: 22px 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-soft);
+}
+
+.recipe-home-card__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.recipe-home-card__body {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
