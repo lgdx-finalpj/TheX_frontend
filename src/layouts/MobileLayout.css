@@ -1,0 +1,23 @@
+﻿.app-shell {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background: var(--app-bg);
+}
+
+.mobile-frame {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  padding: 14px 20px 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.08)),
+    var(--app-bg);
+  box-shadow: 0 0 32px rgba(25, 31, 40, 0.08);
+}
+
+@media (max-width: 380px) {
+  .mobile-frame {
+    padding-inline: 20px;
+  }
+}

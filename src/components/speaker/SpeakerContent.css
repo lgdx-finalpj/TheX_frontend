@@ -1,0 +1,52 @@
+﻿.secondary-device-page {
+  gap: 14px;
+  padding-bottom: 20px;
+}
+
+.secondary-device-hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 232px;
+  padding: 8px 0 4px;
+}
+
+.secondary-device-hero__image-wrap {
+  width: min(100%, 204px);
+  display: flex;
+  justify-content: center;
+}
+
+.secondary-device-hero__image {
+  width: 100%;
+  max-width: 108px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 18px rgba(19, 24, 33, 0.1));
+}
+
+.secondary-device-page__title {
+  margin: -4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.secondary-device-status-grid .status-card {
+  min-height: 94px;
+}
+
+.secondary-device-menu-list {
+  margin-top: 2px;
+}
+
+@media (max-width: 380px) {
+  .secondary-device-page__title {
+    font-size: 16px;
+  }
+
+  .secondary-device-hero {
+    min-height: 216px;
+  }
+}
