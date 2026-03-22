@@ -35,6 +35,12 @@ export interface CoffeeMachineConfig {
   temperature: TemperatureLevel;
   total_extraction_type: ExtractionType;
   total_extraction_ml: 80 | 220;
+  capsule1_step1?: number;
+  capsule2_step2?: number;
+  capsule1_step3?: number;
+  capsule2_step4?: number;
+  capsule1_size?: number;
+  capsule2_size?: number;
 }
 
 export interface LightConfig {
@@ -119,6 +125,10 @@ export interface CapsuleBrandOption {
 export interface MoodCustomDraftContextValue {
   draft: MoodCustomDraft;
   savedMoodCustoms: SavedMoodCustom[];
+  isSavedMoodCustomsLoading: boolean;
+  savedMoodCustomsError: string | null;
+  isApplyingDraft: boolean;
+  applyDraftError: string | null;
   setMoodName: (moodName: string) => void;
   clearMoodName: () => void;
   setSelectedMood: (moodId: MoodOptionId) => void;
@@ -131,6 +141,7 @@ export interface MoodCustomDraftContextValue {
     summary: string,
   ) => void;
   clearProductConfig: (productType: ProductType) => void;
-  applyDraft: () => boolean;
+  applyDraft: () => Promise<boolean>;
+  refreshSavedMoodCustoms: () => Promise<void>;
   resetDraft: () => void;
 }

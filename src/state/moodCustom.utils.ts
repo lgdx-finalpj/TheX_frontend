@@ -33,5 +33,5 @@ export function getCapsuleBrandDisplayName(brandValue: string) {
     return "StoneandBean";
   }
 
-  return brandValue;
+  return "";
 }
