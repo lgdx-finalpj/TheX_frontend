@@ -98,10 +98,20 @@ export const capsuleBrandOptions: CapsuleBrandOption[] = [
     displayName: "StoneandBean",
     logoSrc: coffeeBrandLogo2,
   },
+];
+
+export const capsuleNameOptions: CapsuleBrandOption[] = [
   {
-    id: "custom",
-    label: "직접 입력",
-    displayName: "직접 입력",
+    id: "velocity",
+    label: "V1",
+    displayName: "V1",
+    logoSrc: coffeeCapsule1Image,
+  },
+  {
+    id: "stoneandbean",
+    label: "S1",
+    displayName: "S1",
+    logoSrc: coffeeCapsule2Image,
   },
 ];
 

@@ -2,16 +2,15 @@ import SmartRoutineHeader from "@/components/SmartRoutineHeader";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
   capsuleBrandOptions,
+  capsuleNameOptions,
   coffeeCapsuleAssets,
   lightColorOptions,
   speakerMusicOptions,
 } from "@/state/moodCustom.constants";
-import {
-  getCapsuleBrandDisplayName,
-  getProductOptionByType,
-} from "@/state/moodCustom.utils";
+import { getProductOptionByType } from "@/state/moodCustom.utils";
 import { useMoodCustomDraft } from "@/state/useMoodCustomDraft";
 import type {
+  CapsuleBrandOption,
   CapsuleBrandValue,
   CoffeeCapsuleInfo,
   CoffeeMachineConfig,
@@ -21,18 +20,53 @@ import type {
   SpeakerConfig,
   TemperatureLevel,
 } from "@/state/moodCustom.types";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./SmartRoutineShared.css";
 import "./MoodCustomFlow.css";
+import "./SmartRoutineShared.css";
 
 type CapsuleSlot = "first" | "second";
+type CoffeeExtractionStepKey =
+  | "capsule1Step1"
+  | "capsule2Step2"
+  | "capsule1Step3"
+  | "capsule2Step4";
+type CoffeeExtractionSteps = Record<CoffeeExtractionStepKey, number>;
+
 type ActiveSheet =
   | { type: "brand"; slot: CapsuleSlot }
   | { type: "name"; slot: CapsuleSlot }
   | { type: "temperature" }
   | { type: "extraction" }
+  | { type: "capsule-extraction" }
   | null;
+
+const validProductTypes: ProductType[] = ["coffee_machine", "light", "speaker"];
+const EXTRACTION_STEP_UNIT = 10;
+const MIN_EXTRACTION_STEP_ML = 10;
+const DEFAULT_CAPSULE_NAMES = {
+  first: "V1",
+  second: "S1",
+} as const;
+const editableExtractionStepKeys: Array<
+  "capsule1Step1" | "capsule2Step2" | "capsule1Step3"
+> = ["capsule1Step1", "capsule2Step2", "capsule1Step3"];
+
+function isEditableExtractionStepKey(
+  stepKey: CoffeeExtractionStepKey,
+): stepKey is "capsule1Step1" | "capsule2Step2" | "capsule1Step3" {
+  return editableExtractionStepKeys.includes(
+    stepKey as "capsule1Step1" | "capsule2Step2" | "capsule1Step3",
+  );
+}
+
+const temperatureArc = {
+  width: 270,
+  height: 150,
+  radius: 118,
+  centerX: 135,
+  centerY: 135,
+} as const;
 
 function ChevronRightIcon() {
   return (
@@ -78,14 +112,6 @@ function CloseIcon() {
   );
 }
 
-function PencilBadge() {
-  return (
-    <span className="capsule-brand-badge custom" aria-hidden="true">
-      ✏️
-    </span>
-  );
-}
-
 function BottomSheet({
   children,
   onClose,
@@ -104,6 +130,85 @@ function BottomSheet({
         <div className="bottom-sheet-handle" />
         {children}
       </div>
+    </div>
+  );
+}
+
+function ProductOptionDropdown({
+  id,
+  value,
+  options,
+  onChange,
+}: {
+  id: string;
+  value: string;
+  options: readonly string[];
+  onChange: (nextValue: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (!rootRef.current?.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, []);
+
+  return (
+    <div className={`product-select-wrap ${isOpen ? "open" : ""}`} ref={rootRef}>
+      <button
+        type="button"
+        id={id}
+        className="product-select-button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <span>{value}</span>
+        <span className="product-select-icon" aria-hidden="true">
+          <ChevronDownIcon />
+        </span>
+      </button>
+
+      {isOpen ? (
+        <ul className="product-select-menu" role="listbox" aria-labelledby={id}>
+          {options.map((option) => {
+            const isSelected = option === value;
+
+            return (
+              <li key={option}>
+                <button
+                  type="button"
+                  className={`product-select-option ${isSelected ? "selected" : ""}`}
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onChange(option);
+                    setIsOpen(false);
+                  }}
+                >
+                  {option}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </div>
   );
 }
@@ -151,15 +256,6 @@ function SettingsActionButton({
     </div>
   );
 }
-
-const validProductTypes: ProductType[] = ["coffee_machine", "light", "speaker"];
-const temperatureArc = {
-  width: 270,
-  height: 150,
-  radius: 118,
-  centerX: 135,
-  centerY: 135,
-} as const;
 
 function getTemperatureDraftValue(level: TemperatureLevel | null) {
   if (level === "low") {
@@ -218,26 +314,143 @@ function getTemperatureLabel(level: TemperatureLevel | null) {
 
 function getExtractionLabel(type: ExtractionType | null) {
   if (type === "espresso") {
-    return "espresso(80ml)";
+    return "espresso (80ml)";
   }
 
   if (type === "lungo") {
-    return "lungo(220ml)";
+    return "lungo (220ml)";
   }
 
   return "";
 }
 
-function getBrandMode(brandValue: string): CapsuleBrandValue {
-  if (brandValue === "velocity") {
-    return "velocity";
+function getExtractionTotalByType(type: ExtractionType | null): 80 | 220 | null {
+  if (type === "espresso") {
+    return 80;
   }
 
-  if (brandValue === "stoneandbean") {
-    return "stoneandbean";
+  if (type === "lungo") {
+    return 220;
   }
 
-  return "custom";
+  return null;
+}
+
+function getDefaultExtractionSteps(totalExtractionMl: 80 | 220): CoffeeExtractionSteps {
+  if (totalExtractionMl === 80) {
+    return {
+      capsule1Step1: 20,
+      capsule2Step2: 20,
+      capsule1Step3: 20,
+      capsule2Step4: 20,
+    };
+  }
+
+  return {
+    capsule1Step1: 60,
+    capsule2Step2: 50,
+    capsule1Step3: 60,
+    capsule2Step4: 50,
+  };
+}
+
+function normalizeByStepUnit(value: number) {
+  return Math.round(value / EXTRACTION_STEP_UNIT) * EXTRACTION_STEP_UNIT;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(value, max));
+}
+
+function normalizeExtractionSteps(
+  totalExtractionMl: 80 | 220,
+  source: Partial<CoffeeExtractionSteps>,
+): CoffeeExtractionSteps {
+  const fallback = getDefaultExtractionSteps(totalExtractionMl);
+  const step1Candidate = Number.isFinite(source.capsule1Step1)
+    ? Number(source.capsule1Step1)
+    : fallback.capsule1Step1;
+  const step2Candidate = Number.isFinite(source.capsule2Step2)
+    ? Number(source.capsule2Step2)
+    : fallback.capsule2Step2;
+  const step3Candidate = Number.isFinite(source.capsule1Step3)
+    ? Number(source.capsule1Step3)
+    : fallback.capsule1Step3;
+
+  const step1Max = totalExtractionMl - MIN_EXTRACTION_STEP_ML * 3;
+  const step1 = clamp(
+    normalizeByStepUnit(step1Candidate),
+    MIN_EXTRACTION_STEP_ML,
+    step1Max,
+  );
+
+  const step2Max = totalExtractionMl - step1 - MIN_EXTRACTION_STEP_ML * 2;
+  const step2 = clamp(
+    normalizeByStepUnit(step2Candidate),
+    MIN_EXTRACTION_STEP_ML,
+    step2Max,
+  );
+
+  const step3Max = totalExtractionMl - step1 - step2 - MIN_EXTRACTION_STEP_ML;
+  const step3 = clamp(
+    normalizeByStepUnit(step3Candidate),
+    MIN_EXTRACTION_STEP_ML,
+    step3Max,
+  );
+
+  const step4 = totalExtractionMl - step1 - step2 - step3;
+
+  return {
+    capsule1Step1: step1,
+    capsule2Step2: step2,
+    capsule1Step3: step3,
+    capsule2Step4: step4,
+  };
+}
+
+function getStepLabel(stepKey: CoffeeExtractionStepKey) {
+  if (stepKey === "capsule1Step1") {
+    return "1단계 (V1)";
+  }
+
+  if (stepKey === "capsule2Step2") {
+    return "2단계 (S1)";
+  }
+
+  if (stepKey === "capsule1Step3") {
+    return "3단계 (V1)";
+  }
+
+  return "4단계 (S1, 자동)";
+}
+
+function resolveCapsuleOptionMode(
+  value: string,
+  options: CapsuleBrandOption[],
+): CapsuleBrandValue {
+  const matched = options.find(
+    (option) => option.id === value || option.displayName === value,
+  );
+
+  if (matched) {
+    return matched.id;
+  }
+
+  return options[0]?.id ?? "velocity";
+}
+
+function resolveCapsuleOptionDisplayName(option: CapsuleBrandOption) {
+  return option.displayName;
+}
+
+function getCoffeeExtractionSummary(
+  steps: CoffeeExtractionSteps,
+  firstCapsuleName: string,
+  secondCapsuleName: string,
+) {
+  const capsule1Size = steps.capsule1Step1 + steps.capsule1Step3;
+  const capsule2Size = steps.capsule2Step2 + steps.capsule2Step4;
+  return `${firstCapsuleName} ${capsule1Size}ml · ${secondCapsuleName} ${capsule2Size}ml`;
 }
 
 export default function MoodCustomProductSettingsPage() {
@@ -277,6 +490,19 @@ export default function MoodCustomProductSettingsPage() {
       ? currentProduct.config
       : null;
 
+  const initialExtractionType = coffeeConfig?.total_extraction_type ?? null;
+  const initialExtractionTotalMl =
+    coffeeConfig?.total_extraction_ml ?? getExtractionTotalByType(initialExtractionType);
+  const normalizedInitialExtractionSteps =
+    initialExtractionTotalMl != null
+      ? normalizeExtractionSteps(initialExtractionTotalMl, {
+          capsule1Step1: coffeeConfig?.capsule1_step1,
+          capsule2Step2: coffeeConfig?.capsule2_step2,
+          capsule1Step3: coffeeConfig?.capsule1_step3,
+          capsule2Step4: coffeeConfig?.capsule2_step4,
+        })
+      : getDefaultExtractionSteps(220);
+
   const [firstCapsule, setFirstCapsule] = useState<CoffeeCapsuleInfo>({
     capsule_id: coffeeCapsuleAssets[0].capsule_id,
     image_src: coffeeCapsuleAssets[0].image_src,
@@ -293,8 +519,14 @@ export default function MoodCustomProductSettingsPage() {
     coffeeConfig?.temperature ?? null,
   );
   const [extractionType, setExtractionType] = useState<ExtractionType | null>(
-    coffeeConfig?.total_extraction_type ?? null,
+    initialExtractionType,
   );
+  const [extractionSteps, setExtractionSteps] = useState<CoffeeExtractionSteps>(
+    normalizedInitialExtractionSteps,
+  );
+  const [activeExtractionStep, setActiveExtractionStep] =
+    useState<CoffeeExtractionStepKey>("capsule1Step1");
+
   const [lightColor, setLightColor] = useState(
     lightConfig?.light_color ?? "Soft White",
   );
@@ -305,8 +537,7 @@ export default function MoodCustomProductSettingsPage() {
   const [volume, setVolume] = useState(speakerConfig?.volume ?? 80);
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [brandMode, setBrandMode] = useState<CapsuleBrandValue>("velocity");
-  const [customBrand, setCustomBrand] = useState("");
-  const [capsuleNameInput, setCapsuleNameInput] = useState("");
+  const [nameMode, setNameMode] = useState<CapsuleBrandValue>("velocity");
   const [temperatureDraftValue, setTemperatureDraftValue] = useState(50);
   const [extractionDraft, setExtractionDraft] = useState<ExtractionType>("lungo");
 
@@ -324,27 +555,59 @@ export default function MoodCustomProductSettingsPage() {
     [firstCapsule, secondCapsule],
   );
 
+  const totalExtractionMl = useMemo(
+    () => getExtractionTotalByType(extractionType),
+    [extractionType],
+  );
+
+  const normalizedExtractionSteps = useMemo(() => {
+    if (totalExtractionMl == null) {
+      return null;
+    }
+
+    return normalizeExtractionSteps(totalExtractionMl, {
+      capsule1Step1: extractionSteps.capsule1Step1,
+      capsule2Step2: extractionSteps.capsule2Step2,
+      capsule1Step3: extractionSteps.capsule1Step3,
+      capsule2Step4: extractionSteps.capsule2Step4,
+    });
+  }, [extractionSteps, totalExtractionMl]);
+
+  const capsule1Name = firstCapsule.capsule_name || DEFAULT_CAPSULE_NAMES.first;
+  const capsule2Name = secondCapsule.capsule_name || DEFAULT_CAPSULE_NAMES.second;
+  const capsuleExtractionSummary =
+    normalizedExtractionSteps == null
+      ? ""
+      : getCoffeeExtractionSummary(
+          normalizedExtractionSteps,
+          capsule1Name,
+          capsule2Name,
+        );
+
   if (!resolvedProductType || !currentProduct) {
     return null;
   }
 
   const productOption = getProductOptionByType(resolvedProductType);
+  const capsuleBrandSelectableOptions = capsuleBrandOptions;
+  const capsuleNameSelectableOptions = capsuleNameOptions;
 
   const openBrandSheet = (slot: CapsuleSlot) => {
     const capsule = currentCapsules[slot];
 
-    setBrandMode(getBrandMode(capsule.capsule_brand));
-    setCustomBrand(
-      capsule.capsule_brand === "velocity" ||
-        capsule.capsule_brand === "stoneandbean"
-        ? ""
-        : capsule.capsule_brand,
+    setBrandMode(
+      resolveCapsuleOptionMode(capsule.capsule_brand, capsuleBrandSelectableOptions),
     );
     setActiveSheet({ type: "brand", slot });
   };
 
   const openNameSheet = (slot: CapsuleSlot) => {
-    setCapsuleNameInput(currentCapsules[slot].capsule_name);
+    setNameMode(
+      resolveCapsuleOptionMode(
+        currentCapsules[slot].capsule_name,
+        capsuleNameSelectableOptions,
+      ),
+    );
     setActiveSheet({ type: "name", slot });
   };
 
@@ -356,6 +619,21 @@ export default function MoodCustomProductSettingsPage() {
   const openExtractionSheet = () => {
     setExtractionDraft(extractionType ?? "lungo");
     setActiveSheet({ type: "extraction" });
+  };
+
+  const openCapsuleExtractionSheet = () => {
+    if (!extractionType || totalExtractionMl == null) {
+      return;
+    }
+
+    setExtractionSteps((current) =>
+      normalizeExtractionSteps(totalExtractionMl, {
+        capsule1Step1: current.capsule1Step1,
+        capsule2Step2: current.capsule2Step2,
+        capsule1Step3: current.capsule1Step3,
+      }),
+    );
+    setActiveSheet({ type: "capsule-extraction" });
   };
 
   const updateCapsule = (slot: CapsuleSlot, nextCapsule: CoffeeCapsuleInfo) => {
@@ -384,13 +662,77 @@ export default function MoodCustomProductSettingsPage() {
     });
   };
 
+  const handleExtractionStepChange = (
+    stepKey: "capsule1Step1" | "capsule2Step2" | "capsule1Step3",
+    rawValue: number,
+  ) => {
+    if (totalExtractionMl == null) {
+      return;
+    }
+
+    setExtractionSteps((current) => {
+      const nextValue = normalizeByStepUnit(rawValue);
+
+      if (stepKey === "capsule1Step1") {
+        return normalizeExtractionSteps(totalExtractionMl, {
+          capsule1Step1: nextValue,
+          capsule2Step2: current.capsule2Step2,
+          capsule1Step3: current.capsule1Step3,
+        });
+      }
+
+      if (stepKey === "capsule2Step2") {
+        return normalizeExtractionSteps(totalExtractionMl, {
+          capsule1Step1: current.capsule1Step1,
+          capsule2Step2: nextValue,
+          capsule1Step3: current.capsule1Step3,
+        });
+      }
+
+      return normalizeExtractionSteps(totalExtractionMl, {
+        capsule1Step1: current.capsule1Step1,
+        capsule2Step2: current.capsule2Step2,
+        capsule1Step3: nextValue,
+      });
+    });
+  };
+
+  const getEditableStepMax = (
+    stepKey: "capsule1Step1" | "capsule2Step2" | "capsule1Step3",
+  ) => {
+    if (totalExtractionMl == null || normalizedExtractionSteps == null) {
+      return MIN_EXTRACTION_STEP_ML;
+    }
+
+    if (stepKey === "capsule1Step1") {
+      return totalExtractionMl - MIN_EXTRACTION_STEP_ML * 3;
+    }
+
+    if (stepKey === "capsule2Step2") {
+      return (
+        totalExtractionMl -
+        normalizedExtractionSteps.capsule1Step1 -
+        MIN_EXTRACTION_STEP_ML * 2
+      );
+    }
+
+    return (
+      totalExtractionMl -
+      normalizedExtractionSteps.capsule1Step1 -
+      normalizedExtractionSteps.capsule2Step2 -
+      MIN_EXTRACTION_STEP_ML
+    );
+  };
+
   const canSaveCoffeeMachine =
     Boolean(firstCapsule.capsule_brand) &&
     Boolean(firstCapsule.capsule_name) &&
     Boolean(secondCapsule.capsule_brand) &&
     Boolean(secondCapsule.capsule_name) &&
     Boolean(temperature) &&
-    Boolean(extractionType);
+    Boolean(extractionType) &&
+    totalExtractionMl != null &&
+    normalizedExtractionSteps != null;
 
   const handleSave = () => {
     if (!productOption) {
@@ -398,9 +740,15 @@ export default function MoodCustomProductSettingsPage() {
     }
 
     if (resolvedProductType === "coffee_machine" && canSaveCoffeeMachine) {
-      if (!temperature || !extractionType) {
+      if (!temperature || !extractionType || totalExtractionMl == null) {
         return;
       }
+
+      const normalized = normalizeExtractionSteps(totalExtractionMl, {
+        capsule1Step1: extractionSteps.capsule1Step1,
+        capsule2Step2: extractionSteps.capsule2Step2,
+        capsule1Step3: extractionSteps.capsule1Step3,
+      });
 
       const config: CoffeeMachineConfig = {
         product_code: productOption.product_code,
@@ -408,7 +756,13 @@ export default function MoodCustomProductSettingsPage() {
         second_capsule: secondCapsule,
         temperature,
         total_extraction_type: extractionType,
-        total_extraction_ml: extractionType === "espresso" ? 80 : 220,
+        total_extraction_ml: totalExtractionMl,
+        capsule1_step1: normalized.capsule1Step1,
+        capsule2_step2: normalized.capsule2Step2,
+        capsule1_step3: normalized.capsule1Step3,
+        capsule2_step4: normalized.capsule2Step4,
+        capsule1_size: normalized.capsule1Step1 + normalized.capsule1Step3,
+        capsule2_size: normalized.capsule2Step2 + normalized.capsule2Step4,
       };
 
       upsertProductConfig(
@@ -488,7 +842,11 @@ export default function MoodCustomProductSettingsPage() {
 
                         <div className="capsule-meta-list">
                           <SettingsActionButton
-                            value={getCapsuleBrandDisplayName(capsule.capsule_brand)}
+                            value={
+                              capsuleBrandSelectableOptions.find(
+                                (option) => option.id === capsule.capsule_brand,
+                              )?.displayName ?? ""
+                            }
                             placeholder="브랜드명"
                             onClick={() => openBrandSheet(slot)}
                             onClear={
@@ -518,7 +876,7 @@ export default function MoodCustomProductSettingsPage() {
                   <label>온도 설정</label>
                   <SettingsActionButton
                     value={getTemperatureLabel(temperature)}
-                    placeholder="캡슐 온도를 설정하시오"
+                    placeholder="캡슐 온도를 설정해 주세요"
                     onClick={openTemperatureSheet}
                     onClear={temperature ? () => setTemperature(null) : undefined}
                   />
@@ -531,7 +889,28 @@ export default function MoodCustomProductSettingsPage() {
                     placeholder="총 음료의 용량을 설정해 주세요"
                     onClick={openExtractionSheet}
                     onClear={
-                      extractionType ? () => setExtractionType(null) : undefined
+                      extractionType
+                        ? () => {
+                            setExtractionType(null);
+                            setExtractionSteps(getDefaultExtractionSteps(220));
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+
+                <div className="product-form-card coffee-machine-summary-card">
+                  <label>캡슐별 추출량</label>
+                  <SettingsActionButton
+                    value={capsuleExtractionSummary}
+                    placeholder="캡슐별 추출량을 설정해 주세요"
+                    disabled={!extractionType}
+                    onClick={openCapsuleExtractionSheet}
+                    onClear={
+                      extractionType && totalExtractionMl != null
+                        ? () =>
+                            setExtractionSteps(getDefaultExtractionSteps(totalExtractionMl))
+                        : undefined
                     }
                   />
                 </div>
@@ -541,24 +920,13 @@ export default function MoodCustomProductSettingsPage() {
             {resolvedProductType === "light" ? (
               <>
                 <div className="product-dropdown-card">
-                  <label htmlFor="lightColor">조명 색상</label>
-                  <div className="product-select-wrap">
-                    <select
-                      id="lightColor"
-                      className="product-select"
-                      value={lightColor}
-                      onChange={(event) => setLightColor(event.target.value)}
-                    >
-                      {lightColorOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="product-select-icon" aria-hidden="true">
-                      <ChevronDownIcon />
-                    </span>
-                  </div>
+                  <label>조명 색상</label>
+                  <ProductOptionDropdown
+                    id="lightColor"
+                    value={lightColor}
+                    options={lightColorOptions}
+                    onChange={setLightColor}
+                  />
                 </div>
 
                 <div className="product-slider-card">
@@ -567,9 +935,10 @@ export default function MoodCustomProductSettingsPage() {
                   <input
                     id="brightness"
                     type="range"
+                    className="product-slider-input"
                     min="0"
                     max="100"
-                    step="10"
+                    step="20"
                     value={brightness}
                     onChange={(event) => setBrightness(Number(event.target.value))}
                   />
@@ -585,24 +954,13 @@ export default function MoodCustomProductSettingsPage() {
             {resolvedProductType === "speaker" ? (
               <>
                 <div className="product-dropdown-card">
-                  <label htmlFor="musicType">음악 타입</label>
-                  <div className="product-select-wrap">
-                    <select
-                      id="musicType"
-                      className="product-select"
-                      value={musicType}
-                      onChange={(event) => setMusicType(event.target.value)}
-                    >
-                      {speakerMusicOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="product-select-icon" aria-hidden="true">
-                      <ChevronDownIcon />
-                    </span>
-                  </div>
+                  <label>음악 타입</label>
+                  <ProductOptionDropdown
+                    id="musicType"
+                    value={musicType}
+                    options={speakerMusicOptions}
+                    onChange={setMusicType}
+                  />
                 </div>
 
                 <div className="product-slider-card">
@@ -611,9 +969,10 @@ export default function MoodCustomProductSettingsPage() {
                   <input
                     id="volume"
                     type="range"
+                    className="product-slider-input"
                     min="0"
                     max="100"
-                    step="10"
+                    step="20"
                     value={volume}
                     onChange={(event) => setVolume(Number(event.target.value))}
                   />
@@ -652,7 +1011,7 @@ export default function MoodCustomProductSettingsPage() {
               <h3>{activeSheet.slot === "first" ? "1번" : "2번"} 캡슐 브랜드명</h3>
 
               <div className="capsule-brand-options">
-                {capsuleBrandOptions.map((option) => {
+                {capsuleBrandSelectableOptions.map((option) => {
                   const isSelected = brandMode === option.id;
 
                   return (
@@ -663,44 +1022,26 @@ export default function MoodCustomProductSettingsPage() {
                       onClick={() => setBrandMode(option.id)}
                     >
                       <span className="capsule-radio" aria-hidden="true" />
-                      {option.id === "custom" ? (
-                        <PencilBadge />
-                      ) : (
-                        <img
-                          src={option.logoSrc}
-                          alt={option.displayName}
-                          className="capsule-brand-logo"
-                        />
-                      )}
+                      <img
+                        src={option.logoSrc}
+                        alt={option.displayName}
+                        className="capsule-brand-logo"
+                      />
                       <span>{option.label}</span>
                     </button>
                   );
                 })}
               </div>
 
-              {brandMode === "custom" ? (
-                <textarea
-                  className="sheet-textarea"
-                  placeholder="브랜드명 직접입력(ex.스타벅스)"
-                  value={customBrand}
-                  rows={2}
-                  onChange={(event) => setCustomBrand(event.target.value)}
-                />
-              ) : null}
-
               <button
                 type="button"
                 className="sheet-apply-button"
-                disabled={
-                  brandMode === "custom" ? customBrand.trim().length === 0 : false
-                }
                 onClick={() => {
                   const capsule = currentCapsules[activeSheet.slot];
 
                   updateCapsule(activeSheet.slot, {
                     ...capsule,
-                    capsule_brand:
-                      brandMode === "custom" ? customBrand.trim() : brandMode,
+                    capsule_brand: brandMode,
                   });
                   setActiveSheet(null);
                 }}
@@ -715,37 +1056,44 @@ export default function MoodCustomProductSettingsPage() {
           <BottomSheet onClose={() => setActiveSheet(null)}>
             <div className="capsule-sheet">
               <h3>{activeSheet.slot === "first" ? "1번" : "2번"} 캡슐명</h3>
-              <p className="sheet-caption">
-                입력한 브랜드 :{" "}
-                {getCapsuleBrandDisplayName(
-                  currentCapsules[activeSheet.slot].capsule_brand,
-                )}
-              </p>
 
-              <div className="capsule-name-inline">
-                <PencilBadge />
-                <span>직접 입력</span>
-                <span className="capsule-radio selected" aria-hidden="true" />
+              <div className="capsule-brand-options">
+                {capsuleNameSelectableOptions.map((option) => {
+                  const isSelected = nameMode === option.id;
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`capsule-brand-option ${isSelected ? "selected" : ""}`}
+                      onClick={() => setNameMode(option.id)}
+                    >
+                      <span className="capsule-radio" aria-hidden="true" />
+                      <img
+                        src={option.logoSrc}
+                        alt={option.displayName}
+                        className="capsule-brand-logo"
+                      />
+                      <span>{option.label}</span>
+                    </button>
+                  );
+                })}
               </div>
-
-              <textarea
-                className="sheet-textarea"
-                placeholder="캡슐 전체 이름"
-                value={capsuleNameInput}
-                rows={2}
-                onChange={(event) => setCapsuleNameInput(event.target.value)}
-              />
 
               <button
                 type="button"
                 className="sheet-apply-button"
-                disabled={capsuleNameInput.trim().length === 0}
                 onClick={() => {
                   const capsule = currentCapsules[activeSheet.slot];
+                  const selectedOption = capsuleNameSelectableOptions.find(
+                    (option) => option.id === nameMode,
+                  );
 
                   updateCapsule(activeSheet.slot, {
                     ...capsule,
-                    capsule_name: capsuleNameInput.trim(),
+                    capsule_name: selectedOption
+                      ? resolveCapsuleOptionDisplayName(selectedOption)
+                      : "",
                   });
                   setActiveSheet(null);
                 }}
@@ -805,16 +1153,16 @@ export default function MoodCustomProductSettingsPage() {
 
               <div className="temperature-visual">
                 <div className="temperature-capsule-cluster">
-                <img
-                  src={firstCapsule.image_src}
-                  alt={firstCapsule.capsule_name || "1번 캡슐"}
-                  className="temperature-capsule front"
-                />
-                <img
-                  src={secondCapsule.image_src}
-                  alt={secondCapsule.capsule_name || "2번 캡슐"}
-                  className="temperature-capsule back"
-                />
+                  <img
+                    src={firstCapsule.image_src}
+                    alt={firstCapsule.capsule_name || "1번 캡슐"}
+                    className="temperature-capsule front"
+                  />
+                  <img
+                    src={secondCapsule.image_src}
+                    alt={secondCapsule.capsule_name || "2번 캡슐"}
+                    className="temperature-capsule back"
+                  />
                 </div>
                 <p>
                   {firstCapsule.capsule_name || "1번 캡슐"}
@@ -851,7 +1199,9 @@ export default function MoodCustomProductSettingsPage() {
                   <button
                     key={option.value}
                     type="button"
-                    className={`extraction-option-button ${extractionDraft === option.value ? "selected" : ""}`}
+                    className={`extraction-option-button ${
+                      extractionDraft === option.value ? "selected" : ""
+                    }`}
                     onClick={() => setExtractionDraft(option.value)}
                   >
                     <strong>{option.label}</strong>
@@ -861,7 +1211,9 @@ export default function MoodCustomProductSettingsPage() {
               </div>
 
               <div
-                className={`extraction-volume-box ${extractionDraft === "espresso" ? "small" : "large"}`}
+                className={`extraction-volume-box ${
+                  extractionDraft === "espresso" ? "small" : "large"
+                }`}
               >
                 {extractionDraft === "espresso" ? "80ml" : "220ml"}
               </div>
@@ -870,7 +1222,186 @@ export default function MoodCustomProductSettingsPage() {
                 type="button"
                 className="sheet-apply-button"
                 onClick={() => {
+                  const nextTotalMl = getExtractionTotalByType(extractionDraft);
+                  if (nextTotalMl == null) {
+                    return;
+                  }
+
                   setExtractionType(extractionDraft);
+                  setExtractionSteps((current) => {
+                    if (totalExtractionMl === nextTotalMl) {
+                      return normalizeExtractionSteps(nextTotalMl, {
+                        capsule1Step1: current.capsule1Step1,
+                        capsule2Step2: current.capsule2Step2,
+                        capsule1Step3: current.capsule1Step3,
+                      });
+                    }
+
+                    return getDefaultExtractionSteps(nextTotalMl);
+                  });
+                  setActiveSheet(null);
+                }}
+              >
+                적용
+              </button>
+            </div>
+          </BottomSheet>
+        ) : null}
+
+        {activeSheet?.type === "capsule-extraction" &&
+        totalExtractionMl != null &&
+        normalizedExtractionSteps != null ? (
+          <BottomSheet onClose={() => setActiveSheet(null)}>
+            <div className="capsule-sheet capsule-extraction-sheet">
+              <h3>캡슐별 추출량</h3>
+
+              <div className="capsule-extraction-total-row">
+                <span>총 추출량</span>
+                <strong>{totalExtractionMl}ml</strong>
+              </div>
+
+              <div className="capsule-extraction-cards">
+                {([
+                  {
+                    slot: "first",
+                    imageSrc: firstCapsule.image_src,
+                    name: capsule1Name,
+                    amount:
+                      normalizedExtractionSteps.capsule1Step1 +
+                      normalizedExtractionSteps.capsule1Step3,
+                  },
+                  {
+                    slot: "second",
+                    imageSrc: secondCapsule.image_src,
+                    name: capsule2Name,
+                    amount:
+                      normalizedExtractionSteps.capsule2Step2 +
+                      normalizedExtractionSteps.capsule2Step4,
+                  },
+                ] as const).map((capsule) => {
+                  const isActiveCapsule =
+                    capsule.slot === "first"
+                      ? activeExtractionStep === "capsule1Step1" ||
+                        activeExtractionStep === "capsule1Step3"
+                      : activeExtractionStep === "capsule2Step2" ||
+                        activeExtractionStep === "capsule2Step4";
+
+                  return (
+                    <button
+                      key={capsule.slot}
+                      type="button"
+                      className={`capsule-extraction-card ${
+                        isActiveCapsule ? "active" : ""
+                      }`}
+                      onClick={() =>
+                        setActiveExtractionStep(
+                          capsule.slot === "first"
+                            ? "capsule1Step1"
+                            : "capsule2Step2",
+                        )
+                      }
+                    >
+                      <img src={capsule.imageSrc} alt={capsule.name} />
+                      <strong>{capsule.name}</strong>
+                      <span>{capsule.amount}ml</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="capsule-cup-stage">
+                <div className="capsule-cup-visual" aria-hidden="true">
+                  {([
+                    "capsule2Step4",
+                    "capsule1Step3",
+                    "capsule2Step2",
+                    "capsule1Step1",
+                  ] as const).map((stepKey) => {
+                    const stepValue = normalizedExtractionSteps[stepKey];
+                    const layerHeight = `${(stepValue / totalExtractionMl) * 100}%`;
+                    const isEditable = isEditableExtractionStepKey(stepKey);
+                    const isActiveLayer = activeExtractionStep === stepKey;
+
+                    return (
+                      <div
+                        key={stepKey}
+                        className={`capsule-cup-layer ${stepKey} ${
+                          isActiveLayer ? "active" : ""
+                        } ${isEditable ? "editable" : "auto"}`}
+                        style={{ height: layerHeight }}
+                      >
+                        <span>{stepValue}ml</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="capsule-step-tabs capsule-extraction-tabs">
+                {([
+                  "capsule1Step1",
+                  "capsule2Step2",
+                  "capsule1Step3",
+                  "capsule2Step4",
+                ] as const).map((stepKey) => {
+                  const isEditable = isEditableExtractionStepKey(stepKey);
+
+                  return (
+                    <button
+                      key={stepKey}
+                      type="button"
+                      className={`capsule-step-tab ${
+                        activeExtractionStep === stepKey ? "active" : ""
+                      } ${isEditable ? "" : "auto"}`}
+                      onClick={() =>
+                        isEditable ? setActiveExtractionStep(stepKey) : undefined
+                      }
+                      disabled={!isEditable}
+                    >
+                      {getStepLabel(stepKey)}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {isEditableExtractionStepKey(activeExtractionStep) ? (
+                <div className="capsule-step-card">
+                  <div className="capsule-step-value">
+                    {normalizedExtractionSteps[activeExtractionStep]}ml
+                  </div>
+                  <input
+                    type="range"
+                    className="capsule-step-slider"
+                    min={MIN_EXTRACTION_STEP_ML}
+                    max={getEditableStepMax(activeExtractionStep)}
+                    step={EXTRACTION_STEP_UNIT}
+                    value={normalizedExtractionSteps[activeExtractionStep]}
+                    onChange={(event) =>
+                      handleExtractionStepChange(
+                        activeExtractionStep,
+                        Number(event.target.value),
+                      )
+                    }
+                  />
+                  <div className="capsule-step-limit">
+                    <span>{MIN_EXTRACTION_STEP_ML}ml</span>
+                    <span>{getEditableStepMax(activeExtractionStep)}ml</span>
+                  </div>
+                  <p className="sheet-caption capsule-extraction-help">
+                    1~3단계는 드래그로 조절되고, 4단계는 남은 용량으로 자동 계산됩니다.
+                  </p>
+                </div>
+              ) : (
+                <p className="sheet-caption capsule-extraction-help">
+                  4단계는 자동 계산값입니다.
+                </p>
+              )}
+
+              <button
+                type="button"
+                className="sheet-apply-button"
+                onClick={() => {
+                  setExtractionSteps(normalizedExtractionSteps);
                   setActiveSheet(null);
                 }}
               >
