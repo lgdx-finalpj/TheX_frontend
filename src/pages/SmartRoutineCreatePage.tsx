@@ -1,15 +1,15 @@
-import createRoutineImage from "@/assets/moodcustom/나만의 루틴 만들기.png";
+﻿import createRoutineImage from "@/assets/moodcustom/나만의 루틴 만들기.png";
 import moodCustomImage from "@/assets/moodcustom/나의 무드 커스텀.png";
 import SmartRoutineHeader from "@/components/SmartRoutineHeader";
 import MobileLayout from "@/layouts/MobileLayout";
 import { useMoodCustomDraft } from "@/state/useMoodCustomDraft";
 import { useNavigate } from "react-router-dom";
-import "./SmartRoutineShared.css";
 import "./SmartRoutineCreatePage.css";
+import "./SmartRoutineShared.css";
 
-const routineDescription = "내가 원할 때 여러 제품을 한 번에 작동할 수 있어요.";
+const routineDescription = "내가 원할 때 여러 제품들을 한번에 작동시킬 수 있어요.";
 const moodDescription =
-  "여러 제품 설정을 조합해 원하는 분위기를 \n만들 수 있어요.";
+  "여러 제품 설정을 조합해서 내가 원하는 분위기를\n만들 수 있어요.";
 
 export default function SmartRoutineCreatePage() {
   const navigate = useNavigate();
@@ -24,7 +24,11 @@ export default function SmartRoutineCreatePage() {
         />
 
         <main className="smart-routine-create-content">
-          <button type="button" className="smart-routine-option">
+          <button
+            type="button"
+            className="smart-routine-option"
+            onClick={() => navigate("/smartroutine/create/recipe/coffee-machine")}
+          >
             <img
               src={createRoutineImage}
               alt="나만의 루틴 만들기"

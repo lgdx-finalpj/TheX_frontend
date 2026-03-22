@@ -1,23 +1,18 @@
-import coffeeBrandLogo1 from "@/assets/coffee_brand_logo/커피 브랜드 로고1.png";
-import coffeeBrandLogo2 from "@/assets/coffee_brand_logo/커피 브랜드 로고2.png";
-import coffeeMachineImage from "@/assets/elc_icon/커피머신.png";
+﻿import coffeeMachineImage from "@/assets/elc_icon/커피머신.png";
 import fridgeImage from "@/assets/elc_icon/냉장고.png";
 import lightImage from "@/assets/elc_icon/조명.png";
 import speakerImage from "@/assets/elc_icon/스피커.png";
-import coffeeCapsule1Image from "@/assets/coffee_capsule/coffeecapsule1.png";
-import coffeeCapsule2Image from "@/assets/coffee_capsule/coffeecapsule2.png";
 import customMoodImage from "@/assets/moodcustom/직접만들기무드.png";
 import focusMoodImage from "@/assets/moodcustom/집중무드.png";
 import homeCafeMoodImage from "@/assets/moodcustom/홈카페무드.png";
 import movieMoodImage from "@/assets/moodcustom/영화무드.png";
 import restMoodImage from "@/assets/moodcustom/휴식무드.png";
-import type {
-  CapsuleBrandOption,
-  CoffeeCapsuleAsset,
-  MoodCustomDraft,
-  MoodOption,
-  ProductOption,
-} from "@/state/moodCustom.types";
+import {
+  capsuleBrandOptions,
+  capsuleNameOptions,
+  coffeeCapsuleAssets,
+} from "@/features/coffeeMachine/constants";
+import type { MoodCustomDraft, MoodOption, ProductOption } from "@/state/moodCustom.types";
 
 export const defaultDraft: MoodCustomDraft = {
   mood_id: "",
@@ -74,46 +69,7 @@ export const displayOnlyProductOptions = [
   },
 ] as const;
 
-export const coffeeCapsuleAssets: CoffeeCapsuleAsset[] = [
-  {
-    capsule_id: "capsule-01",
-    image_src: coffeeCapsule1Image,
-  },
-  {
-    capsule_id: "capsule-02",
-    image_src: coffeeCapsule2Image,
-  },
-];
-
-export const capsuleBrandOptions: CapsuleBrandOption[] = [
-  {
-    id: "velocity",
-    label: "VelocityCoffee",
-    displayName: "VelocityCoffee",
-    logoSrc: coffeeBrandLogo1,
-  },
-  {
-    id: "stoneandbean",
-    label: "StoneandBean",
-    displayName: "StoneandBean",
-    logoSrc: coffeeBrandLogo2,
-  },
-];
-
-export const capsuleNameOptions: CapsuleBrandOption[] = [
-  {
-    id: "velocity",
-    label: "V1",
-    displayName: "V1",
-    logoSrc: coffeeCapsule1Image,
-  },
-  {
-    id: "stoneandbean",
-    label: "S1",
-    displayName: "S1",
-    logoSrc: coffeeCapsule2Image,
-  },
-];
+export { coffeeCapsuleAssets, capsuleBrandOptions, capsuleNameOptions };
 
 export const lightColorOptions = [
   "Warm White",

@@ -1,3 +1,13 @@
+import type {
+  CoffeeCapsuleAsset as SharedCoffeeCapsuleAsset,
+  CoffeeCapsuleBrandValue,
+  CoffeeCapsuleInfo as SharedCoffeeCapsuleInfo,
+  CoffeeCapsuleOption,
+  CoffeeMachineConfig as SharedCoffeeMachineConfig,
+  CoffeeMachineExtractionType,
+  CoffeeMachineTemperatureLevel,
+} from "@/features/coffeeMachine/types";
+
 export type MoodOptionId =
   | "home-cafe"
   | "movie-night"
@@ -6,9 +16,9 @@ export type MoodOptionId =
   | "custom";
 
 export type ProductType = "coffee_machine" | "light" | "speaker";
-export type TemperatureLevel = "low" | "middle" | "high";
-export type ExtractionType = "espresso" | "lungo";
-export type CapsuleBrandValue = "velocity" | "stoneandbean" | "custom";
+export type TemperatureLevel = CoffeeMachineTemperatureLevel;
+export type ExtractionType = CoffeeMachineExtractionType;
+export type CapsuleBrandValue = CoffeeCapsuleBrandValue;
 
 export interface MoodOption {
   id: MoodOptionId;
@@ -16,32 +26,9 @@ export interface MoodOption {
   imageSrc: string;
 }
 
-export interface CoffeeCapsuleAsset {
-  capsule_id: string;
-  image_src: string;
-}
-
-export interface CoffeeCapsuleInfo {
-  capsule_id: string;
-  capsule_brand: string;
-  capsule_name: string;
-  image_src: string;
-}
-
-export interface CoffeeMachineConfig {
-  product_code: string;
-  first_capsule: CoffeeCapsuleInfo;
-  second_capsule: CoffeeCapsuleInfo;
-  temperature: TemperatureLevel;
-  total_extraction_type: ExtractionType;
-  total_extraction_ml: 80 | 220;
-  capsule1_step1?: number;
-  capsule2_step2?: number;
-  capsule1_step3?: number;
-  capsule2_step4?: number;
-  capsule1_size?: number;
-  capsule2_size?: number;
-}
+export type CoffeeCapsuleAsset = SharedCoffeeCapsuleAsset;
+export type CoffeeCapsuleInfo = SharedCoffeeCapsuleInfo;
+export type CoffeeMachineConfig = SharedCoffeeMachineConfig;
 
 export interface LightConfig {
   product_code: string;
@@ -115,12 +102,7 @@ export interface ProductOption {
   previewClassName: string;
 }
 
-export interface CapsuleBrandOption {
-  id: CapsuleBrandValue;
-  label: string;
-  displayName: string;
-  logoSrc?: string;
-}
+export type CapsuleBrandOption = CoffeeCapsuleOption;
 
 export interface MoodCustomDraftContextValue {
   draft: MoodCustomDraft;

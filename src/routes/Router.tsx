@@ -5,6 +5,7 @@ import MoodCustomNamePage from "@/pages/MoodCustomNamePage";
 import MoodCustomProductPage from "@/pages/MoodCustomProductPage";
 import MoodCustomProductSettingsPage from "@/pages/MoodCustomProductSettingsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import RecipeCoffeeMachineSettingsPage from "@/pages/RecipeCoffeeMachineSettingsPage";
 import SmartRoutineCreatePage from "@/pages/SmartRoutineCreatePage";
 import SmartRoutineMainPage from "@/pages/SmartRoutineMainPage";
 import SmartRoutineMoodCustomPage from "@/pages/SmartRoutineMoodCustomPage";
@@ -15,6 +16,10 @@ export default function Router() {
       <Route path="/" element={<HomePage />} />
       <Route path="/smartroutine" element={<SmartRoutineMainPage />} />
       <Route path="/smartroutine/create" element={<SmartRoutineCreatePage />} />
+      <Route
+        path="/smartroutine/create/recipe/coffee-machine"
+        element={<RecipeCoffeeMachineSettingsPage />}
+      />
       <Route
         path="/smartroutine/mood-custom"
         element={<SmartRoutineMoodCustomPage />}

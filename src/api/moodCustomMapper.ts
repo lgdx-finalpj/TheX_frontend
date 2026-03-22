@@ -1,9 +1,11 @@
-import type {
+﻿import type {
   CoffeeRecipeCustomizeCoffeeRequestDTO,
   MoodCustomListResponseDTO,
   MyProductListResponseDTO,
   SpeakerMusicType,
 } from "@/api/moodCustomApi";
+import { normalizeExtractionSteps } from "@/features/coffeeMachine/extraction";
+import { buildCoffeeRecipePayloadFromConfig } from "@/features/coffeeMachine/payload";
 import { coffeeCapsuleAssets } from "@/state/moodCustom.constants";
 import { getProductOptionByType } from "@/state/moodCustom.utils";
 import type {
@@ -20,16 +22,6 @@ export type UserProductCode =
   | "SPEAKER01"
   | "FRIDGE01"
   | "WASHER01";
-
-const EXTRACTION_STEP_UNIT = 10;
-const MIN_EXTRACTION_STEP_ML = 10;
-
-type CoffeeExtractionSteps = {
-  capsule1Step1: number;
-  capsule2Step2: number;
-  capsule1Step3: number;
-  capsule2Step4: number;
-};
 
 function mapProductInfoIdToCode(productInfoId: number): UserProductCode | null {
   if (productInfoId === 1) {
@@ -144,9 +136,7 @@ function mapSpeakerTypeToSummary(musicType: SpeakerMusicType) {
   return "Rest";
 }
 
-function mapCapsuleTempToTemperatureLevel(
-  value: string,
-): TemperatureLevel | null {
+function mapCapsuleTempToTemperatureLevel(value: string): TemperatureLevel | null {
   if (value === "LOW") {
     return "low";
   }
@@ -165,122 +155,23 @@ function mapCapsuleTempToTemperatureLevel(
 function mapCapsuleNameToBrand(name: string) {
   const normalized = name.trim().toLowerCase();
 
-  if (normalized.startsWith("v")) {
+  if (normalized.startsWith("v") || normalized.includes("velocity")) {
     return "velocity";
   }
 
-  if (normalized.startsWith("s")) {
-    return "stoneandbean";
-  }
-
-  if (normalized.includes("velocity")) {
-    return "velocity";
-  }
-
-  if (normalized.includes("stone")) {
+  if (normalized.startsWith("s") || normalized.includes("stone")) {
     return "stoneandbean";
   }
 
   return "";
 }
 
-function normalizeByStepUnit(value: number) {
-  return Math.round(value / EXTRACTION_STEP_UNIT) * EXTRACTION_STEP_UNIT;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(value, max));
-}
-
-function getDefaultCoffeeExtractionSteps(
-  totalExtractionMl: 80 | 220,
-): CoffeeExtractionSteps {
-  if (totalExtractionMl === 80) {
-    return {
-      capsule1Step1: 20,
-      capsule2Step2: 20,
-      capsule1Step3: 20,
-      capsule2Step4: 20,
-    };
-  }
-
-  return {
-    capsule1Step1: 60,
-    capsule2Step2: 50,
-    capsule1Step3: 60,
-    capsule2Step4: 50,
-  };
-}
-
-function resolveTotalExtractionMl(
-  rawTotalMl: number,
-  fallback: 80 | 220,
-): 80 | 220 {
+function resolveTotalExtractionMl(rawTotalMl: number, fallback: 80 | 220): 80 | 220 {
   if (rawTotalMl === 80 || rawTotalMl === 220) {
     return rawTotalMl;
   }
 
   return fallback;
-}
-
-function normalizeCoffeeExtractionSteps(
-  totalExtractionMl: 80 | 220,
-  source: Partial<CoffeeExtractionSteps>,
-): CoffeeExtractionSteps {
-  const fallback = getDefaultCoffeeExtractionSteps(totalExtractionMl);
-  const step1Candidate = Number.isFinite(source.capsule1Step1)
-    ? Number(source.capsule1Step1)
-    : fallback.capsule1Step1;
-  const step2Candidate = Number.isFinite(source.capsule2Step2)
-    ? Number(source.capsule2Step2)
-    : fallback.capsule2Step2;
-  const step3Candidate = Number.isFinite(source.capsule1Step3)
-    ? Number(source.capsule1Step3)
-    : fallback.capsule1Step3;
-
-  const step1Max = totalExtractionMl - MIN_EXTRACTION_STEP_ML * 3;
-  const step1 = clamp(
-    normalizeByStepUnit(step1Candidate),
-    MIN_EXTRACTION_STEP_ML,
-    step1Max,
-  );
-
-  const step2Max = totalExtractionMl - step1 - MIN_EXTRACTION_STEP_ML * 2;
-  const step2 = clamp(
-    normalizeByStepUnit(step2Candidate),
-    MIN_EXTRACTION_STEP_ML,
-    step2Max,
-  );
-
-  const step3Max = totalExtractionMl - step1 - step2 - MIN_EXTRACTION_STEP_ML;
-  const step3 = clamp(
-    normalizeByStepUnit(step3Candidate),
-    MIN_EXTRACTION_STEP_ML,
-    step3Max,
-  );
-
-  const step4 = totalExtractionMl - step1 - step2 - step3;
-
-  return {
-    capsule1Step1: step1,
-    capsule2Step2: step2,
-    capsule1Step3: step3,
-    capsule2Step4: step4,
-  };
-}
-
-function mapCapsuleNameToCapsuleId(name: string, fallbackId: number) {
-  const normalized = name.trim().toLowerCase();
-
-  if (normalized === "v1" || normalized.includes("velocity")) {
-    return 1;
-  }
-
-  if (normalized === "s1" || normalized.includes("stone")) {
-    return 2;
-  }
-
-  return fallbackId;
 }
 
 export function mapMoodCustomListItemToSavedMoodCustom(
@@ -300,7 +191,7 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       coffee.capsule1Step3 +
       coffee.capsule2Step4;
     const totalExtractionMl = resolveTotalExtractionMl(totalMlBySteps, 220);
-    const normalizedSteps = normalizeCoffeeExtractionSteps(totalExtractionMl, {
+    const normalizedSteps = normalizeExtractionSteps(totalExtractionMl, {
       capsule1Step1: coffee.capsule1Step1,
       capsule2Step2: coffee.capsule2Step2,
       capsule1Step3: coffee.capsule1Step3,
@@ -406,18 +297,6 @@ export function mapMoodOptionIdToSpeakerMusicType(
   return "REST";
 }
 
-function mapTemperatureLevelToCapsuleTemp(level: TemperatureLevel): "LOW" | "MIDDLE" | "HIGH" {
-  if (level === "low") {
-    return "LOW";
-  }
-
-  if (level === "middle") {
-    return "MIDDLE";
-  }
-
-  return "HIGH";
-}
-
 export function buildCoffeeRecipeCustomizePayload({
   moodName: _moodName,
   moodMemo,
@@ -427,33 +306,11 @@ export function buildCoffeeRecipeCustomizePayload({
   moodMemo: string;
   config: CoffeeMachineConfig;
 }): CoffeeRecipeCustomizeCoffeeRequestDTO {
-  const totalExtractionMl = config.total_extraction_ml;
-  const steps = normalizeCoffeeExtractionSteps(totalExtractionMl, {
-    capsule1Step1: config.capsule1_step1,
-    capsule2Step2: config.capsule2_step2,
-    capsule1Step3: config.capsule1_step3,
-    capsule2Step4: config.capsule2_step4,
-  });
-  const cleanMemo = moodMemo.trim();
-  const capsule1Name = config.first_capsule.capsule_name;
-  const capsule2Name = config.second_capsule.capsule_name;
-
-  return {
+  return buildCoffeeRecipePayloadFromConfig({
     recipeName: "아메리카노",
-    recipeCategory: "COFFEE",
-    capsule1Id: mapCapsuleNameToCapsuleId(capsule1Name, 1),
-    capsule2Id: mapCapsuleNameToCapsuleId(capsule2Name, 2),
-    capsuleTemp: mapTemperatureLevelToCapsuleTemp(config.temperature),
-    capsule1Size: steps.capsule1Step1 + steps.capsule1Step3,
-    capsule2Size: steps.capsule2Step2 + steps.capsule2Step4,
-    capsule1Step1: steps.capsule1Step1,
-    capsule2Step2: steps.capsule2Step2,
-    capsule1Step3: steps.capsule1Step3,
-    capsule2Step4: steps.capsule2Step4,
-    addObj: `${capsule1Name}, ${capsule2Name}`,
-    recipeMemo: cleanMemo,
-    recipeLevel: "EASY",
-  };
+    recipeMemo: moodMemo,
+    config,
+  });
 }
 
 export function findProductTypeByCode(productCode: UserProductCode): ProductType | null {
