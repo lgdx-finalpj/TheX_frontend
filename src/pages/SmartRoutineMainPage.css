@@ -1,0 +1,411 @@
+.smart-routine-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #d0d3db;
+}
+
+.smart-routine-tab {
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 14px 12px 13px;
+  font-size: 17px;
+  color: #7e8089;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease;
+}
+
+.smart-routine-tab.active {
+  color: #111111;
+}
+
+.smart-routine-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #111111;
+}
+
+.smart-routine-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 120px;
+}
+
+.smart-routine-body-filled {
+  padding-top: 18px;
+}
+
+.smart-routine-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 42px;
+  padding-bottom: 28px;
+}
+
+.smart-routine-image {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.smart-routine-copy {
+  margin-top: 16px;
+}
+
+.smart-routine-copy h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #1d1d1f;
+}
+
+.smart-routine-copy p {
+  margin: 0;
+  white-space: pre-line;
+  color: #757985;
+  line-height: 1.28;
+  font-size: 15px;
+}
+
+.smart-routine-link {
+  margin-top: 22px;
+  border: none;
+  background: transparent;
+  color: #4f42ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.smart-routine-link:hover {
+  transform: translateY(-2px);
+}
+
+.smart-routine-link:active {
+  transform: scale(0.98);
+}
+
+.smart-routine-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.smart-routine-footer {
+  position: fixed;
+  right: max(24px, calc((100vw - 430px) / 2 + 24px));
+  bottom: 24px;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primary-pill-button {
+  min-width: 214px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4f42ff;
+  padding: 14px 22px;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(31, 41, 55, 0.08);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.primary-pill-button:hover {
+  transform: translateY(-2px);
+}
+
+.primary-pill-button:active {
+  transform: scale(0.98);
+}
+
+.saved-mood-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.saved-mood-card {
+  position: relative;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 8px 18px rgba(31, 41, 55, 0.14);
+}
+
+.saved-mood-card.executing {
+  animation: saved-mood-execute 0.72s ease;
+}
+
+.saved-mood-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+}
+
+.saved-mood-badge {
+  min-width: 50px;
+  padding: 6px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.saved-mood-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.saved-mood-more {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.saved-mood-more svg {
+  width: 18px;
+  height: 18px;
+}
+
+.saved-mood-action-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saved-mood-action-button,
+.saved-mood-bookmark-button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.saved-mood-action-button:hover,
+.saved-mood-bookmark-button:hover {
+  transform: translateY(-1px);
+}
+
+.saved-mood-action-button:active,
+.saved-mood-bookmark-button:active {
+  transform: scale(0.96);
+}
+
+.saved-mood-action-button svg,
+.saved-mood-bookmark-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.saved-mood-bookmark-button {
+  color: #1f2937;
+}
+
+.saved-mood-bookmark-button.active {
+  color: #111111;
+}
+
+.saved-mood-my-chip {
+  min-width: 40px;
+  height: 27px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111111;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.mood-card-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 164px;
+  padding: 8px 0;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(17, 24, 39, 0.16);
+  z-index: 5;
+  animation: mood-menu-fade-in 0.18s ease both;
+}
+
+.mood-card-menu-button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 13px 18px;
+  text-align: center;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.mood-card-menu-button:hover {
+  background: rgba(232, 244, 248, 0.68);
+}
+
+.mood-card-menu-button:active {
+  transform: scale(0.98);
+}
+
+.saved-mood-settings {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved-mood-setting-chip {
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.smart-routine-recommend-body {
+  padding: 18px 24px 120px;
+}
+
+.recommend-card-list {
+  width: 100%;
+}
+
+.mood-execution-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 17, 17, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mood-execution-modal {
+  width: min(100%, 250px);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(17, 24, 39, 0.16);
+  padding: 28px 24px 24px;
+}
+
+.mood-execution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.mood-execution-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mood-execution-item-image {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  display: block;
+}
+
+.mood-execution-item-copy {
+  margin-top: 10px;
+  color: #5a48c2;
+  line-height: 1.18;
+}
+
+.mood-execution-item-copy strong,
+.mood-execution-item-copy p {
+  display: block;
+  margin: 0;
+}
+
+.mood-execution-item-copy strong {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.mood-execution-item-copy p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #373943;
+}
+
+@keyframes mood-menu-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes saved-mood-execute {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8px 18px rgba(31, 41, 55, 0.14);
+  }
+
+  45% {
+    transform: scale(1.02);
+    box-shadow: 0 16px 32px rgba(79, 66, 255, 0.2);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 18px rgba(31, 41, 55, 0.14);
+  }
+}

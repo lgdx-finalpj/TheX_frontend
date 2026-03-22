@@ -1,4 +1,4 @@
-﻿export interface CurrentUserProfile {
+export interface CurrentUserProfile {
   user_id: string;
   user_nickname: string;
 }
@@ -18,7 +18,8 @@ function isCurrentUserProfile(value: unknown): value is CurrentUserProfile {
 
   const candidate = value as Record<string, unknown>;
   return (
-    (typeof candidate.user_id === "string" || typeof candidate.user_id === "number") &&
+    (typeof candidate.user_id === "string" ||
+      typeof candidate.user_id === "number") &&
     String(candidate.user_id).trim() !== "" &&
     typeof candidate.user_nickname === "string" &&
     candidate.user_nickname.trim() !== ""

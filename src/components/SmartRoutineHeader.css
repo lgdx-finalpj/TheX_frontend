@@ -1,0 +1,48 @@
+.smart-routine-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 14px 10px;
+}
+
+.smart-routine-header-left,
+.smart-routine-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #7c818c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.icon-button:active {
+  transform: scale(0.98);
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.smart-routine-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111111;
+}
