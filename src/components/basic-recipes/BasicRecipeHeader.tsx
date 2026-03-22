@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import plusIcon from "@/assets/icon_image/+ 아이콘.png";
 import bellIcon from "@/assets/icon_image/종모양 아이콘.png";
 import downArrowIcon from "@/assets/icon_image/keyboard_arrow_down 아이콘.png";
@@ -15,10 +16,17 @@ export default function BasicRecipeHeader({
   activeTab,
   onTabChange,
 }: BasicRecipeHeaderProps) {
+  const navigate = useNavigate();
+
   return (
     <header className="recipe-page__header">
       <div className="recipe-page__topbar">
-        <button type="button" className="recipe-page__location">
+        <button
+          type="button"
+          className="recipe-page__location"
+          onClick={() => navigate("/")}
+          aria-label="LHCS 홈으로 이동"
+        >
           <span>LHCS 홈</span>
           <img src={downArrowIcon} alt="" aria-hidden="true" />
         </button>

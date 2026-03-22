@@ -18,7 +18,7 @@
   border: 0;
   background: transparent;
   color: #111111;
-  cursor: default;
+  cursor: pointer;
 }
 
 .home-header__title {

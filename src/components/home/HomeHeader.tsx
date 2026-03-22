@@ -1,5 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import "./HomeHeader.css";
-import { homeOwnerNickname } from "@/mocks/homeDevices";
+import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
 import {
   BellIcon,
   ChevronDownIcon,
@@ -8,13 +9,18 @@ import {
 } from "@/components/home/HomeIcons";
 
 export default function HomeHeader() {
+  const navigate = useNavigate();
+  const { user_nickname } = useCurrentUserProfile();
+  const homeOwnerNickname = user_nickname || "사용자";
+
   return (
     <header className="home-header">
       <div className="home-header__title-group">
         <button
           type="button"
           className="home-header__title-button"
-          aria-label={`${homeOwnerNickname} 홈`}
+          onClick={() => navigate("/")}
+          aria-label={`${homeOwnerNickname} 홈으로 이동`}
         >
           <span className="home-header__title">{homeOwnerNickname} 홈</span>
           <span className="home-header__title-icon">
