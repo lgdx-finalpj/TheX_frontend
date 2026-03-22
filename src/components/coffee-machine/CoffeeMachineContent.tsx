@@ -1,6 +1,5 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
-import backIcon from "@/assets/icon_image/lsicon_arrow-left-filled.png";
 import menuArrowIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import recipeIcon from "@/assets/icon_image/레시피 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
@@ -8,10 +7,15 @@ import supplyIcon from "@/assets/icon_image/소모품 정보 아이콘.png";
 import settingsIcon from "@/assets/icon_image/톱니바퀴 아이콘.png";
 import MenuItem from "@/components/device-detail/MenuItem";
 import StatusCard from "@/components/device-detail/StatusCard";
+import useHorizontalSwipe from "@/hooks/useHorizontalSwipe";
+import "@/components/device-detail/DeviceCommon.css";
+import "./CoffeeMachineContent.css";
 
 interface CoffeeMachineContentProps {
+  onBackClick?: () => void;
   onSpeakerClick?: () => void;
   onAiRecommendedClick?: () => void;
+  onRecipeClick?: () => void;
 }
 
 const statusCards = [
@@ -27,15 +31,26 @@ const menuItems = [
 ];
 
 export default function CoffeeMachineContent({
+  onBackClick,
   onSpeakerClick,
   onAiRecommendedClick,
+  onRecipeClick,
 }: CoffeeMachineContentProps) {
+  const swipeHandlers = useHorizontalSwipe({
+    onSwipeLeft: onSpeakerClick,
+  });
+
   return (
     <MobileLayout>
-      <main className="device-page">
+      <main className="device-page coffee-machine-page" {...swipeHandlers}>
         <header className="device-topbar">
-          <button className="icon-button icon-button--plain" type="button" aria-label="이전으로">
-            <img className="icon-button__image icon-button__image--back" src={backIcon} alt="" />
+          <button
+            className="icon-button icon-button--plain back-button"
+            type="button"
+            onClick={onBackClick}
+            aria-label="이전으로"
+          >
+            <span aria-hidden="true">&lt;</span>
           </button>
 
           <h1 className="device-topbar__title">듀오보 2.0</h1>
@@ -45,22 +60,22 @@ export default function CoffeeMachineContent({
           </button>
         </header>
 
-        <section className="device-hero">
-          <div className="device-hero__image-wrap">
-            <img className="device-hero__image" src={heroImage} alt="듀오보 2.0 커피머신" />
+        <section className="coffee-hero">
+          <div className="coffee-hero__image-wrap">
+            <img className="coffee-hero__image" src={heroImage} alt="듀오보 2.0 커피머신" />
           </div>
 
-          <button className="device-switch" type="button" onClick={onSpeakerClick}>
-            <span className="device-switch__arrow" aria-hidden="true">
-              ›
+          <button className="device-nav device-nav--right" type="button" onClick={onSpeakerClick}>
+            <span className="device-nav__arrow" aria-hidden="true">
+              &gt;
             </span>
-            <span className="device-switch__label">스피커</span>
+            <span className="device-nav__label">스피커</span>
           </button>
 
-          <h2 className="device-hero__title">듀오보 2.0 현재 상태</h2>
+          <h2 className="coffee-hero__title">듀오보 2.0 현재 상태</h2>
         </section>
 
-        <section className="status-grid" aria-label="커피머신 상태 정보">
+        <section className="status-grid coffee-status-grid" aria-label="커피머신 상태 정보">
           {statusCards.map((card) => (
             <StatusCard key={card.title} title={card.title} lines={card.lines} />
           ))}
@@ -89,8 +104,8 @@ export default function CoffeeMachineContent({
           <span className="recommend-card__drink">“카페라떼”</span>
         </button>
 
-        <nav className="menu-list" aria-label="주요 메뉴">
-          <button className="menu-item" type="button" aria-label="레시피">
+        <nav className="menu-list coffee-menu-list" aria-label="주요 메뉴">
+          <button className="menu-item" type="button" onClick={onRecipeClick} aria-label="레시피">
             <span className="menu-item__icon" aria-hidden="true">
               <img className="menu-item__icon-image" src={recipeIcon} alt="" />
             </span>
