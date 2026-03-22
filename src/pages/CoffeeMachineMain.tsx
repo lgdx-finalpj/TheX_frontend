@@ -6,8 +6,10 @@ export default function CoffeeMachineMain() {
 
   return (
     <CoffeeMachineContent
+      onBackClick={() => navigate("/devices")}
       onSpeakerClick={() => navigate("/devices/speaker")}
       onAiRecommendedClick={() => navigate("/devices/coffee-machine/ai-recommended")}
+      onRecipeClick={() => navigate("/devices/coffee-machine/view-basic-recipes")}
     />
   );
 }

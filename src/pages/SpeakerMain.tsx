@@ -6,6 +6,7 @@ export default function SpeakerMainPage() {
 
   return (
     <SpeakerContent
+      onBackClick={() => navigate("/devices")}
       onCoffeeMachineClick={() => navigate("/devices/coffee-machine")}
       onLightingClick={() => navigate("/devices/lighting")}
     />

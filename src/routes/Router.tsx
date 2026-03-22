@@ -4,6 +4,7 @@ import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
 import HomePage from "@/pages/HomePage";
 import LightingMain from "@/pages/LightingMain";
 import NotFoundPage from "@/pages/NotFoundPage";
+import RecipeHomePage from "@/pages/RecipeHomePage";
 import SpeakerMainPage from "@/pages/SpeakerMain";
 
 export default function Router() {
@@ -12,6 +13,7 @@ export default function Router() {
       <Route path="/" element={<HomePage />} />
       <Route path="/devices/coffee-machine" element={<CoffeeMachineMain />} />
       <Route path="/devices/coffee-machine/ai-recommended" element={<AiRecommendedMain />} />
+      <Route path="/devices/coffee-machine/view-basic-recipes" element={<RecipeHomePage />} />
       <Route path="/devices/speaker" element={<SpeakerMainPage />} />
       <Route path="/devices/lighting" element={<LightingMain />} />
       <Route path="/speaker" element={<Navigate to="/devices/speaker" replace />} />
