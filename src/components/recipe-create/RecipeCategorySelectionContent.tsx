@@ -1,6 +1,6 @@
 ﻿import { useNavigate } from "react-router-dom";
 import "./RecipeCategorySelection.css";
-import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
 import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
@@ -40,7 +40,7 @@ export default function RecipeCategorySelectionContent() {
             onClick={() => navigate(-1)}
             aria-label="뒤로가기"
           >
-            <img src={leftArrowIcon} alt="" aria-hidden="true" />
+            <ChevronIcon className="recipe-category-page__back-icon" direction="left" />
           </button>
           <h1>레시피 생성</h1>
         </div>

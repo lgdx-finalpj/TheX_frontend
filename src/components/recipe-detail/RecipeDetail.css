@@ -24,9 +24,10 @@
   letter-spacing: -0.8px;
 }
 
-.recipe-detail__back img {
+.recipe-detail__back-icon {
   width: 22px;
   height: 22px;
+  color: #747c89;
 }
 
 .recipe-detail__content {

@@ -1,4 +1,4 @@
-import menuArrowIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
+﻿import ChevronIcon from "@/components/common/ChevronIcon";
 
 interface MenuItemProps {
   iconSrc: string;
@@ -13,8 +13,9 @@ export default function MenuItem({ iconSrc, label }: MenuItemProps) {
       </span>
       <span className="menu-item__label">{label}</span>
       <span className="menu-item__arrow" aria-hidden="true">
-        <img className="menu-item__arrow-image" src={menuArrowIcon} alt="" />
+        <ChevronIcon className="menu-item__arrow-image" direction="right" />
       </span>
     </button>
   );
 }
+

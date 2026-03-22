@@ -4,7 +4,7 @@ import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
 import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
 import starIcon from "@/assets/icon_image/별 아이콘.png";
-import chevronRightIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import moreIcon from "@/assets/icon_image/검은 옵션 아이콘.png";
 import duoboMachineImage from "@/assets/듀오보.png";
 import type { RecipeCategory, RecipeItem } from "@/types/recipe";
@@ -191,7 +191,7 @@ export default function BasicRecipeCard({
             aria-label={`${displayRecipeName} 상세`}
             onClick={handleMoveToDetail}
           >
-            <img src={chevronRightIcon} alt="" aria-hidden="true" />
+            <ChevronIcon className="recipe-card__detail-arrow" direction="right" />
           </button>
           <div className="recipe-card__menu-anchor" ref={menuRef}>
             <button
@@ -316,4 +316,5 @@ export default function BasicRecipeCard({
     </>
   );
 }
+
 

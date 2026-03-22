@@ -1,10 +1,10 @@
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
-import menuArrowIcon from "@/assets/icon_image/keyboard_arrow_right_black.png";
 import recipeIcon from "@/assets/icon_image/레시피 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
 import supplyIcon from "@/assets/icon_image/소모품 정보 아이콘.png";
 import settingsIcon from "@/assets/icon_image/톱니바퀴 아이콘.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import MenuItem from "@/components/device-detail/MenuItem";
 import StatusCard from "@/components/device-detail/StatusCard";
 import useHorizontalSwipe from "@/hooks/useHorizontalSwipe";
@@ -50,7 +50,7 @@ export default function CoffeeMachineContent({
             onClick={onBackClick}
             aria-label="이전으로"
           >
-            <span aria-hidden="true">&lt;</span>
+            <ChevronIcon className="back-button__icon" direction="left" />
           </button>
 
           <h1 className="device-topbar__title">듀오보 2.0</h1>
@@ -67,7 +67,7 @@ export default function CoffeeMachineContent({
 
           <button className="device-nav device-nav--right" type="button" onClick={onSpeakerClick}>
             <span className="device-nav__arrow" aria-hidden="true">
-              &gt;
+              <ChevronIcon className="device-nav__arrow-icon" direction="right" />
             </span>
             <span className="device-nav__label">스피커</span>
           </button>
@@ -111,7 +111,7 @@ export default function CoffeeMachineContent({
             </span>
             <span className="menu-item__label">레시피</span>
             <span className="menu-item__arrow" aria-hidden="true">
-              <img className="menu-item__arrow-image" src={menuArrowIcon} alt="" />
+              <ChevronIcon className="menu-item__arrow-image" direction="right" />
             </span>
           </button>
 

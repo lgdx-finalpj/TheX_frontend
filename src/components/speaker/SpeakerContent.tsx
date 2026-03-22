@@ -3,6 +3,7 @@ import speakerImage from "@/assets/elc_icon/스피커.png";
 import usefulIcon from "@/assets/icon_image/유용한 기능 아이콘.png";
 import controlIcon from "@/assets/icon_image/주요 기능 제어 아이콘.png";
 import settingsIcon from "@/assets/icon_image/톱니바퀴 아이콘.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import MenuItem from "@/components/device-detail/MenuItem";
 import StatusCard from "@/components/device-detail/StatusCard";
 import useHorizontalSwipe from "@/hooks/useHorizontalSwipe";
@@ -45,7 +46,7 @@ export default function SpeakerContent({
             onClick={onBackClick}
             aria-label="이전으로"
           >
-            <span aria-hidden="true">&lt;</span>
+            <ChevronIcon className="back-button__icon" direction="left" />
           </button>
 
           <h1 className="device-topbar__title">스피커</h1>
@@ -58,7 +59,7 @@ export default function SpeakerContent({
         <section className="secondary-device-hero">
           <button className="device-nav device-nav--left" type="button" onClick={onCoffeeMachineClick}>
             <span className="device-nav__arrow" aria-hidden="true">
-              &lt;
+              <ChevronIcon className="device-nav__arrow-icon" direction="left" />
             </span>
             <span className="device-nav__label">듀오보 2.0</span>
           </button>
@@ -69,7 +70,7 @@ export default function SpeakerContent({
 
           <button className="device-nav device-nav--right" type="button" onClick={onLightingClick}>
             <span className="device-nav__arrow" aria-hidden="true">
-              &gt;
+              <ChevronIcon className="device-nav__arrow-icon" direction="right" />
             </span>
             <span className="device-nav__label">조명</span>
           </button>

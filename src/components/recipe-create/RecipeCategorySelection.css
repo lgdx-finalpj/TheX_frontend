@@ -29,10 +29,10 @@
   border-radius: 999px;
 }
 
-.recipe-category-page--selection .recipe-category-page__back img {
+.recipe-category-page--selection .recipe-category-page__back-icon {
   width: 30px;
   height: 30px;
-  object-fit: contain;
+  color: #747c89;
 }
 
 .recipe-category-page--selection .recipe-category-page__intro {

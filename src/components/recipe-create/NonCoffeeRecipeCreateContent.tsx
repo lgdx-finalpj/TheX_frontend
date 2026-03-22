@@ -2,7 +2,7 @@
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./NoneCoffeeRecipeCreate.css";
-import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
 import {
   createNoneCoffeeRecipeApi,
@@ -122,7 +122,7 @@ export default function NonCoffeeRecipeCreateContent() {
             onClick={() => navigate(-1)}
             aria-label="뒤로가기"
           >
-            <img src={leftArrowIcon} alt="" aria-hidden="true" />
+            <ChevronIcon className="recipe-category-page__back-icon" direction="left" />
           </button>
           <h1>레시피 생성</h1>
         </div>

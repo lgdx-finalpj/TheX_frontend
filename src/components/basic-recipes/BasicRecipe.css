@@ -283,6 +283,13 @@
   height: 18px;
 }
 
+.recipe-card__detail-arrow {
+  width: 18px;
+  height: 18px;
+  color: #111111;
+  opacity: 0.8;
+}
+
 .recipe-card__menu {
   position: absolute;
   top: calc(100% + 8px);

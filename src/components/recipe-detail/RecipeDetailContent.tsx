@@ -2,7 +2,7 @@
 import "@/components/basic-recipes/BasicRecipe.css";
 import HomeHeader from "@/components/basic-recipes/HomeHeader";
 import "./RecipeDetail.css";
-import leftArrowIcon from "@/assets/icon_image/keyboard_arrow_left 아이콘.png";
+import ChevronIcon from "@/components/common/ChevronIcon";
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
 import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
@@ -47,7 +47,7 @@ export default function RecipeDetailContent({
             onClick={() => navigate(backPath)}
             aria-label={`${pageTitle}로 돌아가기`}
           >
-            <img src={leftArrowIcon} alt="" aria-hidden="true" />
+            <ChevronIcon className="recipe-detail__back-icon" direction="left" />
             <span>{pageTitle}</span>
           </button>
         </div>

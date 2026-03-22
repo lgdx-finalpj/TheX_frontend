@@ -45,10 +45,12 @@
 }
 
 .back-button {
-  font-size: 34px;
-  font-weight: 600;
-  line-height: 0.9;
   color: #747c89;
+}
+
+.back-button__icon {
+  width: 30px;
+  height: 30px;
 }
 
 .device-nav {
@@ -72,9 +74,14 @@
 }
 
 .device-nav__arrow {
-  font-size: 27px;
-  line-height: 0.72;
-  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device-nav__arrow-icon {
+  width: 27px;
+  height: 27px;
 }
 
 .device-nav__label {
@@ -175,7 +182,8 @@
 .menu-item__arrow-image {
   width: 22px;
   height: 22px;
-  object-fit: contain;
+  display: block;
+  color: #111111;
   opacity: 0.8;
 }
 
@@ -184,12 +192,14 @@
     font-size: 20px;
   }
 
-  .back-button {
-    font-size: 31px;
+  .back-button__icon {
+    width: 27px;
+    height: 27px;
   }
 
-  .device-nav__arrow {
-    font-size: 23px;
+  .device-nav__arrow-icon {
+    width: 23px;
+    height: 23px;
   }
 
   .device-nav__label {
