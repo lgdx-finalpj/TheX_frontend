@@ -21,7 +21,7 @@ import RecipeCategorySelectionPage from "@/pages/RecipeCategorySelectionPage";
 import RecipeCoffeeMachineSettingsPage from "@/pages/RecipeCoffeeMachineSettingsPage";
 import RecipeHomePage from "@/pages/RecipeHomePage";
 import SmartRoutineCreatePage from "@/pages/SmartRoutineCreatePage";
-import SmartRoutineMain from "@/pages/SmartRoutineMain";
+import SmartRoutineMainPage from "@/pages/SmartRoutineMainPage";
 import SmartRoutineMoodCustomPage from "@/pages/SmartRoutineMoodCustomPage";
 import SpeakerMain from "@/pages/SpeakerMain";
 
@@ -47,7 +47,7 @@ export default function Router() {
       />
 
       {/* 스마트 루틴 */}
-      <Route path="/smartroutine" element={<SmartRoutineMain />} />
+      <Route path="/smartroutine" element={<SmartRoutineMainPage />} />
       <Route path="/smartroutine/create" element={<SmartRoutineCreatePage />} />
       <Route
         path="/smartroutine/create/recipe/coffee-machine"

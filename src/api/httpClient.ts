@@ -1,9 +1,12 @@
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api";
+const configuredBaseUrl =
+  typeof import.meta.env.VITE_API_BASE_URL === "string"
+    ? import.meta.env.VITE_API_BASE_URL.trim()
+    : "";
 
 export const httpClient = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: configuredBaseUrl || "/api",
 });
 
 export function getApiErrorMessage(
