@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import AiRecommendedMain from "@/pages/AiRecommendedMain";
 import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
 import DevicePage from "@/pages/DevicePage";
 import GroupedDevicePage from "@/pages/GroupedDevicePage";
@@ -21,10 +22,10 @@ import RecipeCategorySelectionPage from "@/pages/RecipeCategorySelectionPage";
 export default function Router() {
   return (
     <Routes>
-      {/* ✅ main 홈 유지 */}
+      {/* 홈 */}
       <Route path="/" element={<HomePage />} />
 
-      {/* ✅ 기존 디바이스 구조 */}
+      {/* 디바이스 구조 */}
       <Route path="/devices" element={<DevicePage />} />
       <Route path="/devices/grouped" element={<GroupedDevicePage />} />
       <Route path="/devices/coffee-machine" element={<CoffeeMachineMain />} />
@@ -33,7 +34,10 @@ export default function Router() {
       <Route path="/speaker" element={<Navigate to="/devices/speaker" replace />} />
       <Route path="/smartroutine" element={<SmartRoutineMain />} />
 
-      {/* ✅ 레시피 기능 */}
+      {/* AI 추천 레시피 기능 */}
+      <Route path="/devices/coffee-machine/ai-recommended" element={<AiRecommendedMain />} />
+
+      {/* 레시피 기능 */}
       <Route path="/devices/coffee-machine/view-basic-recipes" element={<RecipeHomePage />} />
       <Route path="/devices/coffee-machine/view-basic-recipes/:recipeId" element={<BasicRecipeDetailPage />} />
 

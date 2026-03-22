@@ -1,5 +1,15 @@
-import PlaceholderPage from "@/pages/PlaceholderPage";
+import { useNavigate } from "react-router-dom";
+import CoffeeMachineContent from "@/components/coffee-machine/CoffeeMachineContent";
 
 export default function CoffeeMachineMain() {
-  return <PlaceholderPage message="커피머신 메인 페이지입니다." />;
+  const navigate = useNavigate();
+
+  return (
+    <CoffeeMachineContent
+      onBackClick={() => navigate("/devices")}
+      onSpeakerClick={() => navigate("/devices/speaker")}
+      onAiRecommendedClick={() => navigate("/devices/coffee-machine/ai-recommended")}
+      onRecipeClick={() => navigate("/devices/coffee-machine/view-basic-recipes")}
+    />
+  );
 }
