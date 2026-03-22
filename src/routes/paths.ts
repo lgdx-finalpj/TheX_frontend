@@ -1,6 +1,7 @@
 export const BASIC_RECIPE_ROUTE = "/devices/coffee-machine/view-basic-recipes";
 export const POPULAR_RECIPE_ROUTE = "/devices/coffee-machine/view-popular-recipes";
 export const MY_RECIPE_ROUTE = "/devices/coffee-machine/view-my-recipes";
+export const AI_RECOMMENDED_RECIPE_ROUTE = "/devices/coffee-machine/ai-recommended";
 export const RECIPE_CATEGORY_SELECTION_ROUTE =
   "/devices/coffee-machine/create-recipe/select-category";
 export const NON_COFFEE_RECIPE_CREATE_ROUTE =

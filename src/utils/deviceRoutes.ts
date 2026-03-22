@@ -1,6 +1,6 @@
 export const productCodeDetailRoutes = {
   COFFEE001: "/devices/coffee-machine",
-  LIGHT001: "/devices/light",
+  LIGHT001: "/devices/lighting",
   SPEAKER01: "/devices/speaker",
 } as const;
 
