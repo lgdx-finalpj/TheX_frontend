@@ -6,7 +6,7 @@ const configuredBaseUrl =
     : "";
 
 export const httpClient = axios.create({
-  baseURL: configuredBaseUrl || "/api",
+  baseURL: configuredBaseUrl || "",
 });
 
 export function getApiErrorMessage(
