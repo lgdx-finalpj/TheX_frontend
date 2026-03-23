@@ -191,7 +191,7 @@ export default function MoodCustomProductSettingsPage() {
               upsertProductConfig(
                 "coffee_machine",
                 config,
-                `커피머신 - 아메리카노, ${config.total_extraction_ml}ml`,
+                `커피머신, 아메리카노, ${config.total_extraction_ml}ml`,
               );
               navigate("/smartroutine/mood-custom");
             }}

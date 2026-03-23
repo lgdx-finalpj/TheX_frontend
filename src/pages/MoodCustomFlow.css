@@ -68,7 +68,7 @@
 
 .mood-custom-step-card.selected .mood-custom-step-main {
   padding-right: 56px;
-  background-image: url("../assets/background_color1.png");
+  background-image: url("../assets/bg_color/background_color1.png");
   background-position: center;
   background-size: cover;
   border-color: #c8dbe4;
@@ -1101,7 +1101,7 @@
 }
 
 .capsule-extraction-sheet {
-  gap: 14px;
+  gap: 0px;
 }
 
 .capsule-extraction-total-row {
