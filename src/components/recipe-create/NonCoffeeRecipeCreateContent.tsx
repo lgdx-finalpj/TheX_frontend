@@ -4,10 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./NoneCoffeeRecipeCreate.css";
 import ChevronIcon from "@/components/common/ChevronIcon";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
-import {
-  createNoneCoffeeRecipeApi,
-  mapApiErrorMessage,
-} from "@/api/recipeApi";
+import { createNoneCoffeeRecipeApi, mapApiErrorMessage } from "@/api/recipeApi";
 import type { RecipeLevel } from "@/types/recipe";
 
 const categoryMap = {
@@ -57,7 +54,9 @@ export default function NonCoffeeRecipeCreateContent() {
   const [recipeLevel, setRecipeLevel] = useState("");
   const [recipeContent, setRecipeContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(
+    null,
+  );
 
   if (!recipeCategory) {
     return null;
@@ -105,7 +104,10 @@ export default function NonCoffeeRecipeCreateContent() {
       navigate(MY_RECIPE_ROUTE);
     } catch (error) {
       setSubmitErrorMessage(
-        mapApiErrorMessage(error, "레시피 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
+        mapApiErrorMessage(
+          error,
+          "레시피 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -122,7 +124,10 @@ export default function NonCoffeeRecipeCreateContent() {
             onClick={() => navigate(-1)}
             aria-label="뒤로가기"
           >
-            <ChevronIcon className="recipe-category-page__back-icon" direction="left" />
+            <ChevronIcon
+              className="recipe-category-page__back-icon"
+              direction="left"
+            />
           </button>
           <h1>레시피 생성</h1>
         </div>
@@ -141,38 +146,14 @@ export default function NonCoffeeRecipeCreateContent() {
             <span className="recipe-create-form__label">레시피 이름</span>
             <input
               value={recipeName}
-              placeholder={getPlaceholder("recipe_name", exampleSet.recipe_name)}
+              placeholder={getPlaceholder(
+                "recipe_name",
+                exampleSet.recipe_name,
+              )}
               onFocus={() => setFocusedField("recipe_name")}
               onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeName(event.target.value)}
             />
-          </label>
-
-          <label className="recipe-create-form__card">
-            <span className="recipe-create-form__label">재료</span>
-            <textarea
-              rows={2}
-              value={ingredient}
-              placeholder={getPlaceholder("ingredient", exampleSet.ingredient)}
-              onFocus={() => setFocusedField("ingredient")}
-              onBlur={() => setFocusedField(null)}
-              onChange={(event) => setIngredient(event.target.value)}
-            />
-          </label>
-
-          <label className="recipe-create-form__card">
-            <span className="recipe-create-form__label">총 용량</span>
-            <div className="recipe-create-form__inline-field">
-              <input
-                inputMode="numeric"
-                value={totalSize}
-                placeholder={getPlaceholder("total_size", exampleSet.total_size)}
-                onFocus={() => setFocusedField("total_size")}
-                onBlur={() => setFocusedField(null)}
-                onChange={(event) => setTotalSize(event.target.value)}
-              />
-              <span>ml</span>
-            </div>
           </label>
 
           <div className="recipe-create-form__card">
@@ -199,12 +180,47 @@ export default function NonCoffeeRecipeCreateContent() {
             </div>
           </div>
 
+          <label className="recipe-create-form__card">
+            <span className="recipe-create-form__label">재료</span>
+            <textarea
+              rows={2}
+              value={ingredient}
+              placeholder={getPlaceholder("ingredient", exampleSet.ingredient)}
+              onFocus={() => setFocusedField("ingredient")}
+              onBlur={() => setFocusedField(null)}
+              onChange={(event) => setIngredient(event.target.value)}
+            />
+          </label>
+
+          <label className="recipe-create-form__card">
+            <span className="recipe-create-form__label">총 용량</span>
+            <div className="recipe-create-form__inline-field">
+              <input
+                inputMode="numeric"
+                value={totalSize}
+                placeholder={getPlaceholder(
+                  "total_size",
+                  exampleSet.total_size,
+                )}
+                onFocus={() => setFocusedField("total_size")}
+                onBlur={() => setFocusedField(null)}
+                onChange={(event) => setTotalSize(event.target.value)}
+              />
+              <span>ml</span>
+            </div>
+          </label>
+
           <label className="recipe-create-form__card recipe-create-form__card--textarea">
-            <span className="recipe-create-form__label">레시피 본문(논커피용)</span>
+            <span className="recipe-create-form__label">
+              레시피 본문(논커피용)
+            </span>
             <textarea
               rows={6}
               value={recipeContent}
-              placeholder={getPlaceholder("recipe_content", exampleSet.recipe_content)}
+              placeholder={getPlaceholder(
+                "recipe_content",
+                exampleSet.recipe_content,
+              )}
               onFocus={() => setFocusedField("recipe_content")}
               onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeContent(event.target.value)}
