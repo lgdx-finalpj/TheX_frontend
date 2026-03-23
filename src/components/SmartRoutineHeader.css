@@ -46,3 +46,25 @@
   font-weight: 800;
   color: #111111;
 }
+
+@media (max-width: 430px) {
+  .smart-routine-header {
+    gap: 8px;
+    padding: 18px 12px 8px;
+  }
+
+  .icon-button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .icon-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .smart-routine-title {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+}
