@@ -14,6 +14,7 @@ import type {
 import {
   getStoredMyRecipe,
   listStoredMyRecipes,
+  type StoredMyRecipeRecord,
   upsertStoredMyRecipe,
 } from "@/utils/myRecipeStore";
 
@@ -46,8 +47,8 @@ interface MyRecipeListResponseItem {
   recipeId: number;
   isCoffee: boolean;
   recipeName: string;
-  recipeCategory: RecipeCategory;
-  isShared: boolean;
+  recipeCategory?: RecipeCategory;
+  isShared?: boolean;
 }
 
 export interface CoffeeRecipeDetailResponse {
@@ -210,14 +211,98 @@ export async function fetchPopularRecipes() {
   }));
 }
 
-export async function fetchMyRecipeList() {
-  return listStoredMyRecipes().map<MyRecipeListResponseItem>((item) => ({
+function mapStoredRecipeToMyRecipeListItem(
+  item: StoredMyRecipeRecord,
+): MyRecipeListResponseItem {
+  return {
     recipeId: item.recipeId,
     isCoffee: item.isCoffee,
     recipeName: item.recipeName,
     recipeCategory: item.recipeCategory,
     isShared: item.isShared,
-  }));
+  };
+}
+
+function mergeMyRecipeList(
+  apiItems: MyRecipeListResponseItem[],
+  storedItems: StoredMyRecipeRecord[],
+) {
+  const storedItemMap = new Map(
+    storedItems.map((item) => [
+      `${item.isCoffee ? "coffee" : "none-coffee"}:${item.recipeId}`,
+      item,
+    ]),
+  );
+  const mergedByIdentity = new Map<string, MyRecipeListResponseItem>();
+  const apiOrderMap = new Map<string, number>();
+
+  apiItems.forEach((item, index) => {
+    const identity = `${item.isCoffee ? "coffee" : "none-coffee"}:${item.recipeId}`;
+    const storedItem = storedItemMap.get(identity);
+    apiOrderMap.set(identity, index);
+
+    mergedByIdentity.set(identity, {
+      ...item,
+      recipeCategory: item.recipeCategory ?? storedItem?.recipeCategory,
+      isShared: item.isShared ?? storedItem?.isShared,
+      recipeName: item.recipeName || storedItem?.recipeName || "",
+    });
+  });
+
+  for (const storedItem of storedItems) {
+    const identity = `${storedItem.isCoffee ? "coffee" : "none-coffee"}:${storedItem.recipeId}`;
+    if (!mergedByIdentity.has(identity)) {
+      mergedByIdentity.set(identity, mapStoredRecipeToMyRecipeListItem(storedItem));
+    }
+  }
+
+  return Array.from(mergedByIdentity.values()).sort((left, right) => {
+    const leftIdentity = `${left.isCoffee ? "coffee" : "none-coffee"}:${left.recipeId}`;
+    const rightIdentity = `${right.isCoffee ? "coffee" : "none-coffee"}:${right.recipeId}`;
+    const leftStored = storedItemMap.get(
+      `${left.isCoffee ? "coffee" : "none-coffee"}:${left.recipeId}`,
+    );
+    const rightStored = storedItemMap.get(
+      `${right.isCoffee ? "coffee" : "none-coffee"}:${right.recipeId}`,
+    );
+    const leftApiOrder = apiOrderMap.get(leftIdentity);
+    const rightApiOrder = apiOrderMap.get(rightIdentity);
+    const leftUpdatedAt = leftStored?.updatedAt ?? 0;
+    const rightUpdatedAt = rightStored?.updatedAt ?? 0;
+
+    if (leftUpdatedAt !== rightUpdatedAt) {
+      return rightUpdatedAt - leftUpdatedAt;
+    }
+
+    if (leftApiOrder == null && rightApiOrder == null) {
+      return 0;
+    }
+
+    if (leftApiOrder == null) {
+      return 1;
+    }
+
+    if (rightApiOrder == null) {
+      return -1;
+    }
+
+    return leftApiOrder - rightApiOrder;
+  });
+}
+
+export async function fetchMyRecipeList() {
+  const storedItems = listStoredMyRecipes();
+
+  try {
+    const response = await apiClient.get<MyRecipeListResponseItem[]>("/auth/my-recipe-list");
+    return mergeMyRecipeList(response.data, storedItems);
+  } catch (error) {
+    if (storedItems.length > 0) {
+      return storedItems.map(mapStoredRecipeToMyRecipeListItem);
+    }
+
+    throw error;
+  }
 }
 
 export async function fetchRecipeDetail(recipeId: number, isCoffee: boolean) {
@@ -233,7 +318,20 @@ export async function fetchMyRecipesWithDetails() {
   const myRecipes = await fetchMyRecipeList();
   const detailPromises: Array<Promise<RecipeItem>> = myRecipes.map((recipe) =>
     fetchRecipeDetail(recipe.recipeId, recipe.isCoffee)
-      .then((detail) => mapRecipeDetailToItem(detail, recipe.isCoffee))
+      .then((detail) => {
+        const mappedRecipe = mapRecipeDetailToItem(detail, recipe.isCoffee);
+
+        return {
+          ...mappedRecipe,
+          recipe_name: mappedRecipe.recipe_name || recipe.recipeName,
+          recipe_category:
+            mappedRecipe.recipe_category ??
+            recipe.recipeCategory ??
+            (recipe.isCoffee ? "COFFEE" : "TEA"),
+          is_shared: detail.isShared ?? recipe.isShared ?? mappedRecipe.is_shared ?? false,
+          is_coffee: recipe.isCoffee,
+        };
+      })
       .catch(
         (): RecipeItem => ({
           recipe_id: recipe.recipeId,
@@ -242,9 +340,10 @@ export async function fetchMyRecipesWithDetails() {
           recipe_type: recipe.isCoffee
             ? ("COFFEE" as RecipeType)
             : ("NONE_COFFEE" as RecipeType),
-          recipe_category: recipe.recipeCategory,
+          recipe_category:
+            recipe.recipeCategory ?? (recipe.isCoffee ? "COFFEE" : "TEA"),
           filter_label: getFilterLabel(recipe.recipeName),
-          is_shared: recipe.isShared,
+          is_shared: recipe.isShared ?? false,
           is_coffee: recipe.isCoffee,
         }),
       ),

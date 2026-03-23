@@ -66,3 +66,40 @@
   line-height: 1.16;
   color: #111111;
 }
+
+@media (max-width: 430px) {
+  .smart-routine-create-content {
+    gap: 16px;
+    padding: 8px 18px 24px;
+  }
+
+  .smart-routine-option {
+    border-radius: 20px;
+    padding: 14px;
+  }
+
+  .smart-routine-option-image {
+    width: 126px;
+    height: 126px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+
+  .smart-routine-card-copy {
+    margin-bottom: 8px;
+  }
+
+  .smart-routine-card-copy h2 {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .smart-routine-card-copy p {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .smart-routine-option-title {
+    font-size: 20px;
+  }
+}

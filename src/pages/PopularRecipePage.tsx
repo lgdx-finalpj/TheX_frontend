@@ -27,7 +27,6 @@ export default function PopularRecipePage() {
   }, [user_id]);
 
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
-  const [baseRecipeIdSet, setBaseRecipeIdSet] = useState<Set<string>>(new Set());
   const [savedRecipeIdSet, setSavedRecipeIdSet] = useState<Set<string>>(new Set());
   const [sharedRecipeIdSet, setSharedRecipeIdSet] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +44,14 @@ export default function PopularRecipePage() {
       ]);
 
       const sharedMyRecipes = myRecipes.filter((recipe) => recipe.is_shared);
+      const hiddenPopularRecipeIds = new Set(
+        sharedMyRecipes.map(getRecipeIdentityFromItem),
+      );
+      const visiblePopularRecipes = popularRecipes.filter(
+        (recipe) => !hiddenPopularRecipeIds.has(getRecipeIdentityFromItem(recipe)),
+      );
 
-      setBaseRecipeIdSet(new Set(popularRecipes.map(getRecipeIdentityFromItem)));
-      setRecipes(popularRecipes);
+      setRecipes(visiblePopularRecipes);
       setSavedRecipeIdSet(new Set(myRecipes.map(getRecipeIdentityFromItem)));
       setSharedRecipeIdSet(new Set(sharedMyRecipes.map(getRecipeIdentityFromItem)));
     } catch (error) {
@@ -126,10 +130,9 @@ export default function PopularRecipePage() {
       });
 
       setRecipes((currentRecipes) => {
-        const isBaseRecipe = baseRecipeIdSet.has(recipeIdentity);
         const isOwnedByCurrentUser = recipe.user_id === currentUserId;
 
-        if (!response.isShared && !isBaseRecipe && isOwnedByCurrentUser) {
+        if (isOwnedByCurrentUser) {
           return currentRecipes.filter(
             (currentRecipe) => getRecipeIdentityFromItem(currentRecipe) !== recipeIdentity,
           );
