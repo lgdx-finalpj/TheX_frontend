@@ -2,7 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 12px 20px 28px;
+  padding: 12px 0px 28px;
 }
 
 .product-settings-panel {
@@ -80,7 +80,7 @@
   text-align: left;
   padding: 0 42px 0 14px;
   color: #9ca3af;
-  font-size: 13px;
+  font-size: 13x;
 }
 
 .settings-action-main.filled {
@@ -461,7 +461,7 @@
 }
 
 .capsule-extraction-sheet {
-  gap: 14px;
+  gap: 0px;
 }
 
 .capsule-extraction-total-row {
@@ -639,7 +639,7 @@
 .capsule-extraction-help {
   margin: 0;
   text-align: center;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 @keyframes sheet-fade-in {

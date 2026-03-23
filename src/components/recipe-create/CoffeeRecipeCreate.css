@@ -1,15 +1,172 @@
 .coffee-recipe-create-page__content {
   min-height: 100dvh;
-  padding-top: 24px;
-  padding-bottom: 40px;
+  padding-top: 28px;
+  padding-bottom: 30px;
   padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
-  background: #eef0f4;
+  background: #edf0f6;
+}
+
+.coffee-recipe-create-page .recipe-category-page__top {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.coffee-recipe-create-page .recipe-category-page__top h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -2px;
+}
+
+.coffee-recipe-create-page .recipe-category-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.coffee-recipe-create-page .recipe-category-page__back-icon {
+  width: 30px;
+  height: 30px;
+  color: #747c89;
+}
+
+.coffee-recipe-create-page .recipe-category-page__intro {
+  margin: 10px;
+}
+
+.coffee-recipe-create-page .recipe-category-page__intro strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.9px;
+  line-height: 1.16;
+  word-break: keep-all;
+}
+
+.coffee-recipe-create-page .recipe-category-page__intro p {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: -0.6px;
+  line-height: 1.34;
+  color: #2f3845;
+  word-break: keep-all;
+}
+
+.coffee-machine-settings-page.coffee-recipe-create__panel {
+  padding: 0 !important;
+}
+
+.coffee-recipe-create__panel .product-settings-panel {
+  gap: 14px;
+}
+
+.coffee-recipe-create__field-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(49, 58, 76, 0.06);
+}
+
+.coffee-recipe-create__field-label {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #111827;
+}
+
+.coffee-recipe-create__input,
+.coffee-recipe-create__textarea {
+  width: 100%;
+  border: 1.5px solid #e0ddd8;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #111111;
+  outline: 0;
+}
+
+.coffee-recipe-create__input {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+
+.coffee-recipe-create__textarea {
+  min-height: 88px;
+  padding: 14px 16px;
+  resize: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+}
+
+.coffee-recipe-create__input::placeholder,
+.coffee-recipe-create__textarea::placeholder {
+  color: #a7acb4;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  opacity: 1;
+}
+
+.coffee-recipe-create__footer {
+  padding-top: 20px;
+  width: 100%;
+}
+
+.coffee-recipe-create__submit {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  border-radius: 14px;
+  background: #d7cabd;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.coffee-recipe-create__submit:disabled {
+  background: #d8d9df;
+  color: #f8f9ff;
 }
 
 @media (max-width: 360px) {
   .coffee-recipe-create-page__content {
     padding-left: calc(12px + env(safe-area-inset-left, 0px));
     padding-right: calc(12px + env(safe-area-inset-right, 0px));
+  }
+
+  .coffee-recipe-create-page .recipe-category-page__top h1 {
+    font-size: 20px;
+  }
+
+  .coffee-recipe-create__field-card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .coffee-recipe-create__input {
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .coffee-recipe-create__textarea {
+    min-height: 84px;
+    padding: 12px 14px;
+    font-size: 13px;
   }
 }

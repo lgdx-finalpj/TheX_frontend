@@ -180,6 +180,14 @@ type CoffeeMachineSettingsPanelProps = {
   submitLabel?: string;
   isSubmitting?: boolean;
   submitError?: string | null;
+  headingText?: string;
+  topContent?: ReactNode;
+  bottomContent?: ReactNode;
+  showCancelButton?: boolean;
+  isSubmitDisabled?: boolean;
+  mainClassName?: string;
+  footerClassName?: string;
+  submitButtonClassName?: string;
 };
 
 export default function CoffeeMachineSettingsPanel({
@@ -192,6 +200,14 @@ export default function CoffeeMachineSettingsPanel({
   submitLabel = "저장",
   isSubmitting = false,
   submitError = null,
+  headingText,
+  topContent = null,
+  bottomContent = null,
+  showCancelButton = true,
+  isSubmitDisabled = false,
+  mainClassName = "",
+  footerClassName = "",
+  submitButtonClassName = "",
 }: CoffeeMachineSettingsPanelProps) {
   const initialExtractionType = initialConfig?.total_extraction_type ?? null;
   const initialExtractionTotalMl =
@@ -277,6 +293,7 @@ export default function CoffeeMachineSettingsPanel({
     Boolean(extractionType) &&
     normalizedSteps != null &&
     totalExtractionMl != null;
+  const submitDisabled = !canSubmit || isSubmitting || isSubmitDisabled;
 
   const updateCapsule = (slot: CapsuleSlot, nextCapsule: CoffeeCapsuleInfo) => {
     if (slot === "first") {
@@ -369,11 +386,12 @@ export default function CoffeeMachineSettingsPanel({
 
   return (
     <>
-      <main className="product-settings-page coffee-machine-settings-page">
+      <main
+        className={`product-settings-page coffee-machine-settings-page ${mainClassName}`.trim()}
+      >
         <section className="product-settings-panel">
-          <h2>
-            {orderNumber}. {productLabel} 설정
-          </h2>
+          {topContent}
+          <h2>{headingText ?? `${orderNumber}. ${productLabel} 설정`}</h2>
 
           <div className="coffee-capsule-grid">
             {([
@@ -485,16 +503,24 @@ export default function CoffeeMachineSettingsPanel({
               }
             />
           </div>
+
+          {bottomContent}
         </section>
 
-        <div className="product-settings-footer">
-          <button type="button" className="secondary-action-button" onClick={onCancel}>
+        <div
+          className={`product-settings-footer ${
+            showCancelButton ? "" : "single-action"
+          } ${footerClassName}`.trim()}
+        >
+          {showCancelButton ? (
+            <button type="button" className="secondary-action-button" onClick={onCancel}>
             취소
-          </button>
+            </button>
+          ) : null}
           <button
             type="button"
-            className="mood-save-button"
-            disabled={!canSubmit || isSubmitting}
+            className={`mood-save-button ${submitButtonClassName}`.trim()}
+            disabled={submitDisabled}
             onClick={() => {
               void handleSave();
             }}

@@ -39,10 +39,12 @@ function mapCapsuleNameToCapsuleId(name: string, fallbackId: number) {
 export function buildCoffeeRecipePayloadFromConfig({
   recipeName = "아메리카노",
   recipeMemo,
+  recipeLevel = "EASY",
   config,
 }: {
   recipeName?: string;
   recipeMemo: string;
+  recipeLevel?: CoffeeRecipeCustomizeCoffeeRequestDTO["recipeLevel"];
   config: CoffeeMachineConfig;
 }): CoffeeRecipeCustomizeCoffeeRequestDTO {
   const totalExtractionMl = config.total_extraction_ml;
@@ -70,7 +72,7 @@ export function buildCoffeeRecipePayloadFromConfig({
     capsule2Step4: steps.capsule2Step4,
     addObj: `${capsule1Name}, ${capsule2Name}`,
     recipeMemo: cleanMemo,
-    recipeLevel: "EASY",
+    recipeLevel,
   };
 }
 

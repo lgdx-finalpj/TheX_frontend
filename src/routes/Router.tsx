@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AiRecommendedRecipeDetailPage from "@/pages/AiRecommendedRecipeDetailPage";
 import BasicRecipeDetailPage from "@/pages/BasicRecipeDetailPage";
 import CoffeeMachineMain from "@/pages/CoffeeMachineMain";
+import CoffeeRecipeCreatePage from "@/pages/CoffeeRecipeCreatePage";
 import DevicePage from "@/pages/DevicePage";
 import GroupedDevicePage from "@/pages/GroupedDevicePage";
 import HomePage from "@/pages/HomePage";
@@ -111,6 +112,10 @@ export default function Router() {
       <Route
         path="/devices/coffee-machine/create-recipe/select-category"
         element={<RecipeCategorySelectionPage />}
+      />
+      <Route
+        path="/devices/coffee-machine/create-recipe/coffee"
+        element={<CoffeeRecipeCreatePage />}
       />
       <Route
         path="/devices/coffee-machine/create-recipe/non-coffee/:categoryKey"

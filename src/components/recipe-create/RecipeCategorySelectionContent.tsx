@@ -4,14 +4,17 @@ import ChevronIcon from "@/components/common/ChevronIcon";
 import coffeeCategoryImage from "@/assets/cat_image/커피_카테고리.png";
 import smoothieCategoryImage from "@/assets/cat_image/스무디_카테고리.png";
 import teaCategoryImage from "@/assets/cat_image/차_카테고리.png";
-import { getNonCoffeeRecipeCreatePath } from "@/routes/paths";
+import {
+  COFFEE_RECIPE_CREATE_ROUTE,
+  getNonCoffeeRecipeCreatePath,
+} from "@/routes/paths";
 
 const recipeCategoryOptions = [
   {
     category_key: "coffee",
     title: "LG 듀오보\n캡슐 커피 레시피",
     image: coffeeCategoryImage,
-    path: undefined,
+    path: COFFEE_RECIPE_CREATE_ROUTE,
   },
   {
     category_key: "smoothie",
