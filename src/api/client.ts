@@ -5,8 +5,12 @@ const configuredBaseUrl =
     ? import.meta.env.VITE_API_BASE_URL.trim()
     : "";
 
+const apiBaseUrl = configuredBaseUrl
+  ? `${configuredBaseUrl.replace(/\/$/, "")}/api`
+  : "/api";
+
 const apiClient = axios.create({
-  baseURL: configuredBaseUrl || "",
+  baseURL: apiBaseUrl,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
