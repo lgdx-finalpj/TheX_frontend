@@ -2,7 +2,6 @@ import createRoutineImage from "@/assets/moodcustom/나만의 루틴 만들기.p
 import MoodRoutineCard from "@/components/smartRoutine/MoodRoutineCard";
 import {
   getColorsetTheme,
-  getMoodTheme,
   toRecommendedMoodItems,
   toSavedMoodItems,
 } from "@/pages/smartRoutineMainPage.utils";
@@ -88,7 +87,7 @@ export default function MineTabSection({
               key={moodCustom.mood_id}
               title={moodCustom.mood_name}
               items={toSavedMoodItems(moodCustom)}
-              theme={getMoodTheme(moodCustom.selected_mood_id)}
+              theme={getColorsetTheme(moodCustom.colorset_main)}
               isExecuting={runningMoodCustomId === moodCustom.mood_id}
               actionSlot={
                 <div className="saved-mood-action-shell">

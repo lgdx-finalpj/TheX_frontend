@@ -16,7 +16,7 @@ import type { MoodCustomDraft, MoodOption, ProductOption } from "@/state/moodCus
 
 export const defaultDraft: MoodCustomDraft = {
   mood_id: "",
-  user_id: "user0000001",
+  user_id: "3",
   colorset_id: "",
   mood_name: "",
   mood_memo: "",

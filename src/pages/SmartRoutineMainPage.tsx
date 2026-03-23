@@ -1,5 +1,6 @@
 import {
   fetchSharedMoodCustomList,
+  saveMoodCustom,
   shareMoodCustom,
   type MoodCustomListResponseDTO,
 } from "@/api/moodCustomApi";
@@ -14,12 +15,19 @@ import type { SavedMoodCustom } from "@/state/moodCustom.types";
 import { useMoodCustomDraft } from "@/state/useMoodCustomDraft";
 import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import "./SmartRoutineShared.css";
 import "./SmartRoutineMainPage.css";
 
 function inferColorsetId(item: MoodCustomListResponseDTO) {
+  if (
+    typeof item.colorsetMain === "string" &&
+    item.colorsetMain.trim().length > 0
+  ) {
+    return item.colorsetMain.trim();
+  }
+
   const speakerType = item.customProduct?.speakerCustom?.musicType;
 
   if (speakerType === "REST") {
@@ -48,7 +56,7 @@ function mapSharedMoodItemToRecommended(
     const recipeName = coffee.recipeName?.trim() || "Coffee";
     products.push({
       product_type: "coffee_machine",
-      summary: `${recipeName} - ${coffee.capsuleTemp}`,
+      summary: `${recipeName}, ${coffee.capsuleTemp}`,
     });
   }
 
@@ -102,6 +110,7 @@ function prioritizeMoodById<T extends { mood_id: string }>(
 
 export default function SmartRoutineMainPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     savedMoodCustoms,
     isSavedMoodCustomsLoading,
@@ -115,11 +124,13 @@ export default function SmartRoutineMainPage() {
     null,
   );
   const [isSharingMoodId, setIsSharingMoodId] = useState<string | null>(null);
+  const [isSavingMoodId, setIsSavingMoodId] = useState<string | null>(null);
   const [shareMoodError, setShareMoodError] = useState<string | null>(null);
+  const [saveMoodError, setSaveMoodError] = useState<string | null>(null);
   const [recommendedMoodCustoms, setRecommendedMoodCustoms] = useState<
     RecommendedMoodCustomRecord[]
   >([]);
-  const [recentSharedMoodId, setRecentSharedMoodId] = useState<string | null>(null);
+  const [prioritizedMoodId, setPrioritizedMoodId] = useState<string | null>(null);
   const [isRecommendedMoodCustomsLoading, setIsRecommendedMoodCustomsLoading] =
     useState(false);
   const [recommendedMoodCustomsError, setRecommendedMoodCustomsError] = useState<
@@ -146,18 +157,38 @@ export default function SmartRoutineMainPage() {
     void refreshSharedMoodCustoms();
   }, [refreshSharedMoodCustoms]);
 
-  const sortedSavedMoodCustoms = useMemo(
-    () => prioritizeMoodById(savedMoodCustoms, recentSharedMoodId),
-    [recentSharedMoodId, savedMoodCustoms],
-  );
+  useEffect(() => {
+    const state = location.state as { activeTab?: "mine" | "recommend"; prioritizedMoodId?: string } | null;
 
-  const bookmarkedRecommendedMoodCustoms = recommendedMoodCustoms.filter(
-    (moodCustom) => bookmarkedMoodIds.includes(moodCustom.mood_id),
+    if (!state) {
+      return;
+    }
+
+    if (state.activeTab) {
+      setActiveTab(state.activeTab);
+    }
+
+    if (typeof state.prioritizedMoodId === "string" && state.prioritizedMoodId) {
+      setPrioritizedMoodId(state.prioritizedMoodId);
+    }
+
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate]);
+
+  const sortedSavedMoodCustoms = useMemo(
+    () => prioritizeMoodById(savedMoodCustoms, prioritizedMoodId),
+    [prioritizedMoodId, savedMoodCustoms],
   );
 
   const savedMoodIdSet = useMemo(
     () => new Set(sortedSavedMoodCustoms.map((moodCustom) => moodCustom.mood_id)),
     [sortedSavedMoodCustoms],
+  );
+
+  const bookmarkedRecommendedMoodCustoms = recommendedMoodCustoms.filter(
+    (moodCustom) =>
+      bookmarkedMoodIds.includes(moodCustom.mood_id) &&
+      !savedMoodIdSet.has(moodCustom.mood_id),
   );
 
   const sharedSavedMoodCustoms = sortedSavedMoodCustoms.filter((moodCustom) =>
@@ -196,7 +227,7 @@ export default function SmartRoutineMainPage() {
       await shareMoodCustom(numericMoodId);
       await refreshSavedMoodCustoms();
       await refreshSharedMoodCustoms();
-      setRecentSharedMoodId(moodId);
+      setPrioritizedMoodId(moodId);
     } catch (error) {
       setShareMoodError(getApiErrorMessage(error, "Failed to share mood custom."));
     } finally {
@@ -216,6 +247,36 @@ export default function SmartRoutineMainPage() {
 
     setRunningMoodCustom(targetMoodCustom);
     setOpenedMenuMoodId(null);
+  };
+
+  const handleSaveMood = async (moodId: string) => {
+    if (isSavingMoodId) {
+      return;
+    }
+
+    const numericMoodId = Number(moodId);
+    if (!Number.isFinite(numericMoodId)) {
+      setSaveMoodError("Invalid mood id for save.");
+      return;
+    }
+
+    setIsSavingMoodId(moodId);
+    setSaveMoodError(null);
+
+    try {
+      await saveMoodCustom(numericMoodId);
+      await refreshSavedMoodCustoms();
+      await refreshSharedMoodCustoms();
+      setPrioritizedMoodId(moodId);
+      setActiveTab("mine");
+      setBookmarkedMoodIds((current) =>
+        current.includes(moodId) ? current : [moodId, ...current],
+      );
+    } catch (error) {
+      setSaveMoodError(getApiErrorMessage(error, "Failed to save mood custom."));
+    } finally {
+      setIsSavingMoodId(null);
+    }
   };
 
   const handleBookmarkToggle = (moodId: string) => {
@@ -274,7 +335,10 @@ export default function SmartRoutineMainPage() {
             sharedSavedMoodCustoms={sharedSavedMoodCustoms}
             recommendedMoodCustoms={recommendedOnlyMoodCustoms}
             bookmarkedMoodIds={bookmarkedMoodIds}
-            onBookmarkToggle={handleBookmarkToggle}
+            savingMoodId={isSavingMoodId}
+            onSaveMood={(moodId) => {
+              void handleSaveMood(moodId);
+            }}
           />
         )}
 
@@ -293,6 +357,7 @@ export default function SmartRoutineMainPage() {
           <p role="alert">{recommendedMoodCustomsError}</p>
         ) : null}
         {shareMoodError ? <p role="alert">{shareMoodError}</p> : null}
+        {saveMoodError ? <p role="alert">{saveMoodError}</p> : null}
       </div>
     </MobileLayout>
   );

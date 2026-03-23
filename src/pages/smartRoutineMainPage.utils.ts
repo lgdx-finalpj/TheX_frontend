@@ -1,14 +1,13 @@
 import duoboImage from "@/assets/elc_icon/듀오보.png";
 import lightDeviceImage from "@/assets/elc_icon/조명.png";
 import speakerDeviceImage from "@/assets/elc_icon/스피커.png";
-import { moodColorsetMock } from "@/pages/smartRoutineMainPage.mocks";
 import type {
   ExecutionModalItem,
   MoodCardTheme,
   MoodRoutineCardItem,
   RecommendedMoodCustomRecord,
 } from "@/types/smartRoutine";
-import type { MoodOptionId, SavedMoodCustom } from "@/state/moodCustom.types";
+import type { SavedMoodCustom } from "@/state/moodCustom.types";
 
 const productTypeLabelMap: Record<string, string> = {
   coffee_machine: "커피머신",
@@ -37,50 +36,20 @@ function hexToRgba(hexColor: string, opacity: number) {
 }
 
 export function getColorsetTheme(colorsetId: string): MoodCardTheme {
-  const colorset = moodColorsetMock.find(
-    (item) => item.colorset_id === colorsetId,
-  );
+  const sanitized = colorsetId.trim();
 
-  if (!colorset) {
+  if (!/^#[0-9a-fA-F]{6}$/.test(sanitized)) {
     return {
-      cardColor: "rgba(163, 109, 0, 0.3)",
+      cardColor: "rgba(163, 109, 0, 0.5)",
       badgeColor: "#A36D00",
-      itemColor: "rgba(163, 109, 0, 0.5)",
+      itemColor: "rgba(163, 109, 0, 0.7)",
     };
   }
 
   return {
-    cardColor: hexToRgba(colorset.colorset_main, colorset.color_opacity1),
-    badgeColor: hexToRgba(colorset.colorset_main, colorset.color_opacity3),
-    itemColor: hexToRgba(colorset.colorset_main, colorset.color_opacity2),
-  };
-}
-
-export function getMoodTheme(selectedMoodId: MoodOptionId): MoodCardTheme {
-  if (selectedMoodId === "home-cafe") {
-    return getColorsetTheme("#A36D00");
-  }
-
-  if (selectedMoodId === "rest") {
-    return getColorsetTheme("#5A48C2");
-  }
-
-  if (selectedMoodId === "focus-mode") {
-    return getColorsetTheme("#1E4F3D");
-  }
-
-  if (selectedMoodId === "movie-night") {
-    return {
-      cardColor: "rgba(59, 62, 115, 0.3)",
-      badgeColor: "#3B3E73",
-      itemColor: "rgba(59, 62, 115, 0.5)",
-    };
-  }
-
-  return {
-    cardColor: "rgba(121, 72, 152, 0.3)",
-    badgeColor: "#794898",
-    itemColor: "rgba(121, 72, 152, 0.5)",
+    cardColor: hexToRgba(sanitized, 50),
+    badgeColor: sanitized,
+    itemColor: hexToRgba(sanitized, 70),
   };
 }
 

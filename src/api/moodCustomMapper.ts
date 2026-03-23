@@ -166,6 +166,39 @@ function mapCapsuleNameToBrand(name: string) {
   return "";
 }
 
+function getSafeNumber(value: number | null | undefined) {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+function getSafeString(value: string | null | undefined, fallback = "") {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : fallback;
+}
+
+function getSafeCapsuleName(value: string | null | undefined, fallback: string) {
+  return getSafeString(value, fallback);
+}
+
+function mapMoodOptionIdToColorsetMain(selectedMoodId: MoodOptionId) {
+  if (selectedMoodId === "rest") {
+    return "#5A48C2";
+  }
+
+  if (selectedMoodId === "focus-mode") {
+    return "#1E4F3D";
+  }
+
+  if (selectedMoodId === "movie-night") {
+    return "#3B3E73";
+  }
+
+  return "#A36D00";
+}
+
 function resolveTotalExtractionMl(rawTotalMl: number, fallback: 80 | 220): 80 | 220 {
   if (rawTotalMl === 80 || rawTotalMl === 220) {
     return rawTotalMl;
@@ -179,23 +212,31 @@ export function mapMoodCustomListItemToSavedMoodCustom(
 ): SavedMoodCustom {
   const customProduct = item.customProduct ?? {};
   const nextProducts: SavedMoodCustom["custom_product"] = [];
+  const selectedMoodId = mapSpeakerTypeToMoodOptionId(
+    customProduct.speakerCustom?.musicType,
+  );
 
   if (customProduct.coffeeCustom) {
     const option = getProductOptionByType("coffee_machine");
     const coffee = customProduct.coffeeCustom;
-    const summaryName = coffee.recipeName.trim();
+    const firstCapsuleName = getSafeCapsuleName(coffee.capsule1Name, "기본 캡슐");
+    const secondCapsuleName = getSafeCapsuleName(
+      coffee.capsule2Name,
+      "캡슐 미선택",
+    );
+    const summaryName = getSafeString(coffee.recipeName);
     const summary = summaryName.length > 0 ? summaryName : "Coffee recipe";
     const totalMlBySteps =
-      coffee.capsule1Step1 +
-      coffee.capsule2Step2 +
-      coffee.capsule1Step3 +
-      coffee.capsule2Step4;
+      getSafeNumber(coffee.capsule1Step1) +
+      getSafeNumber(coffee.capsule2Step2) +
+      getSafeNumber(coffee.capsule1Step3) +
+      getSafeNumber(coffee.capsule2Step4);
     const totalExtractionMl = resolveTotalExtractionMl(totalMlBySteps, 220);
     const normalizedSteps = normalizeExtractionSteps(totalExtractionMl, {
-      capsule1Step1: coffee.capsule1Step1,
-      capsule2Step2: coffee.capsule2Step2,
-      capsule1Step3: coffee.capsule1Step3,
-      capsule2Step4: coffee.capsule2Step4,
+      capsule1Step1: getSafeNumber(coffee.capsule1Step1),
+      capsule2Step2: getSafeNumber(coffee.capsule2Step2),
+      capsule1Step3: getSafeNumber(coffee.capsule1Step3),
+      capsule2Step4: getSafeNumber(coffee.capsule2Step4),
     });
     const mappedTemperature = mapCapsuleTempToTemperatureLevel(coffee.capsuleTemp);
 
@@ -208,14 +249,14 @@ export function mapMoodCustomListItemToSavedMoodCustom(
         first_capsule: {
           capsule_id: coffeeCapsuleAssets[0]?.capsule_id ?? "capsule-01",
           image_src: coffeeCapsuleAssets[0]?.image_src ?? "",
-          capsule_brand: mapCapsuleNameToBrand(coffee.capsule1Name),
-          capsule_name: coffee.capsule1Name,
+          capsule_brand: mapCapsuleNameToBrand(firstCapsuleName),
+          capsule_name: firstCapsuleName,
         },
         second_capsule: {
           capsule_id: coffeeCapsuleAssets[1]?.capsule_id ?? "capsule-02",
           image_src: coffeeCapsuleAssets[1]?.image_src ?? "",
-          capsule_brand: mapCapsuleNameToBrand(coffee.capsule2Name),
-          capsule_name: coffee.capsule2Name,
+          capsule_brand: mapCapsuleNameToBrand(secondCapsuleName),
+          capsule_name: secondCapsuleName,
         },
         temperature: mappedTemperature ?? "middle",
         total_extraction_type: totalExtractionMl === 80 ? "espresso" : "lungo",
@@ -225,11 +266,13 @@ export function mapMoodCustomListItemToSavedMoodCustom(
         capsule1_step3: normalizedSteps.capsule1Step3,
         capsule2_step4: normalizedSteps.capsule2Step4,
         capsule1_size:
+          getSafeNumber(coffee.capsule1Size) ||
           normalizedSteps.capsule1Step1 + normalizedSteps.capsule1Step3,
         capsule2_size:
+          getSafeNumber(coffee.capsule2Size) ||
           normalizedSteps.capsule2Step2 + normalizedSteps.capsule2Step4,
       },
-      summary: `${summary} - ${totalExtractionMl}ml`,
+      summary: `${summary}, ${totalExtractionMl}ml`,
     });
   }
 
@@ -260,9 +303,9 @@ export function mapMoodCustomListItemToSavedMoodCustom(
   return {
     mood_id: String(item.moodId),
     mood_name: item.moodName,
-    selected_mood_id: mapSpeakerTypeToMoodOptionId(
-      customProduct.speakerCustom?.musicType,
-    ),
+    colorset_main:
+      getSafeString(item.colorsetMain) || mapMoodOptionIdToColorsetMain(selectedMoodId),
+    selected_mood_id: selectedMoodId,
     custom_product: nextProducts,
   };
 }

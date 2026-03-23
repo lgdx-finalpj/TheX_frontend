@@ -26,6 +26,16 @@ function isCurrentUserProfile(value: unknown): value is CurrentUserProfile {
   );
 }
 
+function normalizeCurrentUserProfile(value: CurrentUserProfile): CurrentUserProfile {
+  return {
+    user_id: DEFAULT_CURRENT_USER_PROFILE.user_id,
+    user_nickname:
+      value.user_nickname.trim().length > 0
+        ? value.user_nickname
+        : DEFAULT_CURRENT_USER_PROFILE.user_nickname,
+  };
+}
+
 export function getCurrentUserProfile(): CurrentUserProfile {
   if (typeof window === "undefined") {
     return DEFAULT_CURRENT_USER_PROFILE;
@@ -42,10 +52,10 @@ export function getCurrentUserProfile(): CurrentUserProfile {
       return DEFAULT_CURRENT_USER_PROFILE;
     }
 
-    return {
+    return normalizeCurrentUserProfile({
       user_id: String((parsedValue as { user_id: string | number }).user_id),
       user_nickname: parsedValue.user_nickname,
-    };
+    });
   } catch {
     return DEFAULT_CURRENT_USER_PROFILE;
   }
@@ -56,7 +66,10 @@ export function setCurrentUserProfile(profile: CurrentUserProfile) {
     return;
   }
 
-  window.localStorage.setItem(CURRENT_USER_PROFILE_KEY, JSON.stringify(profile));
+  window.localStorage.setItem(
+    CURRENT_USER_PROFILE_KEY,
+    JSON.stringify(normalizeCurrentUserProfile(profile)),
+  );
   window.dispatchEvent(new Event(CURRENT_USER_PROFILE_EVENT));
 }
 

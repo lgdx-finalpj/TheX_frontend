@@ -72,6 +72,7 @@ export interface MoodCustomDraft {
 export interface SavedMoodCustom {
   mood_id: string;
   mood_name: string;
+  colorset_main: string;
   selected_mood_id: MoodOptionId;
   custom_product: CustomProductEntry[];
 }
@@ -123,7 +124,7 @@ export interface MoodCustomDraftContextValue {
     summary: string,
   ) => void;
   clearProductConfig: (productType: ProductType) => void;
-  applyDraft: () => Promise<boolean>;
+  applyDraft: () => Promise<string | null>;
   refreshSavedMoodCustoms: () => Promise<void>;
   resetDraft: () => void;
 }

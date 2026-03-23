@@ -84,16 +84,16 @@ export interface CoffeeCustomDetailResponseDTO {
   recipeName: string;
   recipeCategory: CoffeeRecipeCategory;
   capsule1Name: string;
-  capsule2Name: string;
+  capsule2Name: string | null;
   capsuleTemp: CapsuleTemp;
-  capsule1Size: number;
-  capsule2Size: number;
-  capsule1Step1: number;
-  capsule2Step2: number;
-  capsule1Step3: number;
-  capsule2Step4: number;
-  addObj: string;
-  recipeMemo: string;
+  capsule1Size: number | null;
+  capsule2Size: number | null;
+  capsule1Step1: number | null;
+  capsule2Step2: number | null;
+  capsule1Step3: number | null;
+  capsule2Step4: number | null;
+  addObj: string | null;
+  recipeMemo: string | null;
   isExtract: boolean;
   recipeLevel: CoffeeRecipeLevel;
   isShared: boolean;
@@ -109,6 +109,7 @@ export interface MoodCustomProductResponseDTO {
 export interface MoodCustomListResponseDTO {
   moodId: number;
   moodName: string;
+  colorsetMain?: string;
   customProduct: MoodCustomProductResponseDTO;
 }
 
