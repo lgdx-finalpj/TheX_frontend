@@ -45,7 +45,12 @@ export default function PopularRecipeDetailPage() {
           const matchedRecipe = popularRecipes.find(
             (item) => item.recipe_id === recipeIdNumber,
           );
-          isCoffee = matchedRecipe?.is_coffee ? "true" : "false";
+
+          if (!matchedRecipe) {
+            throw new Error("레시피 종류를 확인할 수 없습니다.");
+          }
+
+          isCoffee = matchedRecipe.is_coffee ? "true" : "false";
         }
 
         const detail = await fetchRecipeDetail(recipeIdNumber, isCoffee !== "false");

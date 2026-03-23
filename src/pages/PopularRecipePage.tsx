@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
 import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
@@ -16,24 +16,7 @@ import {
   getPopularRecipeDetailPath,
   MY_RECIPE_ROUTE,
 } from "@/routes/paths";
-
-function mergeRecipesById(baseRecipes: RecipeItem[], extraRecipes: RecipeItem[]) {
-  const recipeById = new Map<number, RecipeItem>();
-
-  baseRecipes.forEach((recipe) => {
-    recipeById.set(recipe.recipe_id, recipe);
-  });
-
-  extraRecipes.forEach((recipe) => {
-    const existing = recipeById.get(recipe.recipe_id);
-    recipeById.set(
-      recipe.recipe_id,
-      existing ? { ...existing, ...recipe } : recipe,
-    );
-  });
-
-  return Array.from(recipeById.values());
-}
+import { getRecipeIdentityFromItem } from "@/utils/recipeIdentity";
 
 export default function PopularRecipePage() {
   const navigate = useNavigate();
@@ -44,12 +27,12 @@ export default function PopularRecipePage() {
   }, [user_id]);
 
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
-  const [baseRecipeIdSet, setBaseRecipeIdSet] = useState<Set<number>>(new Set());
-  const [savedRecipeIdSet, setSavedRecipeIdSet] = useState<Set<number>>(new Set());
-  const [sharedRecipeIdSet, setSharedRecipeIdSet] = useState<Set<number>>(new Set());
+  const [baseRecipeIdSet, setBaseRecipeIdSet] = useState<Set<string>>(new Set());
+  const [savedRecipeIdSet, setSavedRecipeIdSet] = useState<Set<string>>(new Set());
+  const [sharedRecipeIdSet, setSharedRecipeIdSet] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [pendingRecipeId, setPendingRecipeId] = useState<number | null>(null);
+  const [pendingRecipeId, setPendingRecipeId] = useState<string | null>(null);
 
   const refreshPopularRecipes = useCallback(async () => {
     setIsLoading(true);
@@ -63,10 +46,10 @@ export default function PopularRecipePage() {
 
       const sharedMyRecipes = myRecipes.filter((recipe) => recipe.is_shared);
 
-      setBaseRecipeIdSet(new Set(popularRecipes.map((recipe) => recipe.recipe_id)));
-      setRecipes(mergeRecipesById(popularRecipes, sharedMyRecipes));
-      setSavedRecipeIdSet(new Set(myRecipes.map((recipe) => recipe.recipe_id)));
-      setSharedRecipeIdSet(new Set(sharedMyRecipes.map((recipe) => recipe.recipe_id)));
+      setBaseRecipeIdSet(new Set(popularRecipes.map(getRecipeIdentityFromItem)));
+      setRecipes(popularRecipes);
+      setSavedRecipeIdSet(new Set(myRecipes.map(getRecipeIdentityFromItem)));
+      setSharedRecipeIdSet(new Set(sharedMyRecipes.map(getRecipeIdentityFromItem)));
     } catch (error) {
       setErrorMessage(mapApiErrorMessage(error, "인기 레시피를 불러오지 못했습니다."));
     } finally {
@@ -90,19 +73,22 @@ export default function PopularRecipePage() {
   };
 
   const handleSaveRecipe = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
     if (pendingRecipeId) {
       return;
     }
 
-    setPendingRecipeId(recipe.recipe_id);
+    setPendingRecipeId(recipeIdentity);
     setErrorMessage(null);
 
     try {
       await saveRecipeApi({
         recipeId: recipe.recipe_id,
         recipeCategory: recipe.recipe_category,
+        recipeName: recipe.recipe_name,
       });
-      setSavedRecipeIdSet((current) => new Set([...current, recipe.recipe_id]));
+      setSavedRecipeIdSet((current) => new Set([...current, recipeIdentity]));
     } catch (error) {
       const message = mapApiErrorMessage(error, "레시피 저장에 실패했습니다.");
       setErrorMessage(message);
@@ -113,41 +99,44 @@ export default function PopularRecipePage() {
   };
 
   const handleToggleShareRecipe = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
     if (pendingRecipeId) {
       return false;
     }
 
-    setPendingRecipeId(recipe.recipe_id);
+    setPendingRecipeId(recipeIdentity);
     setErrorMessage(null);
 
     try {
       const response = await toggleRecipeShareApi(
         recipe.recipe_id,
         recipe.recipe_category,
+        recipe.recipe_name,
       );
 
       setSharedRecipeIdSet((current) => {
         const next = new Set(current);
         if (response.isShared) {
-          next.add(recipe.recipe_id);
+          next.add(recipeIdentity);
         } else {
-          next.delete(recipe.recipe_id);
+          next.delete(recipeIdentity);
         }
         return next;
       });
 
       setRecipes((currentRecipes) => {
-        const isBaseRecipe = baseRecipeIdSet.has(recipe.recipe_id);
+        const isBaseRecipe = baseRecipeIdSet.has(recipeIdentity);
         const isOwnedByCurrentUser = recipe.user_id === currentUserId;
 
         if (!response.isShared && !isBaseRecipe && isOwnedByCurrentUser) {
           return currentRecipes.filter(
-            (currentRecipe) => currentRecipe.recipe_id !== recipe.recipe_id,
+            (currentRecipe) => getRecipeIdentityFromItem(currentRecipe) !== recipeIdentity,
           );
         }
 
         return currentRecipes.map((currentRecipe) =>
-          currentRecipe.recipe_id === recipe.recipe_id
+          getRecipeIdentityFromItem(currentRecipe) === recipeIdentity
             ? { ...currentRecipe, is_shared: response.isShared }
             : currentRecipe,
         );
@@ -164,7 +153,8 @@ export default function PopularRecipePage() {
   };
 
   const getDetailPath = useCallback(
-    (recipe: RecipeItem) => getPopularRecipeDetailPath(String(recipe.recipe_id)),
+    (recipe: RecipeItem) =>
+      getPopularRecipeDetailPath(String(recipe.recipe_id), recipe.is_coffee),
     [],
   );
 

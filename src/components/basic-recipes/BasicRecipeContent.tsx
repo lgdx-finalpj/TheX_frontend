@@ -25,9 +25,9 @@ interface BasicRecipeContentProps {
   errorMessage?: string | null;
   onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
   onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
-  pendingRecipeId?: number | null;
-  savedRecipeIdSet?: ReadonlySet<number>;
-  sharedRecipeIdSet?: ReadonlySet<number>;
+  pendingRecipeId?: string | null;
+  savedRecipeIdSet?: ReadonlySet<string>;
+  sharedRecipeIdSet?: ReadonlySet<string>;
   currentUserId?: number;
 }
 

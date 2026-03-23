@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "@/components/basic-recipes/BasicRecipe.css";
 import BasicRecipeFilters from "@/components/basic-recipes/BasicRecipeFilters";
@@ -22,6 +22,7 @@ import {
   getMyRecipeDetailPath,
   RECIPE_CATEGORY_SELECTION_ROUTE,
 } from "@/routes/paths";
+import { getRecipeIdentityFromItem } from "@/utils/recipeIdentity";
 
 export default function MyRecipeContent() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function MyRecipeContent() {
   const [selectedFlavor, setSelectedFlavor] = useState<RecipeFlavor | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [pendingRecipeId, setPendingRecipeId] = useState<number | null>(null);
+  const [pendingRecipeId, setPendingRecipeId] = useState<string | null>(null);
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const refreshMyRecipes = useCallback(async () => {
@@ -42,7 +43,7 @@ export default function MyRecipeContent() {
 
     try {
       const items = await fetchMyRecipesWithDetails();
-      setRecipes([...items].reverse());
+      setRecipes(items);
     } catch (error) {
       setErrorMessage(mapApiErrorMessage(error, "나의 레시피 목록을 불러오지 못했습니다."));
     } finally {
@@ -74,7 +75,7 @@ export default function MyRecipeContent() {
       new Set(
         recipes
           .filter((recipe) => recipe.is_shared)
-          .map((recipe) => recipe.recipe_id),
+          .map(getRecipeIdentityFromItem),
       ),
     [recipes],
   );
@@ -95,26 +96,37 @@ export default function MyRecipeContent() {
   };
 
   const handleToggleShare = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
     if (pendingRecipeId) {
       return false;
     }
 
-    setPendingRecipeId(recipe.recipe_id);
+    setPendingRecipeId(recipeIdentity);
     setErrorMessage(null);
 
     try {
       const response = await toggleRecipeShareApi(
         recipe.recipe_id,
         recipe.recipe_category,
+        recipe.recipe_name,
       );
 
       setRecipes((currentRecipes) =>
         currentRecipes.map((currentRecipe) =>
-          currentRecipe.recipe_id === recipe.recipe_id
+          getRecipeIdentityFromItem(currentRecipe) === recipeIdentity
             ? { ...currentRecipe, is_shared: response.isShared }
             : currentRecipe,
         ),
       );
+
+      if (response.isShared) {
+        navigate(BASIC_RECIPE_ROUTE, {
+          state: {
+            prioritizedRecipeIdentity: recipeIdentity,
+          },
+        });
+      }
 
       return response.isShared;
     } catch (error) {
@@ -155,7 +167,9 @@ export default function MyRecipeContent() {
         />
         <BasicRecipeList
           recipes={isLoading || errorMessage ? [] : filteredRecipes}
-          getDetailPath={(recipe) => getMyRecipeDetailPath(String(recipe.recipe_id))}
+          getDetailPath={(recipe) =>
+            getMyRecipeDetailPath(String(recipe.recipe_id), recipe.is_coffee)
+          }
           listLabel="나의 레시피 목록"
           emptyTitle={
             isLoading

@@ -43,7 +43,12 @@ export default function MyRecipeDetailPage() {
         if (!isCoffee) {
           const myRecipes = await fetchMyRecipeList();
           const matchedRecipe = myRecipes.find((item) => item.recipeId === recipeIdNumber);
-          isCoffee = matchedRecipe?.isCoffee ? "true" : "false";
+
+          if (!matchedRecipe) {
+            throw new Error("레시피 종류를 확인할 수 없습니다.");
+          }
+
+          isCoffee = matchedRecipe.isCoffee ? "true" : "false";
         }
 
         const detail = await fetchRecipeDetail(recipeIdNumber, isCoffee !== "false");

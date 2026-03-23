@@ -1,5 +1,6 @@
 import BasicRecipeCard from "@/components/basic-recipes/BasicRecipeCard";
 import type { RecipeItem } from "@/types/recipe";
+import { getRecipeIdentityFromItem } from "@/utils/recipeIdentity";
 
 interface BasicRecipeListProps {
   recipes: ReadonlyArray<RecipeItem>;
@@ -10,9 +11,9 @@ interface BasicRecipeListProps {
   menuVariant?: "default" | "mine";
   onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
   onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
-  pendingRecipeId?: number | null;
-  savedRecipeIdSet?: ReadonlySet<number>;
-  sharedRecipeIdSet?: ReadonlySet<number>;
+  pendingRecipeId?: string | null;
+  savedRecipeIdSet?: ReadonlySet<string>;
+  sharedRecipeIdSet?: ReadonlySet<string>;
   currentUserId?: number;
 }
 
@@ -45,15 +46,15 @@ export default function BasicRecipeList({
     <section className="recipe-page__list" aria-label={listLabel}>
       {recipes.map((recipe) => (
         <BasicRecipeCard
-          key={recipe.recipe_id}
+          key={getRecipeIdentityFromItem(recipe)}
           recipe={recipe}
           getDetailPath={getDetailPath}
           menuVariant={menuVariant}
           onSaveRecipe={onSaveRecipe}
           onToggleShareRecipe={onToggleShareRecipe}
-          isActionPending={pendingRecipeId === recipe.recipe_id}
-          isSaved={savedRecipeIdSet?.has(recipe.recipe_id) ?? false}
-          isShared={sharedRecipeIdSet?.has(recipe.recipe_id) ?? false}
+          isActionPending={pendingRecipeId === getRecipeIdentityFromItem(recipe)}
+          isSaved={savedRecipeIdSet?.has(getRecipeIdentityFromItem(recipe)) ?? false}
+          isShared={sharedRecipeIdSet?.has(getRecipeIdentityFromItem(recipe)) ?? false}
           currentUserId={currentUserId}
         />
       ))}

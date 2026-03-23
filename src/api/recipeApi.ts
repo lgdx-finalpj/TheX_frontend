@@ -1,4 +1,8 @@
-﻿import apiClient from "@/api/client";
+import apiClient from "@/api/client";
+import {
+  createCoffeeRecipe as createCoffeeRecipeRequest,
+  type CoffeeRecipeCustomizeCoffeeRequestDTO,
+} from "@/api/moodCustomApi";
 import type {
   CapsuleTemp,
   RecipeCategory,
@@ -7,6 +11,11 @@ import type {
   RecipeLevel,
   RecipeType,
 } from "@/types/recipe";
+import {
+  getStoredMyRecipe,
+  listStoredMyRecipes,
+  upsertStoredMyRecipe,
+} from "@/utils/myRecipeStore";
 
 interface CoffeeRecipeListResponse {
   totalCount: number;
@@ -37,6 +46,8 @@ interface MyRecipeListResponseItem {
   recipeId: number;
   isCoffee: boolean;
   recipeName: string;
+  recipeCategory: RecipeCategory;
+  isShared: boolean;
 }
 
 export interface CoffeeRecipeDetailResponse {
@@ -71,6 +82,7 @@ export interface CoffeeRecipeDetailResponse {
 interface CoffeeRecipeSaveRequest {
   recipeId: number;
   recipeCategory: RecipeCategory;
+  recipeName?: string;
 }
 
 interface CoffeeRecipeSaveResponse {
@@ -174,10 +186,10 @@ export async function fetchBasicRecipes() {
     recipe_id: item.recipeId,
     recipe_name: item.recipeName,
     save_count: item.saveCount,
-    recipe_type: "COFFEE",
+    recipe_type: item.recipeCategory === "COFFEE" ? "COFFEE" : "NONE_COFFEE",
     recipe_category: item.recipeCategory,
     filter_label: getFilterLabel(item.recipeName),
-    is_coffee: true,
+    is_coffee: item.recipeCategory === "COFFEE",
   }));
 }
 
@@ -199,8 +211,13 @@ export async function fetchPopularRecipes() {
 }
 
 export async function fetchMyRecipeList() {
-  const response = await apiClient.get<MyRecipeListResponseItem[]>("/auth/my-recipe-list");
-  return response.data;
+  return listStoredMyRecipes().map<MyRecipeListResponseItem>((item) => ({
+    recipeId: item.recipeId,
+    isCoffee: item.isCoffee,
+    recipeName: item.recipeName,
+    recipeCategory: item.recipeCategory,
+    isShared: item.isShared,
+  }));
 }
 
 export async function fetchRecipeDetail(recipeId: number, isCoffee: boolean) {
@@ -225,11 +242,9 @@ export async function fetchMyRecipesWithDetails() {
           recipe_type: recipe.isCoffee
             ? ("COFFEE" as RecipeType)
             : ("NONE_COFFEE" as RecipeType),
-          recipe_category: recipe.isCoffee
-            ? ("COFFEE" as RecipeCategory)
-            : ("SMOOTHIE" as RecipeCategory),
+          recipe_category: recipe.recipeCategory,
           filter_label: getFilterLabel(recipe.recipeName),
-          is_shared: false,
+          is_shared: recipe.isShared,
           is_coffee: recipe.isCoffee,
         }),
       ),
@@ -243,15 +258,37 @@ export async function saveRecipeApi(input: CoffeeRecipeSaveRequest) {
     "/coffee/recipes/save",
     input,
   );
+  const existingRecord = getStoredMyRecipe(
+    input.recipeId,
+    input.recipeCategory === "COFFEE",
+  );
+  upsertStoredMyRecipe({
+    recipeId: input.recipeId,
+    isCoffee: input.recipeCategory === "COFFEE",
+    recipeCategory: input.recipeCategory,
+    recipeName: input.recipeName ?? "",
+    isShared: existingRecord?.isShared ?? false,
+  });
   return response.data;
 }
 
-export async function toggleRecipeShareApi(recipeId: number, recipeCategory: RecipeCategory) {
+export async function toggleRecipeShareApi(
+  recipeId: number,
+  recipeCategory: RecipeCategory,
+  recipeName = "",
+) {
   const response = await apiClient.patch<CoffeeRecipeShareToggleResponse>(
     `/coffee/recipes/${recipeId}/share`,
     undefined,
     { params: { recipeCategory } },
   );
+  upsertStoredMyRecipe({
+    recipeId,
+    isCoffee: recipeCategory === "COFFEE",
+    recipeCategory,
+    recipeName,
+    isShared: response.data.isShared,
+  });
   return response.data;
 }
 
@@ -260,7 +297,28 @@ export async function createNoneCoffeeRecipeApi(input: NoneCoffeeCreateRequest) 
     "/coffee/recipes/customize/none-coffee",
     input,
   );
+  upsertStoredMyRecipe({
+    recipeId: response.data.recipeId,
+    isCoffee: false,
+    recipeCategory: input.recipeCategory,
+    recipeName: input.recipeName,
+    isShared: false,
+  });
   return response.data;
+}
+
+export async function createCoffeeRecipeApi(
+  input: CoffeeRecipeCustomizeCoffeeRequestDTO,
+) {
+  const response = await createCoffeeRecipeRequest(input);
+  upsertStoredMyRecipe({
+    recipeId: response.recipeId,
+    isCoffee: true,
+    recipeCategory: input.recipeCategory,
+    recipeName: input.recipeName,
+    isShared: false,
+  });
+  return response;
 }
 
 export function mapRecipeDetailForView(detail: CoffeeRecipeDetailResponse, isCoffee: boolean) {
