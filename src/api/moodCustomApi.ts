@@ -19,9 +19,9 @@ export interface LightCustomRequestDTO {
 }
 
 export interface SpeakerCustomRequestDTO {
-  musicLink: string;
   volume: number;
-  musicType: SpeakerMusicType;
+  musicType: string;
+  musicLink?: string;
 }
 
 export interface CoffeeRecipeCustomizeCoffeeRequestDTO {

@@ -11,7 +11,6 @@ import {
   buildCoffeeRecipeCustomizePayload,
   mapMoodCustomListItemToSavedMoodCustom,
   mapMoodOptionIdToColorsetId,
-  mapMoodOptionIdToSpeakerMusicType,
 } from "@/api/moodCustomMapper";
 import { getApiErrorMessage } from "@/api/httpClient";
 import { defaultDraft } from "@/state/moodCustom.constants";
@@ -235,9 +234,8 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
 
             if (product.product_type === "speaker" && isSpeakerConfig(config)) {
               const speakerId = await createSpeakerCustom({
-                musicLink: config.music_type,
                 volume: config.volume,
-                musicType: mapMoodOptionIdToSpeakerMusicType(selectedMoodId),
+                musicType: config.music_type,
               });
               customProductPayload.speakerCustom = speakerId;
               continue;

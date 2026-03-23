@@ -2,15 +2,12 @@ import MoodRoutineCard from "@/components/smartRoutine/MoodRoutineCard";
 import {
   getColorsetTheme,
   toRecommendedMoodItems,
-  toSavedMoodItems,
 } from "@/pages/smartRoutineMainPage.utils";
-import type { SavedMoodCustom } from "@/state/moodCustom.types";
 import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
 
 interface RecommendTabSectionProps {
-  sharedSavedMoodCustoms: SavedMoodCustom[];
   recommendedMoodCustoms: RecommendedMoodCustomRecord[];
-  bookmarkedMoodIds: string[];
+  savedMoodIds: string[];
   savingMoodId: string | null;
   onSaveMood: (moodId: string) => void;
 }
@@ -31,27 +28,16 @@ function BookmarkIcon({ filled = false }: { filled?: boolean }) {
 }
 
 export default function RecommendTabSection({
-  sharedSavedMoodCustoms,
   recommendedMoodCustoms,
-  bookmarkedMoodIds,
+  savedMoodIds,
   savingMoodId,
   onSaveMood,
 }: RecommendTabSectionProps) {
   return (
     <main className="smart-routine-body smart-routine-body-filled smart-routine-recommend-body">
       <section className="saved-mood-card-list recommend-card-list">
-        {sharedSavedMoodCustoms.map((moodCustom) => (
-          <MoodRoutineCard
-            key={`shared-${moodCustom.mood_id}`}
-            title={moodCustom.mood_name}
-            items={toSavedMoodItems(moodCustom)}
-            theme={getColorsetTheme(moodCustom.colorset_main)}
-            actionSlot={<span className="saved-mood-my-chip">MY</span>}
-          />
-        ))}
-
         {recommendedMoodCustoms.map((moodCustom) => {
-          const isBookmarked = bookmarkedMoodIds.includes(moodCustom.mood_id);
+          const isSaved = savedMoodIds.includes(moodCustom.mood_id);
           const isSaving = savingMoodId === moodCustom.mood_id;
 
           return (
@@ -63,12 +49,12 @@ export default function RecommendTabSection({
               actionSlot={
                 <button
                   type="button"
-                  className={`saved-mood-bookmark-button ${isBookmarked ? "active" : ""}`}
+                  className={`saved-mood-bookmark-button ${isSaved ? "active" : ""}`}
                   aria-label="무드 커스텀 저장"
-                  disabled={isSaving}
+                  disabled={isSaving || isSaved}
                   onClick={() => onSaveMood(moodCustom.mood_id)}
                 >
-                  <BookmarkIcon filled={isBookmarked} />
+                  <BookmarkIcon filled={isSaved} />
                 </button>
               }
             />

@@ -191,14 +191,6 @@ export default function SmartRoutineMainPage() {
       !savedMoodIdSet.has(moodCustom.mood_id),
   );
 
-  const sharedSavedMoodCustoms = sortedSavedMoodCustoms.filter((moodCustom) =>
-    recommendedMoodCustoms.some((shared) => shared.mood_id === moodCustom.mood_id),
-  );
-
-  const recommendedOnlyMoodCustoms = recommendedMoodCustoms.filter(
-    (moodCustom) => !savedMoodIdSet.has(moodCustom.mood_id),
-  );
-
   const runningMoodItems = runningMoodCustom
     ? getExecutionModalItems(runningMoodCustom)
     : [];
@@ -332,9 +324,8 @@ export default function SmartRoutineMainPage() {
           />
         ) : (
           <RecommendTabSection
-            sharedSavedMoodCustoms={sharedSavedMoodCustoms}
-            recommendedMoodCustoms={recommendedOnlyMoodCustoms}
-            bookmarkedMoodIds={bookmarkedMoodIds}
+            recommendedMoodCustoms={recommendedMoodCustoms}
+            savedMoodIds={Array.from(savedMoodIdSet)}
             savingMoodId={isSavingMoodId}
             onSaveMood={(moodId) => {
               void handleSaveMood(moodId);
