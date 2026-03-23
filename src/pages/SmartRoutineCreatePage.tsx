@@ -7,9 +7,10 @@ import { useNavigate } from "react-router-dom";
 import "./SmartRoutineCreatePage.css";
 import "./SmartRoutineShared.css";
 
-const routineDescription = "내가 원할 때 여러 제품들을 한번에 작동시킬 수 있어요.";
+const routineDescription =
+  "내가 원할 때 여러 제품들을 한번에 작동시킬 수 있어요.";
 const moodDescription =
-  "여러 제품 설정을 조합해서 내가 원하는 분위기를\n만들 수 있어요.";
+  "여러 제품 설정을 조합해서 내가 원하는 분위기를 만들 수 있어요.";
 
 export default function SmartRoutineCreatePage() {
   const navigate = useNavigate();
@@ -27,7 +28,9 @@ export default function SmartRoutineCreatePage() {
           <button
             type="button"
             className="smart-routine-option"
-            onClick={() => navigate("/smartroutine/create/recipe/coffee-machine")}
+            onClick={() =>
+              navigate("/smartroutine/create/recipe/coffee-machine")
+            }
           >
             <img
               src={createRoutineImage}
