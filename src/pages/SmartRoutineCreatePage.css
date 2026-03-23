@@ -71,11 +71,18 @@
   .smart-routine-create-content {
     gap: 16px;
     padding: 8px 18px 24px;
+    align-items: center;
   }
 
   .smart-routine-option {
+    width: min(100%, 222px);
+    aspect-ratio: 1 / 1;
     border-radius: 20px;
     padding: 14px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .smart-routine-option-image {
