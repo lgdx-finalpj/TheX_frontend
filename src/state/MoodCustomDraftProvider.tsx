@@ -192,7 +192,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
       },
       applyDraft: async () => {
         if (isApplyingDraft) {
-          return false;
+          return null;
         }
 
         const moodName = draft.mood_name.trim();
@@ -208,7 +208,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
           configuredProducts.length !== draft.custom_product.length
         ) {
           setApplyDraftError("Please complete every step before applying.");
-          return false;
+          return null;
         }
 
         setIsApplyingDraft(true);
@@ -263,7 +263,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
             throw new Error(`Unsupported product config: ${product.product_type}`);
           }
 
-          await createMoodCustom({
+          const createdMoodId = await createMoodCustom({
             colorsetId: mapMoodOptionIdToColorsetId(selectedMoodId),
             moodName,
             moodMemo: draft.mood_memo.trim(),
@@ -273,12 +273,12 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
           await refreshSavedMoodCustoms();
           setDraft(createEmptyDraft());
           setApplyDraftError(null);
-          return true;
+          return String(createdMoodId);
         } catch (error) {
           setApplyDraftError(
             getApiErrorMessage(error, "Failed to save mood custom."),
           );
-          return false;
+          return null;
         } finally {
           setIsApplyingDraft(false);
         }

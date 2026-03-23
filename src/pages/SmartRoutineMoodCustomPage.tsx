@@ -87,10 +87,15 @@ export default function SmartRoutineMoodCustomPage() {
     configuredProducts.length === selectedProducts.length;
 
   const handleApply = async () => {
-    const applied = await applyDraft();
+    const createdMoodId = await applyDraft();
 
-    if (applied) {
-      navigate("/smartroutine");
+    if (createdMoodId) {
+      navigate("/smartroutine", {
+        state: {
+          prioritizedMoodId: createdMoodId,
+          activeTab: "mine",
+        },
+      });
     }
   };
 
