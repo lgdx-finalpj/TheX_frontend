@@ -120,14 +120,19 @@
   opacity: 1;
 }
 
-.coffee-recipe-create__footer {
+.product-settings-footer.single-action.coffee-recipe-create__footer {
   padding-top: 20px;
   width: 100%;
+  grid-template-columns: minmax(0, 358px);
+  justify-content: center;
+  justify-items: stretch;
 }
 
-.coffee-recipe-create__submit {
+.product-settings-footer.single-action.coffee-recipe-create__footer
+  .mood-save-button.coffee-recipe-create__submit {
   display: block;
-  width: 100%;
+  width: 358px;
+  max-width: 100%;
   min-width: 0;
   min-height: 56px;
   border-radius: 14px;
