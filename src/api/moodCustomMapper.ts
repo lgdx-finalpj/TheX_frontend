@@ -284,7 +284,7 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       product_code: option?.product_code ?? "LIGHT01",
       product_label: option?.label ?? "Light",
       config: null,
-      summary: `${customProduct.lightCustom.lightColor}, ${customProduct.lightCustom.lightBright}%`,
+      summary: `${customProduct.lightCustom.lightColor}, ${customProduct.lightCustom.lightBright}/10`,
     });
   }
 
@@ -296,7 +296,7 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       product_code: option?.product_code ?? "SPEAKER01",
       product_label: option?.label ?? "Speaker",
       config: null,
-      summary: `${mapSpeakerTypeToSummary(customProduct.speakerCustom.musicType)}, ${customProduct.speakerCustom.volume}%`,
+      summary: `${mapSpeakerTypeToSummary(customProduct.speakerCustom.musicType)}, ${customProduct.speakerCustom.volume}/10`,
     });
   }
 

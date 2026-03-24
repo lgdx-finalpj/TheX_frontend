@@ -660,10 +660,11 @@
 
 .product-slider-scale {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(11, minmax(0, 1fr));
   margin-top: 8px;
   color: #111111;
   font-size: 12px;
+  gap: 0;
 }
 
 .product-slider-scale span {

@@ -65,7 +65,7 @@ function mapSharedMoodItemToRecommended(
     const light = customProduct.lightCustom;
     products.push({
       product_type: "light",
-      summary: `${light.lightColor}, ${light.lightBright}%`,
+      summary: `${light.lightColor}, ${light.lightBright}/10`,
     });
   }
 
@@ -73,7 +73,7 @@ function mapSharedMoodItemToRecommended(
     const speaker = customProduct.speakerCustom;
     products.push({
       product_type: "speaker",
-      summary: `${speaker.musicType}, ${speaker.volume}%`,
+      summary: `${speaker.musicType}, ${speaker.volume}/10`,
     });
   }
 

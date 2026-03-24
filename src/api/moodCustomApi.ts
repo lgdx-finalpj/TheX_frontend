@@ -131,8 +131,9 @@ function extractNumericId(payload: NumericMapResponse, key: string) {
 }
 
 export async function fetchMyProductList() {
-  const { data } =
-    await httpClient.get<MyProductListResponseDTO[]>("/auth/my-product-list");
+  const { data } = await httpClient.get<MyProductListResponseDTO[]>(
+    "/auth/my-product-list",
+  );
   return data;
 }
 
@@ -205,5 +206,6 @@ export async function saveMoodCustom(moodId: number) {
 }
 
 export async function executeMoodCustom(moodId: number) {
-  await httpClient.post(`/mood/select/${moodId}`);
+  const { data } = await httpClient.post<void>(`/mood/select/${moodId}`);
+  return data;
 }

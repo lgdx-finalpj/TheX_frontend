@@ -149,11 +149,11 @@ export default function MoodCustomProductSettingsPage() {
   const [lightColor, setLightColor] = useState(
     lightConfig?.light_color ?? "Soft White",
   );
-  const [brightness, setBrightness] = useState(lightConfig?.brightness ?? 40);
+  const [brightness, setBrightness] = useState(lightConfig?.brightness ?? 4);
   const [musicType, setMusicType] = useState(
     speakerConfig?.music_type ?? "Cafe BGM",
   );
-  const [volume, setVolume] = useState(speakerConfig?.volume ?? 80);
+  const [volume, setVolume] = useState(speakerConfig?.volume ?? 8);
 
   useEffect(() => {
     if (!resolvedProductType || !currentProduct) {
@@ -216,7 +216,7 @@ export default function MoodCustomProductSettingsPage() {
       upsertProductConfig(
         resolvedProductType,
         config,
-        `조명 - ${config.light_color}, ${config.brightness}%`,
+        `조명 - ${config.light_color}, ${config.brightness}/10`,
       );
     }
 
@@ -232,7 +232,7 @@ export default function MoodCustomProductSettingsPage() {
       upsertProductConfig(
         resolvedProductType,
         config,
-        `스피커 - ${config.music_type}, ${config.volume}%`,
+        `스피커 - ${config.music_type}, ${config.volume}/10`,
       );
     }
 
@@ -267,19 +267,19 @@ export default function MoodCustomProductSettingsPage() {
 
                 <div className="product-slider-card">
                   <label htmlFor="brightness">조명 밝기</label>
-                  <div className="product-slider-value">{brightness}%</div>
+                  <div className="product-slider-value">{brightness}</div>
                   <input
                     id="brightness"
                     type="range"
                     className="product-slider-input"
                     min="0"
-                    max="100"
-                    step="20"
+                    max="10"
+                    step="1"
                     value={brightness}
                     onChange={(event) => setBrightness(Number(event.target.value))}
                   />
                   <div className="product-slider-scale">
-                    {["0%", "20%", "40%", "60%", "80%", "100%"].map((label) => (
+                    {["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((label) => (
                       <span key={label}>{label}</span>
                     ))}
                   </div>
@@ -301,19 +301,19 @@ export default function MoodCustomProductSettingsPage() {
 
                 <div className="product-slider-card">
                   <label htmlFor="volume">볼륨</label>
-                  <div className="product-slider-value">{volume}%</div>
+                  <div className="product-slider-value">{volume}</div>
                   <input
                     id="volume"
                     type="range"
                     className="product-slider-input"
                     min="0"
-                    max="100"
-                    step="20"
+                    max="10"
+                    step="1"
                     value={volume}
                     onChange={(event) => setVolume(Number(event.target.value))}
                   />
                   <div className="product-slider-scale">
-                    {["0%", "20%", "40%", "60%", "80%", "100%"].map((label) => (
+                    {["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((label) => (
                       <span key={label}>{label}</span>
                     ))}
                   </div>
