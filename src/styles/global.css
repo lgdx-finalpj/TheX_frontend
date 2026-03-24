@@ -80,6 +80,10 @@ body,
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  background:
+    url("../assets/bg_color/background_color1.png") center top / cover no-repeat,
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.5), transparent 28%),
+    var(--app-bg);
 }
 
 body {
@@ -90,6 +94,7 @@ body {
     "Malgun Gothic",
     sans-serif;
   background:
+    url("../assets/bg_color/background_color1.png") center top / cover no-repeat,
     radial-gradient(circle at top, rgba(255, 255, 255, 0.5), transparent 28%),
     var(--app-bg);
   color: var(--text-main);

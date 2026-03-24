@@ -2,7 +2,9 @@
   min-height: 100dvh;
   display: flex;
   justify-content: center;
-  background-color: #d3d3d3;
+  background:
+    url("../assets/bg_color/background_color1.png") center top / cover no-repeat,
+    #eef7fb;
 }
 
 .mobile-frame {
