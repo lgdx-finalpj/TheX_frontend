@@ -39,7 +39,7 @@
 }
 
 .smart-routine-body-filled {
-  padding-top: 18px;
+  padding-top: 0;
 }
 
 .smart-routine-main-content {
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-top: 42px;
+  padding-top: 0;
   padding-bottom: 28px;
 }
 

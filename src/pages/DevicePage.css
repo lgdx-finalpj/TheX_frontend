@@ -1,5 +1,5 @@
 .device-page {
   position: relative;
-  padding: 28px 16px
+  padding: 0 16px
     calc(var(--bottom-nav-height) + 32px + env(safe-area-inset-bottom));
 }

@@ -1,6 +1,6 @@
 .coffee-recipe-create-page__content {
   min-height: 100dvh;
-  padding-top: 28px;
+  padding-top: 0;
   padding-bottom: 30px;
   padding-left: calc(var(--page-side-padding) + env(safe-area-inset-left, 0px));
   padding-right: calc(var(--page-side-padding) + env(safe-area-inset-right, 0px));
