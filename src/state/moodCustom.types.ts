@@ -7,6 +7,7 @@ import type {
   CoffeeMachineExtractionType,
   CoffeeMachineTemperatureLevel,
 } from "@/features/coffeeMachine/types";
+import type { SpeakerMusicType } from "@/api/moodCustomApi";
 
 export type MoodOptionId =
   | "home-cafe"
@@ -39,7 +40,7 @@ export interface LightConfig {
 export interface SpeakerConfig {
   speaker_id: string;
   product_code: string;
-  music_type: string;
+  music_type: SpeakerMusicType;
   music_link: string;
   volume: number;
 }

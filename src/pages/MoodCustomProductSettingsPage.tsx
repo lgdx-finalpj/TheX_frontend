@@ -3,6 +3,8 @@ import { CoffeeMachineSettingsPanel } from "@/features/coffeeMachine";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
   lightColorOptions,
+  mapSpeakerMusicLabelToType,
+  mapSpeakerMusicTypeToLabel,
   speakerMusicOptions,
 } from "@/state/moodCustom.constants";
 import { getProductOptionByType } from "@/state/moodCustom.utils";
@@ -151,7 +153,7 @@ export default function MoodCustomProductSettingsPage() {
   );
   const [brightness, setBrightness] = useState(lightConfig?.brightness ?? 4);
   const [musicType, setMusicType] = useState(
-    speakerConfig?.music_type ?? "Cafe BGM",
+    speakerConfig ? mapSpeakerMusicTypeToLabel(speakerConfig.music_type) : "Cafe BGM",
   );
   const [volume, setVolume] = useState(speakerConfig?.volume ?? 8);
 
@@ -224,7 +226,7 @@ export default function MoodCustomProductSettingsPage() {
       const config: SpeakerConfig = {
         speaker_id: "speaker-custom-01",
         product_code: productOption.product_code,
-        music_type: musicType,
+        music_type: mapSpeakerMusicLabelToType(musicType),
         music_link: "",
         volume,
       };
@@ -232,7 +234,7 @@ export default function MoodCustomProductSettingsPage() {
       upsertProductConfig(
         resolvedProductType,
         config,
-        `스피커 - ${config.music_type}, ${config.volume}/10`,
+        `스피커 - ${musicType}, ${config.volume}/10`,
       );
     }
 

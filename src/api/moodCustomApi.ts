@@ -2,7 +2,18 @@ import { httpClient } from "@/api/httpClient";
 
 type NumericMapResponse = Record<string, number>;
 
-export type SpeakerMusicType = "HOMECAFE" | "MOVIE" | "FOCUSING" | "REST";
+export type SpeakerMusicType =
+  | "HOMECAFE"
+  | "MOVIE"
+  | "FOCUSING"
+  | "REST"
+  | "JAZZ"
+  | "ACOUSTIC"
+  | "CLASSICAL"
+  | "CAFE_BGM"
+  | "CHILL"
+  | "K_POP"
+  | "MUSICAL";
 export type CoffeeRecipeLevel = "EASY" | "NORMAL" | "HARD";
 export type CoffeeRecipeCategory = "COFFEE" | "SMOOTHIE" | "TEA";
 export type CapsuleTemp = "HIGH" | "MIDDLE" | "LOW";
@@ -20,7 +31,7 @@ export interface LightCustomRequestDTO {
 
 export interface SpeakerCustomRequestDTO {
   volume: number;
-  musicType: string;
+  musicType: SpeakerMusicType;
   musicLink?: string;
 }
 

@@ -6,7 +6,10 @@
 } from "@/api/moodCustomApi";
 import { normalizeExtractionSteps } from "@/features/coffeeMachine/extraction";
 import { buildCoffeeRecipePayloadFromConfig } from "@/features/coffeeMachine/payload";
-import { coffeeCapsuleAssets } from "@/state/moodCustom.constants";
+import {
+  coffeeCapsuleAssets,
+  mapSpeakerMusicTypeToLabel,
+} from "@/state/moodCustom.constants";
 import { getProductOptionByType } from "@/state/moodCustom.utils";
 import type {
   CoffeeMachineConfig,
@@ -100,7 +103,7 @@ export function getAvailableProductCodes(products: MyProductListResponseDTO[]) {
   return availableCodes;
 }
 
-function mapSpeakerTypeToMoodOptionId(musicType?: SpeakerMusicType): MoodOptionId {
+function mapSpeakerTypeToMoodOptionId(musicType?: string): MoodOptionId {
   if (musicType === "HOMECAFE") {
     return "home-cafe";
   }
@@ -120,21 +123,6 @@ function mapSpeakerTypeToMoodOptionId(musicType?: SpeakerMusicType): MoodOptionI
   return "custom";
 }
 
-function mapSpeakerTypeToSummary(musicType: SpeakerMusicType) {
-  if (musicType === "HOMECAFE") {
-    return "Home Cafe";
-  }
-
-  if (musicType === "MOVIE") {
-    return "Movie";
-  }
-
-  if (musicType === "FOCUSING") {
-    return "Focusing";
-  }
-
-  return "Rest";
-}
 
 function mapCapsuleTempToTemperatureLevel(value: string): TemperatureLevel | null {
   if (value === "LOW") {
@@ -290,13 +278,17 @@ export function mapMoodCustomListItemToSavedMoodCustom(
 
   if (customProduct.speakerCustom) {
     const option = getProductOptionByType("speaker");
+    const speakerMusicType = getSafeString(
+      mapSpeakerMusicTypeToLabel(customProduct.speakerCustom.musicType),
+      "Speaker",
+    );
 
     nextProducts.push({
       product_type: "speaker",
       product_code: option?.product_code ?? "SPEAKER01",
       product_label: option?.label ?? "Speaker",
       config: null,
-      summary: `${mapSpeakerTypeToSummary(customProduct.speakerCustom.musicType)}, ${customProduct.speakerCustom.volume}/10`,
+      summary: `${speakerMusicType}, ${customProduct.speakerCustom.volume}/10`,
     });
   }
 

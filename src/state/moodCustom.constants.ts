@@ -2,6 +2,7 @@
 import fridgeImage from "@/assets/elc_icon/냉장고.png";
 import lightImage from "@/assets/elc_icon/조명.png";
 import speakerImage from "@/assets/elc_icon/스피커.png";
+import type { SpeakerMusicType } from "@/api/moodCustomApi";
 import customMoodImage from "@/assets/moodcustom/직접만들기무드.png";
 import focusMoodImage from "@/assets/moodcustom/집중무드.png";
 import homeCafeMoodImage from "@/assets/moodcustom/홈카페무드.png";
@@ -81,12 +82,35 @@ export const lightColorOptions = [
   "Purple",
 ];
 
-export const speakerMusicOptions = [
-  "Jazz",
-  "Acoustic",
-  "Classical",
-  "Cafe BGM",
-  "Chill",
-  "K-pop",
-  "Musical",
-];
+export const speakerMusicOptionItems = [
+  { label: "Jazz", value: "JAZZ" },
+  { label: "Acoustic", value: "ACOUSTIC" },
+  { label: "Classical", value: "CLASSICAL" },
+  { label: "Cafe BGM", value: "CAFE_BGM" },
+  { label: "Chill", value: "CHILL" },
+  { label: "K-pop", value: "K_POP" },
+  { label: "Musical", value: "MUSICAL" },
+] as const satisfies ReadonlyArray<{ label: string; value: SpeakerMusicType }>;
+
+const legacySpeakerMusicTypeLabelMap: Partial<Record<SpeakerMusicType, string>> = {
+  HOMECAFE: "Home Cafe",
+  MOVIE: "Movie",
+  FOCUSING: "Focusing",
+  REST: "Rest",
+};
+
+export const speakerMusicOptions = speakerMusicOptionItems.map((item) => item.label);
+
+export function mapSpeakerMusicLabelToType(label: string): SpeakerMusicType {
+  return (
+    speakerMusicOptionItems.find((item) => item.label === label)?.value ?? "CAFE_BGM"
+  );
+}
+
+export function mapSpeakerMusicTypeToLabel(musicType: string): string {
+  return (
+    speakerMusicOptionItems.find((item) => item.value === musicType)?.label ??
+    legacySpeakerMusicTypeLabelMap[musicType as SpeakerMusicType] ??
+    musicType
+  );
+}

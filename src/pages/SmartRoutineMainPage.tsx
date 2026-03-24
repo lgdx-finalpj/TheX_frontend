@@ -12,6 +12,7 @@ import MineTabSection from "@/components/smartRoutine/MineTabSection";
 import RecommendTabSection from "@/components/smartRoutine/RecommendTabSection";
 import MobileLayout from "@/layouts/MobileLayout";
 import { getExecutionModalItems } from "@/pages/smartRoutineMainPage.utils";
+import { mapSpeakerMusicTypeToLabel } from "@/state/moodCustom.constants";
 import type { SavedMoodCustom } from "@/state/moodCustom.types";
 import { useMoodCustomDraft } from "@/state/useMoodCustomDraft";
 import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
@@ -73,7 +74,7 @@ function mapSharedMoodItemToRecommended(
     const speaker = customProduct.speakerCustom;
     products.push({
       product_type: "speaker",
-      summary: `${speaker.musicType}, ${speaker.volume}/10`,
+      summary: `${mapSpeakerMusicTypeToLabel(speaker.musicType)}, ${speaker.volume}/10`,
     });
   }
 
