@@ -11,9 +11,13 @@ interface MobileLayoutProps {
 
 export default function MobileLayout({ children }: MobileLayoutProps) {
   const location = useLocation();
-  const isSmartRoutinePage = location.pathname.startsWith("/smartroutine");
-  const backgroundImage = isSmartRoutinePage ? backgroundColor2 : backgroundColor1;
-  const backgroundBaseColor = isSmartRoutinePage ? "#f5f5f7" : "#eef7fb";
+  const isBackground2Page =
+    location.pathname.startsWith("/smartroutine") ||
+    location.pathname.startsWith("/devices/coffee-machine/view-") ||
+    location.pathname.startsWith("/devices/coffee-machine/create-recipe") ||
+    location.pathname.startsWith("/devices/coffee-machine/ai-recommended");
+  const backgroundImage = isBackground2Page ? backgroundColor2 : backgroundColor1;
+  const backgroundBaseColor = isBackground2Page ? "#f5f5f7" : "#eef7fb";
 
   useEffect(() => {
     const composedBackground =
