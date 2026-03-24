@@ -1,4 +1,5 @@
 import {
+  executeMoodCustom,
   fetchSharedMoodCustomList,
   saveMoodCustom,
   shareMoodCustom,
@@ -125,8 +126,10 @@ export default function SmartRoutineMainPage() {
   );
   const [isSharingMoodId, setIsSharingMoodId] = useState<string | null>(null);
   const [isSavingMoodId, setIsSavingMoodId] = useState<string | null>(null);
+  const [isExecutingMoodId, setIsExecutingMoodId] = useState<string | null>(null);
   const [shareMoodError, setShareMoodError] = useState<string | null>(null);
   const [saveMoodError, setSaveMoodError] = useState<string | null>(null);
+  const [executeMoodError, setExecuteMoodError] = useState<string | null>(null);
   const [recommendedMoodCustoms, setRecommendedMoodCustoms] = useState<
     RecommendedMoodCustomRecord[]
   >([]);
@@ -228,7 +231,11 @@ export default function SmartRoutineMainPage() {
     }
   };
 
-  const handleExecuteMood = (moodId: string) => {
+  const handleExecuteMood = async (moodId: string) => {
+    if (isExecutingMoodId) {
+      return;
+    }
+
     const targetMoodCustom = savedMoodCustoms.find(
       (moodCustom) => moodCustom.mood_id === moodId,
     );
@@ -237,8 +244,27 @@ export default function SmartRoutineMainPage() {
       return;
     }
 
+    const numericMoodId = Number(moodId);
+    if (!Number.isFinite(numericMoodId)) {
+      setExecuteMoodError("Invalid mood id for execute.");
+      setOpenedMenuMoodId(null);
+      return;
+    }
+
     setRunningMoodCustom(targetMoodCustom);
+    setIsExecutingMoodId(moodId);
+    setExecuteMoodError(null);
     setOpenedMenuMoodId(null);
+
+    try {
+      await executeMoodCustom(numericMoodId);
+    } catch (error) {
+      setExecuteMoodError(
+        getApiErrorMessage(error, "Failed to execute mood custom."),
+      );
+    } finally {
+      setIsExecutingMoodId(null);
+    }
   };
 
   const handleSaveMood = async (moodId: string) => {
@@ -318,7 +344,9 @@ export default function SmartRoutineMainPage() {
             onShareMood={(moodId) => {
               void handleShareMood(moodId);
             }}
-            onExecuteMood={handleExecuteMood}
+            onExecuteMood={(moodId) => {
+              void handleExecuteMood(moodId);
+            }}
             onBookmarkToggle={handleBookmarkToggle}
             onCreateMoodCustom={() => navigate("/smartroutine/create")}
           />
@@ -349,6 +377,7 @@ export default function SmartRoutineMainPage() {
         ) : null}
         {shareMoodError ? <p role="alert">{shareMoodError}</p> : null}
         {saveMoodError ? <p role="alert">{saveMoodError}</p> : null}
+        {executeMoodError ? <p role="alert">{executeMoodError}</p> : null}
       </div>
     </MobileLayout>
   );

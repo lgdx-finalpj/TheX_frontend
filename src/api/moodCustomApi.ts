@@ -203,3 +203,7 @@ export async function saveMoodCustom(moodId: number) {
   );
   return extractNumericId(data, "moodId");
 }
+
+export async function executeMoodCustom(moodId: number) {
+  await httpClient.post(`/mood/select/${moodId}`);
+}
