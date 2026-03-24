@@ -28,7 +28,10 @@ function isCurrentUserProfile(value: unknown): value is CurrentUserProfile {
 
 function normalizeCurrentUserProfile(value: CurrentUserProfile): CurrentUserProfile {
   return {
-    user_id: DEFAULT_CURRENT_USER_PROFILE.user_id,
+    user_id:
+      String(value.user_id).trim().length > 0
+        ? String(value.user_id).trim()
+        : DEFAULT_CURRENT_USER_PROFILE.user_id,
     user_nickname:
       value.user_nickname.trim().length > 0
         ? value.user_nickname

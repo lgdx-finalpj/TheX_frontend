@@ -249,13 +249,6 @@ function mergeMyRecipeList(
     });
   });
 
-  for (const storedItem of storedItems) {
-    const identity = `${storedItem.isCoffee ? "coffee" : "none-coffee"}:${storedItem.recipeId}`;
-    if (!mergedByIdentity.has(identity)) {
-      mergedByIdentity.set(identity, mapStoredRecipeToMyRecipeListItem(storedItem));
-    }
-  }
-
   return Array.from(mergedByIdentity.values()).sort((left, right) => {
     const leftIdentity = `${left.isCoffee ? "coffee" : "none-coffee"}:${left.recipeId}`;
     const rightIdentity = `${right.isCoffee ? "coffee" : "none-coffee"}:${right.recipeId}`;

@@ -1,7 +1,8 @@
 import type { RecipeCategory } from "@/types/recipe";
+import { getCurrentUserProfile } from "@/utils/currentUserProfile";
 import { getRecipeIdentity } from "@/utils/recipeIdentity";
 
-const MY_RECIPE_STORE_KEY = "my-recipe-store";
+const MY_RECIPE_STORE_KEY_PREFIX = "my-recipe-store";
 
 export interface StoredMyRecipeRecord {
   recipeId: number;
@@ -12,12 +13,17 @@ export interface StoredMyRecipeRecord {
   updatedAt: number;
 }
 
+function getMyRecipeStoreKey() {
+  const { user_id } = getCurrentUserProfile();
+  return `${MY_RECIPE_STORE_KEY_PREFIX}:${user_id}`;
+}
+
 function readStoredRecipes() {
   if (typeof window === "undefined") {
     return [] as StoredMyRecipeRecord[];
   }
 
-  const rawValue = window.localStorage.getItem(MY_RECIPE_STORE_KEY);
+  const rawValue = window.localStorage.getItem(getMyRecipeStoreKey());
   if (!rawValue) {
     return [] as StoredMyRecipeRecord[];
   }
@@ -35,7 +41,7 @@ function writeStoredRecipes(records: StoredMyRecipeRecord[]) {
     return;
   }
 
-  window.localStorage.setItem(MY_RECIPE_STORE_KEY, JSON.stringify(records));
+  window.localStorage.setItem(getMyRecipeStoreKey(), JSON.stringify(records));
 }
 
 export function listStoredMyRecipes() {
