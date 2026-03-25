@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { getLatestSensor } from "@/api/sensor";
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
 import recipeIcon from "@/assets/icon_image/레시피 아이콘.png";
@@ -30,12 +32,60 @@ const menuItems = [
   { iconSrc: supplyIcon, label: "소모품 정보" },
 ];
 
+function formatSensorValue(value: number, unit: "°C" | "%") {
+  return `${value}${unit}`;
+}
+
 export default function CoffeeMachineContent({
   onBackClick,
   onSpeakerClick,
   onAiRecommendedClick,
   onRecipeClick,
 }: CoffeeMachineContentProps) {
+  const [sensorMeta, setSensorMeta] = useState<{
+    temperature: number;
+    humidity: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLatestSensor = async () => {
+      try {
+        const latestSensor = await getLatestSensor();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const hasValidTemperature = Number.isFinite(latestSensor.temperature);
+        const hasValidHumidity = Number.isFinite(latestSensor.humidity);
+
+        if (!hasValidTemperature || !hasValidHumidity) {
+          setSensorMeta(null);
+          return;
+        }
+
+        setSensorMeta({
+          temperature: latestSensor.temperature,
+          humidity: latestSensor.humidity,
+        });
+      } catch (error) {
+        console.error("센서 최신값을 불러오지 못했습니다.", error);
+
+        if (isMounted) {
+          setSensorMeta(null);
+        }
+      }
+    };
+
+    void fetchLatestSensor();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const swipeHandlers = useHorizontalSwipe({
     onSwipeLeft: onSpeakerClick,
   });
@@ -89,7 +139,12 @@ export default function CoffeeMachineContent({
         >
           <span className="recommend-card__header">
             <strong className="recommend-card__title">LG의 오늘 추천 커피!</strong>
-            <span className="recommend-card__meta">[현재 온도 : 4℃ / 현재 습도 : 40%]</span>
+            {sensorMeta ? (
+              <span className="recommend-card__meta">
+                [현재 온도 : {formatSensorValue(sensorMeta.temperature, "°C")} / 현재 습도 :{" "}
+                {formatSensorValue(sensorMeta.humidity, "%")}]
+              </span>
+            ) : null}
           </span>
 
           <span className="recommend-card__body">
