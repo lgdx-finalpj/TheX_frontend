@@ -288,7 +288,7 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       product_code: option?.product_code ?? "SPEAKER01",
       product_label: option?.label ?? "Speaker",
       config: null,
-      summary: `${speakerMusicType}, ${customProduct.speakerCustom.volume}/10`,
+      summary: `${speakerMusicType}, ${customProduct.speakerCustom.volume}/20`,
     });
   }
 

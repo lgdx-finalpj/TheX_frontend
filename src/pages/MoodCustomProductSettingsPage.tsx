@@ -16,6 +16,7 @@ import "./MoodCustomFlow.css";
 import "./SmartRoutineShared.css";
 
 const validProductTypes: ProductType[] = ["coffee_machine", "light", "speaker"];
+const speakerVolumeScaleLabels = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20"];
 
 function ChevronDownIcon() {
   return (
@@ -234,7 +235,7 @@ export default function MoodCustomProductSettingsPage() {
       upsertProductConfig(
         resolvedProductType,
         config,
-        `스피커 - ${musicType}, ${config.volume}/10`,
+        `스피커 - ${musicType}, ${config.volume}/20`,
       );
     }
 
@@ -309,13 +310,13 @@ export default function MoodCustomProductSettingsPage() {
                     type="range"
                     className="product-slider-input"
                     min="0"
-                    max="10"
+                    max="20"
                     step="1"
                     value={volume}
                     onChange={(event) => setVolume(Number(event.target.value))}
                   />
                   <div className="product-slider-scale">
-                    {["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((label) => (
+                    {speakerVolumeScaleLabels.map((label) => (
                       <span key={label}>{label}</span>
                     ))}
                   </div>

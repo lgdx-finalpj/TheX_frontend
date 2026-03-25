@@ -74,7 +74,7 @@ function mapSharedMoodItemToRecommended(
     const speaker = customProduct.speakerCustom;
     products.push({
       product_type: "speaker",
-      summary: `${mapSpeakerMusicTypeToLabel(speaker.musicType)}, ${speaker.volume}/10`,
+      summary: `${mapSpeakerMusicTypeToLabel(speaker.musicType)}, ${speaker.volume}/20`,
     });
   }
 
