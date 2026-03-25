@@ -93,6 +93,12 @@ interface CoffeeRecipeSaveResponse {
   isCoffee: boolean;
 }
 
+export interface AiRecommendedCoffeeRecipeResponse {
+  recipeId: number;
+  recipeName: string;
+  recipeCategory: RecipeCategory;
+}
+
 export interface NoneCoffeeCreateRequest {
   recipeName: string;
   recipeCategory: Exclude<RecipeCategory, "COFFEE">;
@@ -209,6 +215,14 @@ export async function fetchPopularRecipes() {
     user_nickname: item.userNickname,
     is_coffee: item.recipeCategory === "COFFEE",
   }));
+}
+
+export async function fetchAiRecommendedCoffeeRecipe() {
+  const response = await apiClient.get<AiRecommendedCoffeeRecipeResponse>(
+    "/coffee/recipes/ai-recommend",
+  );
+
+  return response.data;
 }
 
 function mapStoredRecipeToMyRecipeListItem(

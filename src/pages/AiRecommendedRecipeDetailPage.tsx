@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { fetchAiRecommendedCoffeeRecipe } from "@/api/recipeApi";
 import MobileLayout from "@/layouts/MobileLayout";
 import RecipeDetailContent from "@/components/recipe-detail/RecipeDetailContent";
 import { recipeFlavorChips, type RecipeItem } from "@/types/recipe";
@@ -24,12 +26,43 @@ const mockAiRecommendedRecipe: RecipeItem = {
 };
 
 export default function AiRecommendedRecipeDetailPage() {
+  const [recipe, setRecipe] = useState<RecipeItem>(mockAiRecommendedRecipe);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRecommendedRecipe = async () => {
+      try {
+        const recommendedRecipe = await fetchAiRecommendedCoffeeRecipe();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setRecipe((currentRecipe) => ({
+          ...currentRecipe,
+          recipe_id: recommendedRecipe.recipeId,
+          recipe_name: recommendedRecipe.recipeName?.trim() || currentRecipe.recipe_name,
+          recipe_category: recommendedRecipe.recipeCategory,
+        }));
+      } catch (error) {
+        console.error("AI 추천 레시피를 불러오지 못했습니다.", error);
+      }
+    };
+
+    void loadRecommendedRecipe();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <MobileLayout>
       <RecipeDetailContent
         pageTitle={"AI \uCD94\uCC9C \uB808\uC2DC\uD53C \uC870\uD68C"}
         backPath="/devices/coffee-machine"
-        recipe={mockAiRecommendedRecipe}
+        recipe={recipe}
       />
     </MobileLayout>
   );

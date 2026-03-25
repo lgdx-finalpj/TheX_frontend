@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { fetchAiRecommendedCoffeeRecipe } from "@/api/recipeApi";
 import { getLatestSensor } from "@/api/sensor";
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
@@ -38,6 +39,8 @@ function formatSensorValue(value: number, unit: "°C" | "%") {
   return `${value}${unit}`;
 }
 
+const DEFAULT_RECOMMENDED_COFFEE_NAME = "카페라떼";
+
 export default function CoffeeMachineContent({
   onBackClick,
   onSpeakerClick,
@@ -48,6 +51,9 @@ export default function CoffeeMachineContent({
     temperature: number;
     humidity: number;
   } | null>(null);
+  const [recommendedCoffeeName, setRecommendedCoffeeName] = useState(
+    DEFAULT_RECOMMENDED_COFFEE_NAME,
+  );
   const [isSensorLoading, setIsSensorLoading] = useState(true);
 
   useEffect(() => {
@@ -92,6 +98,38 @@ export default function CoffeeMachineContent({
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRecommendedCoffee = async () => {
+      try {
+        const recommendedCoffee = await fetchAiRecommendedCoffeeRecipe();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const trimmedRecipeName = recommendedCoffee.recipeName?.trim();
+
+        setRecommendedCoffeeName(
+          trimmedRecipeName || DEFAULT_RECOMMENDED_COFFEE_NAME,
+        );
+      } catch (error) {
+        console.error("AI 추천 커피를 불러오지 못했습니다.", error);
+
+        if (isMounted) {
+          setRecommendedCoffeeName(DEFAULT_RECOMMENDED_COFFEE_NAME);
+        }
+      }
+    };
+
+    void fetchRecommendedCoffee();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const swipeHandlers = useHorizontalSwipe({
     onSwipeLeft: onSpeakerClick,
   });
@@ -118,12 +156,23 @@ export default function CoffeeMachineContent({
 
         <section className="coffee-hero">
           <div className="coffee-hero__image-wrap">
-            <img className="coffee-hero__image" src={heroImage} alt="듀오보 2.0 커피머신" />
+            <img
+              className="coffee-hero__image"
+              src={heroImage}
+              alt="듀오보 2.0 커피머신"
+            />
           </div>
 
-          <button className="device-nav device-nav--right" type="button" onClick={onSpeakerClick}>
+          <button
+            className="device-nav device-nav--right"
+            type="button"
+            onClick={onSpeakerClick}
+          >
             <span className="device-nav__arrow" aria-hidden="true">
-              <ChevronIcon className="device-nav__arrow-icon" direction="right" />
+              <ChevronIcon
+                className="device-nav__arrow-icon"
+                direction="right"
+              />
             </span>
             <span className="device-nav__label">스피커</span>
           </button>
@@ -131,9 +180,16 @@ export default function CoffeeMachineContent({
           <h2 className="coffee-hero__title">듀오보 2.0 현재 상태</h2>
         </section>
 
-        <section className="status-grid coffee-status-grid" aria-label="커피머신 상태 정보">
+        <section
+          className="status-grid coffee-status-grid"
+          aria-label="커피머신 상태 정보"
+        >
           {statusCards.map((card) => (
-            <StatusCard key={card.title} title={card.title} lines={card.lines} />
+            <StatusCard
+              key={card.title}
+              title={card.title}
+              lines={card.lines}
+            />
           ))}
         </section>
 
@@ -145,18 +201,30 @@ export default function CoffeeMachineContent({
         >
           <span className="recommend-card__header">
             <span className="recommend-card__title-group">
-              <strong className="recommend-card__title">LG의 오늘 추천 커피!</strong>
-              <span className="recommend-card__badge">실시간 센서 반영</span>
+              <span className="recommend-card__title-row">
+                <strong className="recommend-card__title">
+                  AI 추천 커피 레시피
+                </strong>
+                <span className="recommend-card__badge">실시간 센서 반영</span>
+              </span>
             </span>
 
             {sensorMeta ? (
-              <span className="recommend-card__sensor-list" aria-label="실시간 온습도 정보">
+              <span
+                className="recommend-card__sensor-list"
+                aria-label="실시간 온습도 정보"
+              >
                 <span className="recommend-card__sensor-pill recommend-card__sensor-pill--temperature">
-                  <span className="recommend-card__sensor-icon" aria-hidden="true">
+                  <span
+                    className="recommend-card__sensor-icon"
+                    aria-hidden="true"
+                  >
                     <FaTemperatureHigh />
                   </span>
                   <span className="recommend-card__sensor-copy">
-                    <span className="recommend-card__sensor-label">현재 온도</span>
+                    <span className="recommend-card__sensor-label">
+                      현재 온도
+                    </span>
                     <strong className="recommend-card__sensor-value">
                       {formatSensorValue(sensorMeta.temperature, "°C")}
                     </strong>
@@ -164,11 +232,16 @@ export default function CoffeeMachineContent({
                 </span>
 
                 <span className="recommend-card__sensor-pill recommend-card__sensor-pill--humidity">
-                  <span className="recommend-card__sensor-icon" aria-hidden="true">
+                  <span
+                    className="recommend-card__sensor-icon"
+                    aria-hidden="true"
+                  >
                     <WiHumidity />
                   </span>
                   <span className="recommend-card__sensor-copy">
-                    <span className="recommend-card__sensor-label">현재 습도</span>
+                    <span className="recommend-card__sensor-label">
+                      현재 습도
+                    </span>
                     <strong className="recommend-card__sensor-value">
                       {formatSensorValue(sensorMeta.humidity, "%")}
                     </strong>
@@ -177,36 +250,49 @@ export default function CoffeeMachineContent({
               </span>
             ) : (
               <span className="recommend-card__meta">
-                {isSensorLoading ? "센서 정보 불러오는 중" : "센서 데이터 확인 중"}
+                {isSensorLoading
+                  ? "센서 정보 불러오는 중"
+                  : "센서 데이터 확인 중"}
               </span>
             )}
           </span>
 
-          <span className="recommend-card__body">
-            기온이 낮을 때는 바디감이 있고 따뜻한 음료가 체온 유지에 좋습니다. 또한 오늘은 공기가 꽤 건조한
-            편입니다.
-          </span>
-
           <span className="recommend-card__highlight">
-            이런 날씨에는 부드럽고 따뜻한 느낌을 주는 대표적인 선택!
+            지금 이 순간의 온도와 습도를 분석해, AI가 딱 맞는 커피를 추천합니다
+            <br />
+            오늘의 커피는 바로!
           </span>
 
-          <span className="recommend-card__drink">“카페라떼”</span>
+          <span className="recommend-card__drink">
+            “{recommendedCoffeeName}”
+          </span>
         </button>
 
         <nav className="menu-list coffee-menu-list" aria-label="주요 메뉴">
-          <button className="menu-item" type="button" onClick={onRecipeClick} aria-label="레시피">
+          <button
+            className="menu-item"
+            type="button"
+            onClick={onRecipeClick}
+            aria-label="레시피"
+          >
             <span className="menu-item__icon" aria-hidden="true">
               <img className="menu-item__icon-image" src={recipeIcon} alt="" />
             </span>
             <span className="menu-item__label">레시피</span>
             <span className="menu-item__arrow" aria-hidden="true">
-              <ChevronIcon className="menu-item__arrow-image" direction="right" />
+              <ChevronIcon
+                className="menu-item__arrow-image"
+                direction="right"
+              />
             </span>
           </button>
 
           {menuItems.map((item) => (
-            <MenuItem key={item.label} iconSrc={item.iconSrc} label={item.label} />
+            <MenuItem
+              key={item.label}
+              iconSrc={item.iconSrc}
+              label={item.label}
+            />
           ))}
         </nav>
       </main>
