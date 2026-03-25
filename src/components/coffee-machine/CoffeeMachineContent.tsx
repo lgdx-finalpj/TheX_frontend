@@ -258,7 +258,9 @@ export default function CoffeeMachineContent({
           </span>
 
           <span className="recommend-card__highlight">
-            지금 이 순간의 온도와 습도를 분석해, AI가 딱 맞는 커피를 추천합니다
+            지금 이 순간의 온도와 습도를 분석해,
+            <br />
+            AI가 딱 맞는 커피를 추천합니다
             <br />
             오늘의 커피는 바로!
           </span>
