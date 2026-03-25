@@ -10,6 +10,8 @@ import ChevronIcon from "@/components/common/ChevronIcon";
 import MenuItem from "@/components/device-detail/MenuItem";
 import StatusCard from "@/components/device-detail/StatusCard";
 import useHorizontalSwipe from "@/hooks/useHorizontalSwipe";
+import { FaTemperatureHigh } from "react-icons/fa6";
+import { WiHumidity } from "react-icons/wi";
 import "@/components/device-detail/DeviceCommon.css";
 import "./CoffeeMachineContent.css";
 
@@ -46,6 +48,7 @@ export default function CoffeeMachineContent({
     temperature: number;
     humidity: number;
   } | null>(null);
+  const [isSensorLoading, setIsSensorLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -63,6 +66,7 @@ export default function CoffeeMachineContent({
 
         if (!hasValidTemperature || !hasValidHumidity) {
           setSensorMeta(null);
+          setIsSensorLoading(false);
           return;
         }
 
@@ -70,11 +74,13 @@ export default function CoffeeMachineContent({
           temperature: latestSensor.temperature,
           humidity: latestSensor.humidity,
         });
+        setIsSensorLoading(false);
       } catch (error) {
         console.error("센서 최신값을 불러오지 못했습니다.", error);
 
         if (isMounted) {
           setSensorMeta(null);
+          setIsSensorLoading(false);
         }
       }
     };
@@ -138,13 +144,42 @@ export default function CoffeeMachineContent({
           onClick={onAiRecommendedClick}
         >
           <span className="recommend-card__header">
-            <strong className="recommend-card__title">LG의 오늘 추천 커피!</strong>
+            <span className="recommend-card__title-group">
+              <strong className="recommend-card__title">LG의 오늘 추천 커피!</strong>
+              <span className="recommend-card__badge">실시간 센서 반영</span>
+            </span>
+
             {sensorMeta ? (
-              <span className="recommend-card__meta">
-                [현재 온도 : {formatSensorValue(sensorMeta.temperature, "°C")} / 현재 습도 :{" "}
-                {formatSensorValue(sensorMeta.humidity, "%")}]
+              <span className="recommend-card__sensor-list" aria-label="실시간 온습도 정보">
+                <span className="recommend-card__sensor-pill recommend-card__sensor-pill--temperature">
+                  <span className="recommend-card__sensor-icon" aria-hidden="true">
+                    <FaTemperatureHigh />
+                  </span>
+                  <span className="recommend-card__sensor-copy">
+                    <span className="recommend-card__sensor-label">현재 온도</span>
+                    <strong className="recommend-card__sensor-value">
+                      {formatSensorValue(sensorMeta.temperature, "°C")}
+                    </strong>
+                  </span>
+                </span>
+
+                <span className="recommend-card__sensor-pill recommend-card__sensor-pill--humidity">
+                  <span className="recommend-card__sensor-icon" aria-hidden="true">
+                    <WiHumidity />
+                  </span>
+                  <span className="recommend-card__sensor-copy">
+                    <span className="recommend-card__sensor-label">현재 습도</span>
+                    <strong className="recommend-card__sensor-value">
+                      {formatSensorValue(sensorMeta.humidity, "%")}
+                    </strong>
+                  </span>
+                </span>
               </span>
-            ) : null}
+            ) : (
+              <span className="recommend-card__meta">
+                {isSensorLoading ? "센서 정보 불러오는 중" : "센서 데이터 확인 중"}
+              </span>
+            )}
           </span>
 
           <span className="recommend-card__body">
