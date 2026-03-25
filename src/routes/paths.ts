@@ -12,6 +12,8 @@ export const NON_COFFEE_RECIPE_CREATE_ROUTE =
 export const BASIC_RECIPE_DETAIL_ROUTE = `${BASIC_RECIPE_ROUTE}/:recipeId`;
 export const POPULAR_RECIPE_DETAIL_ROUTE = `${POPULAR_RECIPE_ROUTE}/:recipeId`;
 export const MY_RECIPE_DETAIL_ROUTE = `${MY_RECIPE_ROUTE}/:recipeId`;
+export const AI_RECOMMENDED_RECIPE_DETAIL_ROUTE =
+  `${AI_RECOMMENDED_RECIPE_ROUTE}/:recipeId`;
 
 export const getBasicRecipeDetailPath = (recipeId: string, isCoffee?: boolean) =>
   `${BASIC_RECIPE_ROUTE}/${recipeId}${
@@ -25,6 +27,11 @@ export const getPopularRecipeDetailPath = (recipeId: string, isCoffee?: boolean)
 
 export const getMyRecipeDetailPath = (recipeId: string, isCoffee?: boolean) =>
   `${MY_RECIPE_ROUTE}/${recipeId}${
+    typeof isCoffee === "boolean" ? `?isCoffee=${isCoffee}` : ""
+  }`;
+
+export const getAiRecommendedRecipeDetailPath = (recipeId: string, isCoffee?: boolean) =>
+  `${AI_RECOMMENDED_RECIPE_ROUTE}/${recipeId}${
     typeof isCoffee === "boolean" ? `?isCoffee=${isCoffee}` : ""
   }`;
 

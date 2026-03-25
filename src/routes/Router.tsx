@@ -80,6 +80,10 @@ export default function Router() {
         path="/devices/coffee-machine/ai-recommended"
         element={<AiRecommendedRecipeDetailPage />}
       />
+      <Route
+        path="/devices/coffee-machine/ai-recommended/:recipeId"
+        element={<AiRecommendedRecipeDetailPage />}
+      />
 
       {/* 레시피 기능 */}
       <Route

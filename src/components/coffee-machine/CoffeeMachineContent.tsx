@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { fetchAiRecommendedCoffeeRecipe } from "@/api/recipeApi";
+import {
+  fetchAiRecommendedCoffeeRecipe,
+  type AiRecommendedCoffeeRecipeResponse,
+} from "@/api/recipeApi";
 import { getLatestSensor } from "@/api/sensor";
 import MobileLayout from "@/layouts/MobileLayout";
 import heroImage from "@/assets/듀오보.png";
@@ -19,7 +22,9 @@ import "./CoffeeMachineContent.css";
 interface CoffeeMachineContentProps {
   onBackClick?: () => void;
   onSpeakerClick?: () => void;
-  onAiRecommendedClick?: () => void;
+  onAiRecommendedClick?: (
+    recommendedRecipe: AiRecommendedCoffeeRecipeResponse | null,
+  ) => void;
   onRecipeClick?: () => void;
 }
 
@@ -54,6 +59,8 @@ export default function CoffeeMachineContent({
   const [recommendedCoffeeName, setRecommendedCoffeeName] = useState(
     DEFAULT_RECOMMENDED_COFFEE_NAME,
   );
+  const [recommendedCoffee, setRecommendedCoffee] =
+    useState<AiRecommendedCoffeeRecipeResponse | null>(null);
   const [isSensorLoading, setIsSensorLoading] = useState(true);
 
   useEffect(() => {
@@ -110,6 +117,7 @@ export default function CoffeeMachineContent({
         }
 
         const trimmedRecipeName = recommendedCoffee.recipeName?.trim();
+        setRecommendedCoffee(recommendedCoffee);
 
         setRecommendedCoffeeName(
           trimmedRecipeName || DEFAULT_RECOMMENDED_COFFEE_NAME,
@@ -118,6 +126,7 @@ export default function CoffeeMachineContent({
         console.error("AI 추천 커피를 불러오지 못했습니다.", error);
 
         if (isMounted) {
+          setRecommendedCoffee(null);
           setRecommendedCoffeeName(DEFAULT_RECOMMENDED_COFFEE_NAME);
         }
       }
@@ -197,7 +206,7 @@ export default function CoffeeMachineContent({
           className="recommend-card"
           type="button"
           aria-label="AI 추천 레시피"
-          onClick={onAiRecommendedClick}
+          onClick={() => onAiRecommendedClick?.(recommendedCoffee)}
         >
           <span className="recommend-card__header">
             <span className="recommend-card__title-group">
