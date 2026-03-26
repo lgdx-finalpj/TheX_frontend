@@ -482,10 +482,7 @@
     padding-inline: 4px;
   }
 
-  .recipe-page__control-row {
-    padding-inline: 4px;
-  }
-
+  .recipe-page__control-row,
   .recipe-page__list {
     padding-inline: 10px;
   }
