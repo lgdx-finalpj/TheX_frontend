@@ -302,6 +302,8 @@
   width: 270px;
   height: 178px;
   margin: 0 auto;
+  touch-action: none;
+  user-select: none;
 }
 
 .temperature-arc-track {
@@ -335,6 +337,7 @@
   inset: 0;
   opacity: 0;
   cursor: pointer;
+  pointer-events: none;
 }
 
 .temperature-guide {

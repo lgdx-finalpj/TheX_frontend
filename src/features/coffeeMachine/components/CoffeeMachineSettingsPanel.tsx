@@ -29,7 +29,14 @@ import type {
   CoffeeMachineExtractionType,
   CoffeeMachineTemperatureLevel,
 } from "@/features/coffeeMachine/types";
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 import "./CoffeeMachineSettingsPanel.css";
 
 type CapsuleSlot = "first" | "second";
@@ -43,6 +50,7 @@ type ActiveSheet =
 
 const temperatureArc = {
   width: 270,
+  shellHeight: 178,
   height: 150,
   radius: 118,
   centerX: 135,
@@ -155,6 +163,14 @@ function getTemperatureKnobPosition(value: number) {
   };
 }
 
+function getTemperatureValueFromPoint(x: number, y: number) {
+  const deltaY = Math.max(0, temperatureArc.centerY - y);
+  const angle = Math.atan2(deltaY, x - temperatureArc.centerX);
+  const clampedAngle = Math.max(0, Math.min(Math.PI, angle));
+
+  return Math.round(((Math.PI - clampedAngle) / Math.PI) * 100);
+}
+
 function resolveCapsuleOptionMode(
   value: string,
   options: CoffeeCapsuleOption[],
@@ -250,6 +266,8 @@ export default function CoffeeMachineSettingsPanel({
   const [nameMode, setNameMode] = useState<CoffeeCapsuleBrandValue>("velocity");
   const [temperatureDraftValue, setTemperatureDraftValue] = useState(50);
   const [extractionDraft, setExtractionDraft] = useState<CoffeeMachineExtractionType>("lungo");
+  const temperatureArcShellRef = useRef<HTMLDivElement | null>(null);
+  const activeTemperaturePointerIdRef = useRef<number | null>(null);
 
   const currentCapsules = useMemo(
     () => ({
@@ -352,6 +370,66 @@ export default function CoffeeMachineSettingsPanel({
         capsule1Step3: rawValue,
       });
     });
+  };
+
+  const updateTemperatureDraftFromClientPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const shell = temperatureArcShellRef.current;
+
+      if (!shell) {
+        return;
+      }
+
+      const rect = shell.getBoundingClientRect();
+      const normalizedX =
+        ((clientX - rect.left) / rect.width) * temperatureArc.width;
+      const normalizedY =
+        ((clientY - rect.top) / rect.height) * temperatureArc.shellHeight;
+      const clampedX = Math.max(0, Math.min(temperatureArc.width, normalizedX));
+      const clampedY = Math.max(
+        0,
+        Math.min(temperatureArc.shellHeight, normalizedY),
+      );
+
+      setTemperatureDraftValue(getTemperatureValueFromPoint(clampedX, clampedY));
+    },
+    [],
+  );
+
+  const handleTemperaturePointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    activeTemperaturePointerIdRef.current = event.pointerId;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateTemperatureDraftFromClientPoint(event.clientX, event.clientY);
+  };
+
+  const handleTemperaturePointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (activeTemperaturePointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    updateTemperatureDraftFromClientPoint(event.clientX, event.clientY);
+  };
+
+  const releaseTemperaturePointer = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (activeTemperaturePointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    activeTemperaturePointerIdRef.current = null;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
   const handleSave = async () => {
@@ -643,7 +721,15 @@ export default function CoffeeMachineSettingsPanel({
               {getTemperatureLabel(getTemperatureLevelFromValue(temperatureDraftValue))}
             </div>
 
-            <div className="temperature-arc-shell">
+            <div
+              ref={temperatureArcShellRef}
+              className="temperature-arc-shell"
+              onPointerDown={handleTemperaturePointerDown}
+              onPointerMove={handleTemperaturePointerMove}
+              onPointerUp={releaseTemperaturePointer}
+              onPointerCancel={releaseTemperaturePointer}
+              onLostPointerCapture={releaseTemperaturePointer}
+            >
               <svg
                 className="temperature-arc-track"
                 viewBox={`0 0 ${temperatureArc.width} ${temperatureArc.height}`}
