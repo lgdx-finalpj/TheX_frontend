@@ -66,6 +66,7 @@ export default function SmartRoutineMoodCustomPage() {
     draft,
     applyDraft,
     isApplyingDraft,
+    isEditMode,
     applyDraftError,
     clearMoodName,
     clearSelectedMood,
@@ -102,11 +103,14 @@ export default function SmartRoutineMoodCustomPage() {
   return (
     <MobileLayout>
       <div className="page smart-routine-page mood-custom-page">
-        <SmartRoutineHeader title="무드 커스텀하기" backTo="/smartroutine/create" />
+        <SmartRoutineHeader
+          title={isEditMode ? "무드 커스텀 수정하기" : "무드 커스텀하기"}
+          backTo={isEditMode ? "/smartroutine" : "/smartroutine/create"}
+        />
 
         <main className="mood-custom-overview">
           <StepCard
-            label="무드 이름은 어떻게 설정할까요?"
+            label="무드 이름을 어떻게 설정할까요?"
             value={hasMoodName ? draft.mood_name : "무드 이름 설정하기"}
             variant={hasMoodName ? "selected" : "idle"}
             onClick={() => navigate("/smartroutine/mood-custom/name")}
@@ -229,7 +233,13 @@ export default function SmartRoutineMoodCustomPage() {
                   void handleApply();
                 }}
               >
-                {isApplyingDraft ? "저장중..." : "저장"}
+                {isApplyingDraft
+                  ? isEditMode
+                    ? "수정중..."
+                    : "저장중..."
+                  : isEditMode
+                    ? "수정"
+                    : "저장"}
               </button>
               {applyDraftError ? (
                 <p role="alert" className="mood-action-feedback-error">

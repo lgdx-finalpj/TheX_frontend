@@ -125,6 +125,28 @@ function mapSpeakerTypeToMoodOptionId(musicType?: string): MoodOptionId {
   return "custom";
 }
 
+function mapColorsetMainToMoodOptionId(colorsetMain?: string): MoodOptionId | null {
+  const normalizedColorsetMain = colorsetMain?.trim().toUpperCase();
+
+  if (normalizedColorsetMain === "#5A48C2") {
+    return "rest";
+  }
+
+  if (normalizedColorsetMain === "#1E4F3D") {
+    return "focus-mode";
+  }
+
+  if (normalizedColorsetMain === "#3B3E73") {
+    return "movie-night";
+  }
+
+  if (normalizedColorsetMain === "#A36D00") {
+    return "home-cafe";
+  }
+
+  return null;
+}
+
 
 function mapCapsuleTempToTemperatureLevel(value: string): TemperatureLevel | null {
   if (value === "LOW") {
@@ -202,9 +224,10 @@ export function mapMoodCustomListItemToSavedMoodCustom(
 ): SavedMoodCustom {
   const customProduct = item.customProduct ?? {};
   const nextProducts: SavedMoodCustom["custom_product"] = [];
-  const selectedMoodId = mapSpeakerTypeToMoodOptionId(
-    customProduct.speakerCustom?.musicType,
-  );
+  const colorsetMain = getSafeString(item.colorsetMain);
+  const selectedMoodId =
+    mapColorsetMainToMoodOptionId(colorsetMain) ??
+    mapSpeakerTypeToMoodOptionId(customProduct.speakerCustom?.musicType);
 
   if (customProduct.coffeeCustom) {
     const option = getProductOptionByType("coffee_machine");
@@ -273,7 +296,11 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       product_type: "light",
       product_code: option?.product_code ?? "LIGHT01",
       product_label: option?.label ?? "Light",
-      config: null,
+      config: {
+        product_code: option?.product_code ?? "LIGHT01",
+        light_color: customProduct.lightCustom.lightColor,
+        brightness: customProduct.lightCustom.lightBright,
+      },
       summary: `${customProduct.lightCustom.lightColor}, ${customProduct.lightCustom.lightBright}/10`,
     });
   }
@@ -289,7 +316,13 @@ export function mapMoodCustomListItemToSavedMoodCustom(
       product_type: "speaker",
       product_code: option?.product_code ?? "SPEAKER01",
       product_label: option?.label ?? "Speaker",
-      config: null,
+      config: {
+        speaker_id: `speaker-${item.moodId}`,
+        product_code: option?.product_code ?? "SPEAKER01",
+        music_type: customProduct.speakerCustom.musicType,
+        music_link: customProduct.speakerCustom.musicLink ?? "",
+        volume: customProduct.speakerCustom.volume,
+      },
       summary: `${speakerMusicType}, ${customProduct.speakerCustom.volume}/20`,
     });
   }
@@ -297,8 +330,7 @@ export function mapMoodCustomListItemToSavedMoodCustom(
   return {
     mood_id: String(item.moodId),
     mood_name: item.moodName,
-    colorset_main:
-      getSafeString(item.colorsetMain) || mapMoodOptionIdToColorsetMain(selectedMoodId),
+    colorset_main: colorsetMain || mapMoodOptionIdToColorsetMain(selectedMoodId),
     selected_mood_id: selectedMoodId,
     custom_product: nextProducts,
   };

@@ -6,6 +6,7 @@ import {
   createSpeakerCustom,
   fetchMyMoodCustomList,
   type MoodCustomProductRequestDTO,
+  updateMoodCustom,
 } from "@/api/moodCustomApi";
 import {
   buildCoffeeRecipeCustomizePayload,
@@ -34,6 +35,39 @@ function createEmptyDraft(): MoodCustomDraft {
   };
 }
 
+function cloneProductConfig(config: ProductConfig | null): ProductConfig | null {
+  if (!config) {
+    return null;
+  }
+
+  if (isLightConfig(config) || isSpeakerConfig(config)) {
+    return { ...config };
+  }
+
+  if (isCoffeeMachineConfig(config)) {
+    return {
+      ...config,
+      first_capsule: { ...config.first_capsule },
+      second_capsule: { ...config.second_capsule },
+    };
+  }
+
+  return config;
+}
+
+function createDraftFromSavedMoodCustom(moodCustom: SavedMoodCustom): MoodCustomDraft {
+  return {
+    ...createEmptyDraft(),
+    mood_id: moodCustom.mood_id,
+    mood_name: moodCustom.mood_name,
+    selected_mood_id: moodCustom.selected_mood_id,
+    custom_product: moodCustom.custom_product.map((product) => ({
+      ...product,
+      config: cloneProductConfig(product.config),
+    })),
+  };
+}
+
 function isLightConfig(config: ProductConfig): config is LightConfig {
   return "light_color" in config;
 }
@@ -48,6 +82,7 @@ function isCoffeeMachineConfig(config: ProductConfig): config is CoffeeMachineCo
 
 export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState<MoodCustomDraft>(createEmptyDraft);
+  const [editingMoodCustomId, setEditingMoodCustomId] = useState<string | null>(null);
   const [savedMoodCustoms, setSavedMoodCustoms] = useState<SavedMoodCustom[]>([]);
   const [isSavedMoodCustomsLoading, setIsSavedMoodCustomsLoading] =
     useState(false);
@@ -87,6 +122,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
       isSavedMoodCustomsLoading,
       savedMoodCustomsError,
       isApplyingDraft,
+      isEditMode: editingMoodCustomId !== null,
       applyDraftError,
       setMoodName: (moodName) => {
         setApplyDraftError(null);
@@ -116,6 +152,11 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
           selected_mood_id: null,
           custom_product: [],
         }));
+      },
+      startEditingMoodCustom: (moodCustom) => {
+        setApplyDraftError(null);
+        setEditingMoodCustomId(moodCustom.mood_id);
+        setDraft(createDraftFromSavedMoodCustom(moodCustom));
       },
       addProduct: (productType) => {
         setApplyDraftError(null);
@@ -261,15 +302,22 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
             throw new Error(`Unsupported product config: ${product.product_type}`);
           }
 
-          const createdMoodId = await createMoodCustom({
+          const moodPayload = {
             colorsetId: mapMoodOptionIdToColorsetId(selectedMoodId),
             moodName,
             moodMemo: draft.mood_memo.trim(),
             customProduct: customProductPayload,
-          });
+          };
+          const numericEditingMoodId =
+            editingMoodCustomId !== null ? Number(editingMoodCustomId) : null;
+          const createdMoodId =
+            numericEditingMoodId !== null && Number.isFinite(numericEditingMoodId)
+              ? await updateMoodCustom(numericEditingMoodId, moodPayload)
+              : await createMoodCustom(moodPayload);
 
           await refreshSavedMoodCustoms();
           setDraft(createEmptyDraft());
+          setEditingMoodCustomId(null);
           setApplyDraftError(null);
           return String(createdMoodId);
         } catch (error) {
@@ -284,6 +332,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
       refreshSavedMoodCustoms,
       resetDraft: () => {
         setApplyDraftError(null);
+        setEditingMoodCustomId(null);
         setDraft(createEmptyDraft());
       },
     }),
@@ -292,6 +341,7 @@ export function MoodCustomDraftProvider({ children }: { children: ReactNode }) {
       draft,
       isApplyingDraft,
       isSavedMoodCustomsLoading,
+      editingMoodCustomId,
       refreshSavedMoodCustoms,
       savedMoodCustoms,
       savedMoodCustomsError,

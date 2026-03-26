@@ -112,11 +112,13 @@ export interface MoodCustomDraftContextValue {
   isSavedMoodCustomsLoading: boolean;
   savedMoodCustomsError: string | null;
   isApplyingDraft: boolean;
+  isEditMode: boolean;
   applyDraftError: string | null;
   setMoodName: (moodName: string) => void;
   clearMoodName: () => void;
   setSelectedMood: (moodId: MoodOptionId) => void;
   clearSelectedMood: () => void;
+  startEditingMoodCustom: (moodCustom: SavedMoodCustom) => void;
   addProduct: (productType: ProductType) => void;
   removeProduct: (productType: ProductType) => void;
   upsertProductConfig: (

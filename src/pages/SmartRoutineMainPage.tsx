@@ -122,6 +122,7 @@ export default function SmartRoutineMainPage() {
     isSavedMoodCustomsLoading,
     savedMoodCustomsError,
     refreshSavedMoodCustoms,
+    startEditingMoodCustom,
   } = useMoodCustomDraft();
 
   const [activeTab, setActiveTab] = useState<"mine" | "recommend">("mine");
@@ -354,6 +355,12 @@ export default function SmartRoutineMainPage() {
     }
   };
 
+  const handleEditMood = (moodCustom: SavedMoodCustom) => {
+    startEditingMoodCustom(moodCustom);
+    setOpenedMenuMoodId(null);
+    navigate("/smartroutine/mood-custom");
+  };
+
   const handleSaveMood = async (moodId: string) => {
     if (isSavingMoodId) {
       return;
@@ -493,6 +500,7 @@ export default function SmartRoutineMainPage() {
             deletingMoodId={isDeletingMoodId}
             executingMoodId={isExecutingMoodId}
             onMoodMenuToggle={handleMoodMenuToggle}
+            onEditMood={handleEditMood}
             onShareMood={(moodId) => {
               void handleShareMood(moodId);
             }}

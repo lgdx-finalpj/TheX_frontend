@@ -16,6 +16,7 @@ interface MineTabSectionProps {
   deletingMoodId: string | null;
   executingMoodId: string | null;
   onMoodMenuToggle: (moodId: string) => void;
+  onEditMood: (moodCustom: SavedMoodCustom) => void;
   onShareMood: (moodId: string) => void;
   onDeleteMood: (moodId: string) => void;
   onExecuteMood: (moodId: string) => void;
@@ -57,6 +58,7 @@ export default function MineTabSection({
   deletingMoodId,
   executingMoodId,
   onMoodMenuToggle,
+  onEditMood,
   onShareMood,
   onDeleteMood,
   onExecuteMood,
@@ -100,6 +102,14 @@ export default function MineTabSection({
 
                     {openedMenuMoodId === moodId ? (
                       <div className="mood-card-menu">
+                        <button
+                          type="button"
+                          className="mood-card-menu-button"
+                          disabled={isPending}
+                          onClick={() => onEditMood(moodCustom)}
+                        >
+                          무드 커스텀 수정
+                        </button>
                         <button
                           type="button"
                           className="mood-card-menu-button"

@@ -198,6 +198,14 @@ export async function createMoodCustom(payload: MoodCustomRequestDTO) {
   return extractNumericId(data, "moodId");
 }
 
+export async function updateMoodCustom(moodId: number, payload: MoodCustomRequestDTO) {
+  const { data } = await httpClient.patch<NumericMapResponse>(
+    `/mood/custom/${moodId}`,
+    payload,
+  );
+  return extractNumericId(data, "moodId");
+}
+
 export async function shareMoodCustom(moodId: number) {
   const { data } = await httpClient.patch<NumericMapResponse>(
     `/mood/${moodId}/share`,
