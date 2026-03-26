@@ -13,7 +13,10 @@ interface BasicRecipeCardProps {
   recipe: RecipeItem;
   getDetailPath: (recipe: RecipeItem) => string;
   menuVariant?: "default" | "mine";
+  onEditRecipe?: (recipe: RecipeItem) => Promise<void> | void;
   onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onUnsaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onDeleteRecipe?: (recipe: RecipeItem) => Promise<void>;
   onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
   isActionPending?: boolean;
   isSaved?: boolean;
@@ -33,7 +36,10 @@ export default function BasicRecipeCard({
   recipe,
   getDetailPath,
   menuVariant = "default",
+  onEditRecipe,
   onSaveRecipe,
+  onUnsaveRecipe,
+  onDeleteRecipe,
   onToggleShareRecipe,
   isActionPending = false,
   isSaved = false,
@@ -56,6 +62,10 @@ export default function BasicRecipeCard({
     Boolean(onToggleShareRecipe) &&
     isOwnedByCurrentUser &&
     menuVariant === "default";
+  const showSavedRecipeCancelAction =
+    Boolean(onUnsaveRecipe) &&
+    !isOwnedByCurrentUser &&
+    menuVariant === "mine";
   const recipeCategoryIcon =
     categoryIconMap[recipe.recipe_category] ?? coffeeCategoryImage;
 
@@ -130,6 +140,63 @@ export default function BasicRecipeCard({
     }
   };
 
+  const handleEditClick = async () => {
+    if (!onEditRecipe || isActionPending) {
+      handleNotReadyClick("레시피 수정");
+      return;
+    }
+
+    setActionErrorMessage(null);
+
+    try {
+      await onEditRecipe(recipe);
+      setIsMenuOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "레시피 수정 화면을 열지 못했습니다.";
+      setActionErrorMessage(message);
+    }
+  };
+
+  const handleUnsaveClick = async () => {
+    if (!onUnsaveRecipe || isActionPending) {
+      return;
+    }
+
+    setActionErrorMessage(null);
+
+    try {
+      await onUnsaveRecipe(recipe);
+      setIsMenuOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "저장 취소 중 오류가 발생했습니다.";
+      setActionErrorMessage(message);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (!isOwnedByCurrentUser) {
+      setActionErrorMessage("내가 만든 레시피만 삭제할 수 있습니다.");
+      return;
+    }
+
+    if (!onDeleteRecipe || isActionPending) {
+      return;
+    }
+
+    setActionErrorMessage(null);
+
+    try {
+      await onDeleteRecipe(recipe);
+      setIsMenuOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "레시피 삭제 중 오류가 발생했습니다.";
+      setActionErrorMessage(message);
+    }
+  };
+
   const handleExtractClick = () => {
     setIsMenuOpen(false);
     if (!recipe.is_coffee) {
@@ -139,7 +206,11 @@ export default function BasicRecipeCard({
   };
 
   const handleMoveToDetail = () => {
-    navigate(getDetailPath(recipe));
+    navigate(getDetailPath(recipe), {
+      state: {
+        recipePreview: recipe,
+      },
+    });
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -215,22 +286,32 @@ export default function BasicRecipeCard({
               >
                 {menuVariant === "mine" ? (
                   <>
-                    <button
-                      type="button"
-                      className="recipe-card__menu-item"
-                      role="menuitem"
-                      onClick={() => handleNotReadyClick("레시피 수정")}
-                    >
-                      레시피 수정
-                    </button>
-                    <button
-                      type="button"
-                      className="recipe-card__menu-item"
-                      role="menuitem"
-                      onClick={() => handleNotReadyClick("레시피 삭제")}
-                    >
-                      레시피 삭제
-                    </button>
+                    {isOwnedByCurrentUser ? (
+                      <button
+                        type="button"
+                        className="recipe-card__menu-item"
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={() => {
+                          void handleEditClick();
+                        }}
+                      >
+                        레시피 수정
+                      </button>
+                    ) : null}
+                    {isOwnedByCurrentUser ? (
+                      <button
+                        type="button"
+                        className="recipe-card__menu-item"
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={() => {
+                          void handleDeleteClick();
+                        }}
+                      >
+                        레시피 삭제
+                      </button>
+                    ) : null}
                     {isOwnedByCurrentUser ? (
                       <button
                         type="button"
@@ -242,6 +323,16 @@ export default function BasicRecipeCard({
                         onClick={handleShareClick}
                       >
                         {isShared ? "공유 취소" : "레시피 공유"}
+                      </button>
+                    ) : showSavedRecipeCancelAction ? (
+                      <button
+                        type="button"
+                        className="recipe-card__menu-item"
+                        role="menuitem"
+                        disabled={isActionPending}
+                        onClick={handleUnsaveClick}
+                      >
+                        저장 취소
                       </button>
                     ) : null}
                     <button

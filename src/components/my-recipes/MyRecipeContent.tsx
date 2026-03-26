@@ -6,9 +6,12 @@ import BasicRecipeList from "@/components/basic-recipes/BasicRecipeList";
 import HomeHeader from "@/components/basic-recipes/HomeHeader";
 import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
 import {
+  deleteOwnRecipeApi,
+  fetchRecipeDetail,
   fetchMyRecipesWithDetails,
   mapApiErrorMessage,
   toggleRecipeShareApi,
+  unsaveRecipeApi,
 } from "@/api/recipeApi";
 import {
   recipeFlavorChips,
@@ -19,9 +22,12 @@ import {
 } from "@/types/recipe";
 import {
   BASIC_RECIPE_ROUTE,
+  COFFEE_RECIPE_CREATE_ROUTE,
+  getNonCoffeeRecipeCreatePath,
   getMyRecipeDetailPath,
   RECIPE_CATEGORY_SELECTION_ROUTE,
 } from "@/routes/paths";
+import { buildRecipeEditState } from "@/utils/recipeEdit";
 import { getRecipeIdentityFromItem } from "@/utils/recipeIdentity";
 
 export default function MyRecipeContent() {
@@ -138,6 +144,88 @@ export default function MyRecipeContent() {
     }
   };
 
+  const handleUnsaveRecipe = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
+    if (pendingRecipeId) {
+      return;
+    }
+
+    setPendingRecipeId(recipeIdentity);
+    setErrorMessage(null);
+
+    try {
+      await unsaveRecipeApi(recipe.recipe_id, recipe.recipe_category);
+      setRecipes((currentRecipes) =>
+        currentRecipes.filter(
+          (currentRecipe) => getRecipeIdentityFromItem(currentRecipe) !== recipeIdentity,
+        ),
+      );
+    } catch (error) {
+      const message = mapApiErrorMessage(error, "저장한 레시피를 취소하지 못했습니다.");
+      setErrorMessage(message);
+      throw new Error(message);
+    } finally {
+      setPendingRecipeId(null);
+    }
+  };
+
+  const handleDeleteRecipe = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
+    if (pendingRecipeId) {
+      return;
+    }
+
+    setPendingRecipeId(recipeIdentity);
+    setErrorMessage(null);
+
+    try {
+      await deleteOwnRecipeApi(recipe.recipe_id, recipe.recipe_category);
+      setRecipes((currentRecipes) =>
+        currentRecipes.filter(
+          (currentRecipe) => getRecipeIdentityFromItem(currentRecipe) !== recipeIdentity,
+        ),
+      );
+    } catch (error) {
+      const message = mapApiErrorMessage(error, "레시피를 삭제하지 못했습니다.");
+      setErrorMessage(message);
+      throw new Error(message);
+    } finally {
+      setPendingRecipeId(null);
+    }
+  };
+
+  const handleEditRecipe = async (recipe: RecipeItem) => {
+    const recipeIdentity = getRecipeIdentityFromItem(recipe);
+
+    if (pendingRecipeId) {
+      return;
+    }
+
+    setPendingRecipeId(recipeIdentity);
+    setErrorMessage(null);
+
+    try {
+      const detail = await fetchRecipeDetail(
+        recipe.owned_recipe_id ?? recipe.recipe_id,
+        recipe.is_coffee,
+      );
+      const editState = buildRecipeEditState(detail);
+      const editPath = editState.isCoffee
+        ? COFFEE_RECIPE_CREATE_ROUTE
+        : getNonCoffeeRecipeCreatePath(editState.recipeCategory.toLowerCase());
+
+      navigate(editPath, { state: editState });
+    } catch (error) {
+      const message = mapApiErrorMessage(error, "레시피 수정 정보를 불러오지 못했습니다.");
+      setErrorMessage(message);
+      throw new Error(message);
+    } finally {
+      setPendingRecipeId(null);
+    }
+  };
+
   return (
     <div className="page recipe-page my-recipe-page">
       <header className="recipe-page__header">
@@ -168,7 +256,10 @@ export default function MyRecipeContent() {
         <BasicRecipeList
           recipes={isLoading || errorMessage ? [] : filteredRecipes}
           getDetailPath={(recipe) =>
-            getMyRecipeDetailPath(String(recipe.recipe_id), recipe.is_coffee)
+            getMyRecipeDetailPath(
+              String(recipe.owned_recipe_id ?? recipe.recipe_id),
+              recipe.is_coffee,
+            )
           }
           listLabel="나의 레시피 목록"
           emptyTitle={
@@ -185,6 +276,9 @@ export default function MyRecipeContent() {
                 "기본 레시피나 인기 레시피에서 저장한 항목을 다시 확인해보세요."
           }
           menuVariant="mine"
+          onEditRecipe={handleEditRecipe}
+          onUnsaveRecipe={handleUnsaveRecipe}
+          onDeleteRecipe={handleDeleteRecipe}
           onToggleShareRecipe={handleToggleShare}
           pendingRecipeId={pendingRecipeId}
           sharedRecipeIdSet={sharedRecipeIdSet}

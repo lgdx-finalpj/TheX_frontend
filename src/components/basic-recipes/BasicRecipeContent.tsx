@@ -23,7 +23,10 @@ interface BasicRecipeContentProps {
   menuVariant?: "default" | "mine";
   isLoading?: boolean;
   errorMessage?: string | null;
+  onEditRecipe?: (recipe: RecipeItem) => Promise<void> | void;
   onSaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onUnsaveRecipe?: (recipe: RecipeItem) => Promise<void>;
+  onDeleteRecipe?: (recipe: RecipeItem) => Promise<void>;
   onToggleShareRecipe?: (recipe: RecipeItem) => Promise<boolean>;
   pendingRecipeId?: string | null;
   savedRecipeIdSet?: ReadonlySet<string>;
@@ -42,7 +45,10 @@ export default function BasicRecipeContent({
   menuVariant = "default",
   isLoading = false,
   errorMessage = null,
+  onEditRecipe,
   onSaveRecipe,
+  onUnsaveRecipe,
+  onDeleteRecipe,
   onToggleShareRecipe,
   pendingRecipeId,
   savedRecipeIdSet,
@@ -115,7 +121,10 @@ export default function BasicRecipeContent({
           emptyTitle={emptyTitle}
           emptyDescription={emptyDescription}
           menuVariant={menuVariant}
+          onEditRecipe={onEditRecipe}
           onSaveRecipe={onSaveRecipe}
+          onUnsaveRecipe={onUnsaveRecipe}
+          onDeleteRecipe={onDeleteRecipe}
           onToggleShareRecipe={onToggleShareRecipe}
           pendingRecipeId={pendingRecipeId}
           savedRecipeIdSet={savedRecipeIdSet}
