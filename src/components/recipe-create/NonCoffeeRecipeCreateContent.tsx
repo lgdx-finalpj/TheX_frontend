@@ -1,11 +1,19 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import "./NoneCoffeeRecipeCreate.css";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  createNoneCoffeeRecipeApi,
+  mapApiErrorMessage,
+  updateNoneCoffeeRecipeApi,
+} from "@/api/recipeApi";
 import ChevronIcon from "@/components/common/ChevronIcon";
 import { MY_RECIPE_ROUTE } from "@/routes/paths";
-import { createNoneCoffeeRecipeApi, mapApiErrorMessage } from "@/api/recipeApi";
 import type { RecipeLevel } from "@/types/recipe";
+import {
+  isRecipeEditState,
+  type NonCoffeeRecipeEditState,
+} from "@/utils/recipeEdit";
+import "./NoneCoffeeRecipeCreate.css";
 
 const categoryMap = {
   smoothie: "SMOOTHIE",
@@ -35,6 +43,7 @@ type FieldKey = "recipe_name" | "ingredient" | "total_size" | "recipe_content";
 
 export default function NonCoffeeRecipeCreateContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { categoryKey } = useParams();
   const recipeCategory = useMemo(
     () =>
@@ -47,12 +56,29 @@ export default function NonCoffeeRecipeCreateContent() {
   );
   const exampleSet =
     categoryKey === "tea" ? nonCoffeeExamples.tea : nonCoffeeExamples.smoothie;
+  const rawState = location.state;
+  const editState: NonCoffeeRecipeEditState | null =
+    recipeCategory &&
+    isRecipeEditState(rawState) &&
+    !rawState.isCoffee &&
+    rawState.recipeCategory === recipeCategory
+      ? rawState
+      : null;
+  const isEditMode = editState !== null;
   const [focusedField, setFocusedField] = useState<FieldKey | null>(null);
-  const [recipeName, setRecipeName] = useState("");
-  const [ingredient, setIngredient] = useState("");
-  const [totalSize, setTotalSize] = useState("");
-  const [recipeLevel, setRecipeLevel] = useState("");
-  const [recipeContent, setRecipeContent] = useState("");
+  const [recipeName, setRecipeName] = useState(editState?.recipeName ?? "");
+  const [ingredient, setIngredient] = useState(editState?.ingredient ?? "");
+  const [totalSize, setTotalSize] = useState(editState?.totalSize ?? "");
+  const [recipeLevel, setRecipeLevel] = useState(
+    editState?.recipeLevel === "EASY"
+      ? "쉬움"
+      : editState?.recipeLevel === "NORMAL"
+        ? "보통"
+        : editState?.recipeLevel === "HARD"
+          ? "어려움"
+          : "",
+  );
+  const [recipeContent, setRecipeContent] = useState(editState?.recipeContent ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(
     null,
@@ -90,23 +116,30 @@ export default function NonCoffeeRecipeCreateContent() {
     const normalizedLevel =
       normalizedRecipeLevelMap[recipeLevel] ?? ("EASY" as RecipeLevel);
     const parsedTotalSize = Number(totalSize);
+    const payload = {
+      recipeName: recipeName.trim(),
+      recipeCategory,
+      ingredient: ingredient.trim(),
+      recipeContent: recipeContent.trim(),
+      totalSize: Number.isNaN(parsedTotalSize) ? 0 : parsedTotalSize,
+      recipeLevel: normalizedLevel,
+    };
 
     try {
-      await createNoneCoffeeRecipeApi({
-        recipeName: recipeName.trim(),
-        recipeCategory,
-        ingredient: ingredient.trim(),
-        recipeContent: recipeContent.trim(),
-        totalSize: Number.isNaN(parsedTotalSize) ? 0 : parsedTotalSize,
-        recipeLevel: normalizedLevel,
-      });
+      if (editState) {
+        await updateNoneCoffeeRecipeApi(editState.recipeId, payload);
+      } else {
+        await createNoneCoffeeRecipeApi(payload);
+      }
 
       navigate(MY_RECIPE_ROUTE);
     } catch (error) {
       setSubmitErrorMessage(
         mapApiErrorMessage(
           error,
-          "레시피 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
+          isEditMode
+            ? "레시피 수정에 실패했습니다. 잠시 후 다시 시도해주세요."
+            : "레시피 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
         ),
       );
     } finally {
@@ -129,15 +162,21 @@ export default function NonCoffeeRecipeCreateContent() {
               direction="left"
             />
           </button>
-          <h1>레시피 생성</h1>
+          <h1>{isEditMode ? "레시피 수정" : "레시피 생성"}</h1>
         </div>
 
         <section className="recipe-category-page__intro">
-          <strong>나만의 홈카페 레시피를 만들어보세요!</strong>
+          <strong>
+            {isEditMode
+              ? "기존 레시피를 원하는 내용으로 수정해보세요!"
+              : "나만의 홈카페 레시피를 만들어보세요!"}
+          </strong>
           <p>
             추출 시간, 온도, 캡슐을 설정해
             <br />
-            나만의 레시피를 저장할 수 있습니다.
+            {isEditMode
+              ? "기존 내용이 입력된 상태로 바로 수정할 수 있습니다."
+              : "나만의 레시피를 저장할 수 있습니다."}
           </p>
         </section>
 
@@ -146,10 +185,7 @@ export default function NonCoffeeRecipeCreateContent() {
             <span className="recipe-create-form__label">레시피 이름</span>
             <input
               value={recipeName}
-              placeholder={getPlaceholder(
-                "recipe_name",
-                exampleSet.recipe_name,
-              )}
+              placeholder={getPlaceholder("recipe_name", exampleSet.recipe_name)}
               onFocus={() => setFocusedField("recipe_name")}
               onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeName(event.target.value)}
@@ -198,10 +234,7 @@ export default function NonCoffeeRecipeCreateContent() {
               <input
                 inputMode="numeric"
                 value={totalSize}
-                placeholder={getPlaceholder(
-                  "total_size",
-                  exampleSet.total_size,
-                )}
+                placeholder={getPlaceholder("total_size", exampleSet.total_size)}
                 onFocus={() => setFocusedField("total_size")}
                 onBlur={() => setFocusedField(null)}
                 onChange={(event) => setTotalSize(event.target.value)}
@@ -211,16 +244,11 @@ export default function NonCoffeeRecipeCreateContent() {
           </label>
 
           <label className="recipe-create-form__card recipe-create-form__card--textarea">
-            <span className="recipe-create-form__label">
-              레시피 본문(논커피용)
-            </span>
+            <span className="recipe-create-form__label">레시피 본문(논커피용)</span>
             <textarea
               rows={6}
               value={recipeContent}
-              placeholder={getPlaceholder(
-                "recipe_content",
-                exampleSet.recipe_content,
-              )}
+              placeholder={getPlaceholder("recipe_content", exampleSet.recipe_content)}
               onFocus={() => setFocusedField("recipe_content")}
               onBlur={() => setFocusedField(null)}
               onChange={(event) => setRecipeContent(event.target.value)}
@@ -232,7 +260,7 @@ export default function NonCoffeeRecipeCreateContent() {
             className="recipe-create-form__submit"
             disabled={!isFormValid || isSubmitting}
           >
-            {isSubmitting ? "등록 중..." : "등록"}
+            {isSubmitting ? (isEditMode ? "수정 중..." : "등록 중...") : isEditMode ? "수정" : "등록"}
           </button>
 
           {submitErrorMessage ? (
