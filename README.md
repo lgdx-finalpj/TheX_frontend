@@ -1,4 +1,4 @@
-# The X Frontend
+# The Ex Frontend
 사이트: https://the-x-frontend.vercel.app/
 
 <img width="1581" height="509" alt="readme" src="https://github.com/user-attachments/assets/0570aeb0-2557-4ce1-944f-3a8674d05e8f" />
