@@ -3,17 +3,13 @@ import { httpClient } from "@/api/httpClient";
 type NumericMapResponse = Record<string, number>;
 
 export type SpeakerMusicType =
-  | "HOMECAFE"
-  | "MOVIE"
-  | "FOCUSING"
-  | "REST"
-  | "JAZZ"
-  | "ACOUSTIC"
-  | "CLASSICAL"
-  | "CAFE_BGM"
-  | "CHILL"
-  | "K_POP"
-  | "MUSICAL";
+  | "Jazz"
+  | "Acoustic"
+  | "Classical"
+  | "Cafe BGM"
+  | "Chill"
+  | "K-POP"
+  | "Musical";
 export type CoffeeRecipeLevel = "EASY" | "NORMAL" | "HARD";
 export type CoffeeRecipeCategory = "COFFEE" | "SMOOTHIE" | "TEA";
 export type CapsuleTemp = "HIGH" | "MIDDLE" | "LOW";

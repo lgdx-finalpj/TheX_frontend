@@ -83,34 +83,41 @@ export const lightColorOptions = [
 ];
 
 export const speakerMusicOptionItems = [
-  { label: "Jazz", value: "JAZZ" },
-  { label: "Acoustic", value: "ACOUSTIC" },
-  { label: "Classical", value: "CLASSICAL" },
-  { label: "Cafe BGM", value: "CAFE_BGM" },
-  { label: "Chill", value: "CHILL" },
-  { label: "K-pop", value: "K_POP" },
-  { label: "Musical", value: "MUSICAL" },
+  { label: "Jazz", value: "Jazz" },
+  { label: "Acoustic", value: "Acoustic" },
+  { label: "Classical", value: "Classical" },
+  { label: "Cafe BGM", value: "Cafe BGM" },
+  { label: "Chill", value: "Chill" },
+  { label: "K-POP", value: "K-POP" },
+  { label: "Musical", value: "Musical" },
 ] as const satisfies ReadonlyArray<{ label: string; value: SpeakerMusicType }>;
 
-const legacySpeakerMusicTypeLabelMap: Partial<Record<SpeakerMusicType, string>> = {
+const legacySpeakerMusicTypeLabelMap: Record<string, string> = {
   HOMECAFE: "Home Cafe",
   MOVIE: "Movie",
   FOCUSING: "Focusing",
   REST: "Rest",
+  JAZZ: "Jazz",
+  ACOUSTIC: "Acoustic",
+  CLASSICAL: "Classical",
+  CAFE_BGM: "Cafe BGM",
+  CHILL: "Chill",
+  K_POP: "K-POP",
+  MUSICAL: "Musical",
 };
 
 export const speakerMusicOptions = speakerMusicOptionItems.map((item) => item.label);
 
 export function mapSpeakerMusicLabelToType(label: string): SpeakerMusicType {
   return (
-    speakerMusicOptionItems.find((item) => item.label === label)?.value ?? "CAFE_BGM"
+    speakerMusicOptionItems.find((item) => item.label === label)?.value ?? "Cafe BGM"
   );
 }
 
 export function mapSpeakerMusicTypeToLabel(musicType: string): string {
   return (
     speakerMusicOptionItems.find((item) => item.value === musicType)?.label ??
-    legacySpeakerMusicTypeLabelMap[musicType as SpeakerMusicType] ??
+    legacySpeakerMusicTypeLabelMap[musicType] ??
     musicType
   );
 }

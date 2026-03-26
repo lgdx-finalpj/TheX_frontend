@@ -104,19 +104,21 @@ export function getAvailableProductCodes(products: MyProductListResponseDTO[]) {
 }
 
 function mapSpeakerTypeToMoodOptionId(musicType?: string): MoodOptionId {
-  if (musicType === "HOMECAFE") {
+  const normalizedMusicType = mapSpeakerMusicTypeToLabel(musicType ?? "");
+
+  if (normalizedMusicType === "Home Cafe" || normalizedMusicType === "Cafe BGM") {
     return "home-cafe";
   }
 
-  if (musicType === "MOVIE") {
+  if (normalizedMusicType === "Movie" || normalizedMusicType === "Musical") {
     return "movie-night";
   }
 
-  if (musicType === "FOCUSING") {
+  if (normalizedMusicType === "Focusing" || normalizedMusicType === "Classical") {
     return "focus-mode";
   }
 
-  if (musicType === "REST") {
+  if (normalizedMusicType === "Rest" || normalizedMusicType === "Chill") {
     return "rest";
   }
 
@@ -318,18 +320,18 @@ export function mapMoodOptionIdToSpeakerMusicType(
   selectedMoodId: MoodOptionId | null,
 ): SpeakerMusicType {
   if (selectedMoodId === "home-cafe") {
-    return "HOMECAFE";
+    return "Cafe BGM";
   }
 
   if (selectedMoodId === "movie-night") {
-    return "MOVIE";
+    return "Musical";
   }
 
   if (selectedMoodId === "focus-mode") {
-    return "FOCUSING";
+    return "Classical";
   }
 
-  return "REST";
+  return "Chill";
 }
 
 export function buildCoffeeRecipeCustomizePayload({

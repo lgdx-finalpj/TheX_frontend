@@ -32,17 +32,19 @@ function inferColorsetId(item: MoodCustomListResponseDTO) {
     return item.colorsetMain.trim();
   }
 
-  const speakerType = item.customProduct?.speakerCustom?.musicType;
+  const speakerType = mapSpeakerMusicTypeToLabel(
+    item.customProduct?.speakerCustom?.musicType ?? "",
+  );
 
-  if (speakerType === "REST") {
+  if (speakerType === "Rest" || speakerType === "Chill") {
     return "#5A48C2";
   }
 
-  if (speakerType === "FOCUSING") {
+  if (speakerType === "Focusing" || speakerType === "Classical") {
     return "#1E4F3D";
   }
 
-  if (speakerType === "MOVIE") {
+  if (speakerType === "Movie" || speakerType === "Musical") {
     return "#3B3E73";
   }
 
