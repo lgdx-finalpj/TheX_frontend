@@ -171,6 +171,19 @@ function getTemperatureValueFromPoint(x: number, y: number) {
   return Math.round(((Math.PI - clampedAngle) / Math.PI) * 100);
 }
 
+function isPointNearTemperatureArc(x: number, y: number, tolerance = 28) {
+  if (y > temperatureArc.centerY + tolerance * 0.35) {
+    return false;
+  }
+
+  const distanceFromCenter = Math.hypot(
+    x - temperatureArc.centerX,
+    y - temperatureArc.centerY,
+  );
+
+  return Math.abs(distanceFromCenter - temperatureArc.radius) <= tolerance;
+}
+
 function resolveCapsuleOptionMode(
   value: string,
   options: CoffeeCapsuleOption[],
@@ -403,6 +416,22 @@ export default function CoffeeMachineSettingsPanel({
       return;
     }
 
+    const shell = temperatureArcShellRef.current;
+
+    if (!shell) {
+      return;
+    }
+
+    const rect = shell.getBoundingClientRect();
+    const normalizedX =
+      ((event.clientX - rect.left) / rect.width) * temperatureArc.width;
+    const normalizedY =
+      ((event.clientY - rect.top) / rect.height) * temperatureArc.shellHeight;
+
+    if (!isPointNearTemperatureArc(normalizedX, normalizedY)) {
+      return;
+    }
+
     activeTemperaturePointerIdRef.current = event.pointerId;
     event.currentTarget.setPointerCapture(event.pointerId);
     updateTemperatureDraftFromClientPoint(event.clientX, event.clientY);
@@ -412,6 +441,22 @@ export default function CoffeeMachineSettingsPanel({
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
     if (activeTemperaturePointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    const shell = temperatureArcShellRef.current;
+
+    if (!shell) {
+      return;
+    }
+
+    const rect = shell.getBoundingClientRect();
+    const normalizedX =
+      ((event.clientX - rect.left) / rect.width) * temperatureArc.width;
+    const normalizedY =
+      ((event.clientY - rect.top) / rect.height) * temperatureArc.shellHeight;
+
+    if (!isPointNearTemperatureArc(normalizedX, normalizedY, 36)) {
       return;
     }
 
