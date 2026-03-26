@@ -7,9 +7,15 @@ import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
 
 interface RecommendTabSectionProps {
   recommendedMoodCustoms: RecommendedMoodCustomRecord[];
-  savedMoodIds: string[];
+  mySharedMoodIdSet: ReadonlySet<string>;
+  savedMoodIdSet: ReadonlySet<string>;
+  openedMenuMoodId: string | null;
   savingMoodId: string | null;
+  sharingMoodId: string | null;
+  onMoodMenuToggle: (moodId: string) => void;
   onSaveMood: (moodId: string) => void;
+  onUnsaveMood: (moodId: string) => void;
+  onShareCancelMood: (moodId: string) => void;
 }
 
 function BookmarkIcon({ filled = false }: { filled?: boolean }) {
@@ -27,35 +33,86 @@ function BookmarkIcon({ filled = false }: { filled?: boolean }) {
   );
 }
 
+function MoreIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="5.5" r="1.8" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+      <circle cx="12" cy="18.5" r="1.8" fill="currentColor" />
+    </svg>
+  );
+}
+
 export default function RecommendTabSection({
   recommendedMoodCustoms,
-  savedMoodIds,
+  mySharedMoodIdSet,
+  savedMoodIdSet,
+  openedMenuMoodId,
   savingMoodId,
+  sharingMoodId,
+  onMoodMenuToggle,
   onSaveMood,
+  onUnsaveMood,
+  onShareCancelMood,
 }: RecommendTabSectionProps) {
   return (
     <main className="smart-routine-body smart-routine-body-filled smart-routine-recommend-body">
       <section className="saved-mood-card-list recommend-card-list">
         {recommendedMoodCustoms.map((moodCustom) => {
-          const isSaved = savedMoodIds.includes(moodCustom.mood_id);
-          const isSaving = savingMoodId === moodCustom.mood_id;
+          const moodId = moodCustom.mood_id;
+          const isMySharedMood = mySharedMoodIdSet.has(moodId);
+          const isSaved = savedMoodIdSet.has(moodId);
+          const isSaving = savingMoodId === moodId;
+          const isSharing = sharingMoodId === moodId;
 
           return (
             <MoodRoutineCard
-              key={moodCustom.mood_id}
+              key={moodId}
               title={moodCustom.mood_name}
               items={toRecommendedMoodItems(moodCustom)}
               theme={getColorsetTheme(moodCustom.colorset_id)}
               actionSlot={
-                <button
-                  type="button"
-                  className={`saved-mood-bookmark-button ${isSaved ? "active" : ""}`}
-                  aria-label="무드 커스텀 저장"
-                  disabled={isSaving || isSaved}
-                  onClick={() => onSaveMood(moodCustom.mood_id)}
-                >
-                  <BookmarkIcon filled={isSaved} />
-                </button>
+                isMySharedMood ? (
+                  <div className="saved-mood-header-actions">
+                    <span className="saved-mood-my-chip">MY</span>
+                    <div className="saved-mood-action-shell">
+                      <button
+                        type="button"
+                        className="saved-mood-action-button"
+                        aria-label="내 공유 무드 옵션 열기"
+                        disabled={isSharing}
+                        onClick={() => onMoodMenuToggle(moodId)}
+                      >
+                        <MoreIcon />
+                      </button>
+
+                      {openedMenuMoodId === moodId ? (
+                        <div className="mood-card-menu">
+                          <button
+                            type="button"
+                            className="mood-card-menu-button"
+                            disabled={isSharing}
+                            onClick={() => onShareCancelMood(moodId)}
+                          >
+                            공유 취소
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`saved-mood-bookmark-button ${isSaved ? "active" : ""}`}
+                    aria-label={isSaved ? "무드 커스텀 저장 취소" : "무드 커스텀 저장"}
+                    disabled={isSaving}
+                    onClick={() =>
+                      isSaved ? onUnsaveMood(moodId) : onSaveMood(moodId)
+                    }
+                  >
+                    <BookmarkIcon filled={isSaved} />
+                  </button>
+                )
               }
             />
           );

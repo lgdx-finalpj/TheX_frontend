@@ -1,8 +1,10 @@
 import {
+  deleteMoodCustom,
   executeMoodCustom,
   fetchSharedMoodCustomList,
   saveMoodCustom,
   shareMoodCustom,
+  unsaveMoodCustom,
   type MoodCustomListResponseDTO,
 } from "@/api/moodCustomApi";
 import { getApiErrorMessage } from "@/api/httpClient";
@@ -119,17 +121,23 @@ export default function SmartRoutineMainPage() {
     savedMoodCustomsError,
     refreshSavedMoodCustoms,
   } = useMoodCustomDraft();
+
   const [activeTab, setActiveTab] = useState<"mine" | "recommend">("mine");
   const [openedMenuMoodId, setOpenedMenuMoodId] = useState<string | null>(null);
-  const [bookmarkedMoodIds, setBookmarkedMoodIds] = useState<string[]>([]);
+  const [ownedMoodIds, setOwnedMoodIds] = useState<string[]>([]);
+  const [savedRecommendedMoodIds, setSavedRecommendedMoodIds] = useState<string[]>(
+    [],
+  );
   const [runningMoodCustom, setRunningMoodCustom] = useState<SavedMoodCustom | null>(
     null,
   );
   const [isSharingMoodId, setIsSharingMoodId] = useState<string | null>(null);
   const [isSavingMoodId, setIsSavingMoodId] = useState<string | null>(null);
+  const [isDeletingMoodId, setIsDeletingMoodId] = useState<string | null>(null);
   const [isExecutingMoodId, setIsExecutingMoodId] = useState<string | null>(null);
   const [shareMoodError, setShareMoodError] = useState<string | null>(null);
   const [saveMoodError, setSaveMoodError] = useState<string | null>(null);
+  const [deleteMoodError, setDeleteMoodError] = useState<string | null>(null);
   const [executeMoodError, setExecuteMoodError] = useState<string | null>(null);
   const [recommendedMoodCustoms, setRecommendedMoodCustoms] = useState<
     RecommendedMoodCustomRecord[]
@@ -147,11 +155,14 @@ export default function SmartRoutineMainPage() {
 
     try {
       const response = await fetchSharedMoodCustomList();
-      setRecommendedMoodCustoms(response.map(mapSharedMoodItemToRecommended));
+      const mappedMoodCustoms = response.map(mapSharedMoodItemToRecommended);
+      setRecommendedMoodCustoms(mappedMoodCustoms);
+      return mappedMoodCustoms;
     } catch (error) {
       setRecommendedMoodCustomsError(
         getApiErrorMessage(error, "Failed to load recommended mood customs."),
       );
+      return [];
     } finally {
       setIsRecommendedMoodCustomsLoading(false);
     }
@@ -162,7 +173,10 @@ export default function SmartRoutineMainPage() {
   }, [refreshSharedMoodCustoms]);
 
   useEffect(() => {
-    const state = location.state as { activeTab?: "mine" | "recommend"; prioritizedMoodId?: string } | null;
+    const state = location.state as {
+      activeTab?: "mine" | "recommend";
+      prioritizedMoodId?: string;
+    } | null;
 
     if (!state) {
       return;
@@ -174,25 +188,86 @@ export default function SmartRoutineMainPage() {
 
     if (typeof state.prioritizedMoodId === "string" && state.prioritizedMoodId) {
       setPrioritizedMoodId(state.prioritizedMoodId);
+      if (state.activeTab !== "recommend") {
+        setOwnedMoodIds((current) =>
+          current.includes(state.prioritizedMoodId as string)
+            ? current
+            : [state.prioritizedMoodId as string, ...current],
+        );
+      }
     }
 
     navigate(location.pathname, { replace: true, state: null });
   }, [location.pathname, location.state, navigate]);
+
+  useEffect(() => {
+    if (ownedMoodIds.length > 0 || savedMoodCustoms.length === 0) {
+      return;
+    }
+
+    setOwnedMoodIds(savedMoodCustoms.map((moodCustom) => moodCustom.mood_id));
+  }, [ownedMoodIds.length, savedMoodCustoms]);
 
   const sortedSavedMoodCustoms = useMemo(
     () => prioritizeMoodById(savedMoodCustoms, prioritizedMoodId),
     [prioritizedMoodId, savedMoodCustoms],
   );
 
-  const savedMoodIdSet = useMemo(
-    () => new Set(sortedSavedMoodCustoms.map((moodCustom) => moodCustom.mood_id)),
-    [sortedSavedMoodCustoms],
+  const sortedRecommendedMoodCustoms = useMemo(
+    () => prioritizeMoodById(recommendedMoodCustoms, prioritizedMoodId),
+    [prioritizedMoodId, recommendedMoodCustoms],
   );
 
-  const bookmarkedRecommendedMoodCustoms = recommendedMoodCustoms.filter(
-    (moodCustom) =>
-      bookmarkedMoodIds.includes(moodCustom.mood_id) &&
-      !savedMoodIdSet.has(moodCustom.mood_id),
+  const savedMoodIdSet = useMemo(
+    () => new Set(savedMoodCustoms.map((moodCustom) => moodCustom.mood_id)),
+    [savedMoodCustoms],
+  );
+
+  const ownedMoodIdSet = useMemo(() => new Set(ownedMoodIds), [ownedMoodIds]);
+
+  const ownedSavedMoodCustoms = useMemo(
+    () =>
+      sortedSavedMoodCustoms.filter((moodCustom) =>
+        ownedMoodIdSet.has(moodCustom.mood_id),
+      ),
+    [ownedMoodIdSet, sortedSavedMoodCustoms],
+  );
+
+  const externalSavedMoodCustoms = useMemo(
+    () =>
+      sortedSavedMoodCustoms.filter(
+        (moodCustom) => !ownedMoodIdSet.has(moodCustom.mood_id),
+      ),
+    [ownedMoodIdSet, sortedSavedMoodCustoms],
+  );
+
+  const mySharedMoodIdSet = useMemo(
+    () =>
+      new Set(
+        sortedRecommendedMoodCustoms
+          .filter((moodCustom) => ownedMoodIdSet.has(moodCustom.mood_id))
+          .map((moodCustom) => moodCustom.mood_id),
+      ),
+    [ownedMoodIdSet, sortedRecommendedMoodCustoms],
+  );
+
+  const serverSavedRecommendedMoodIdSet = useMemo(
+    () =>
+      new Set(
+        sortedRecommendedMoodCustoms
+          .filter(
+            (moodCustom) =>
+              savedMoodIdSet.has(moodCustom.mood_id) &&
+              !ownedMoodIdSet.has(moodCustom.mood_id),
+          )
+          .map((moodCustom) => moodCustom.mood_id),
+      ),
+    [ownedMoodIdSet, savedMoodIdSet, sortedRecommendedMoodCustoms],
+  );
+
+  const savedRecommendedMoodIdSet = useMemo(
+    () => new Set([...savedRecommendedMoodIds, ...serverSavedRecommendedMoodIdSet]),
+    [savedRecommendedMoodIds, serverSavedRecommendedMoodIdSet],
   );
 
   const runningMoodItems = runningMoodCustom
@@ -222,8 +297,17 @@ export default function SmartRoutineMainPage() {
     try {
       await shareMoodCustom(numericMoodId);
       await refreshSavedMoodCustoms();
-      await refreshSharedMoodCustoms();
-      setPrioritizedMoodId(moodId);
+      const nextRecommendedMoodCustoms = await refreshSharedMoodCustoms();
+      const isShared = nextRecommendedMoodCustoms.some(
+        (moodCustom) => moodCustom.mood_id === moodId,
+      );
+
+      if (isShared) {
+        setPrioritizedMoodId(moodId);
+        setActiveTab("recommend");
+      } else if (prioritizedMoodId === moodId) {
+        setPrioritizedMoodId(null);
+      }
     } catch (error) {
       setShareMoodError(getApiErrorMessage(error, "Failed to share mood custom."));
     } finally {
@@ -286,9 +370,7 @@ export default function SmartRoutineMainPage() {
       await saveMoodCustom(numericMoodId);
       await refreshSavedMoodCustoms();
       await refreshSharedMoodCustoms();
-      setPrioritizedMoodId(moodId);
-      setActiveTab("mine");
-      setBookmarkedMoodIds((current) =>
+      setSavedRecommendedMoodIds((current) =>
         current.includes(moodId) ? current : [moodId, ...current],
       );
     } catch (error) {
@@ -298,12 +380,74 @@ export default function SmartRoutineMainPage() {
     }
   };
 
-  const handleBookmarkToggle = (moodId: string) => {
-    setBookmarkedMoodIds((current) =>
-      current.includes(moodId)
-        ? current.filter((id) => id !== moodId)
-        : [...current, moodId],
-    );
+  const handleUnsaveMood = async (moodId: string) => {
+    if (isSavingMoodId) {
+      return;
+    }
+
+    const numericMoodId = Number(moodId);
+    if (!Number.isFinite(numericMoodId)) {
+      setSaveMoodError("Invalid mood id for unsave.");
+      return;
+    }
+
+    setIsSavingMoodId(moodId);
+    setSaveMoodError(null);
+    setOpenedMenuMoodId(null);
+
+    try {
+      await unsaveMoodCustom(numericMoodId);
+      await refreshSavedMoodCustoms();
+      await refreshSharedMoodCustoms();
+      setSavedRecommendedMoodIds((current) =>
+        current.filter((currentMoodId) => currentMoodId !== moodId),
+      );
+    } catch (error) {
+      setSaveMoodError(getApiErrorMessage(error, "Failed to unsave mood custom."));
+    } finally {
+      setIsSavingMoodId(null);
+    }
+  };
+
+  const handleDeleteMood = async (moodId: string) => {
+    if (isDeletingMoodId) {
+      return;
+    }
+
+    const numericMoodId = Number(moodId);
+    if (!Number.isFinite(numericMoodId)) {
+      setDeleteMoodError("Invalid mood id for delete.");
+      setOpenedMenuMoodId(null);
+      return;
+    }
+
+    setIsDeletingMoodId(moodId);
+    setDeleteMoodError(null);
+
+    try {
+      await deleteMoodCustom(numericMoodId);
+      await refreshSavedMoodCustoms();
+      await refreshSharedMoodCustoms();
+      setOwnedMoodIds((current) =>
+        current.filter((currentMoodId) => currentMoodId !== moodId),
+      );
+      setSavedRecommendedMoodIds((current) =>
+        current.filter((currentMoodId) => currentMoodId !== moodId),
+      );
+
+      if (runningMoodCustom?.mood_id === moodId) {
+        setRunningMoodCustom(null);
+      }
+
+      if (prioritizedMoodId === moodId) {
+        setPrioritizedMoodId(null);
+      }
+    } catch (error) {
+      setDeleteMoodError(getApiErrorMessage(error, "Failed to delete mood custom."));
+    } finally {
+      setIsDeletingMoodId(null);
+      setOpenedMenuMoodId(null);
+    }
   };
 
   const handleMoodMenuToggle = (moodId: string) => {
@@ -326,7 +470,9 @@ export default function SmartRoutineMainPage() {
           </button>
           <button
             type="button"
-            className={`smart-routine-tab ${activeTab === "recommend" ? "active" : ""}`}
+            className={`smart-routine-tab ${
+              activeTab === "recommend" ? "active" : ""
+            }`}
             aria-current={activeTab === "recommend" ? "page" : undefined}
             onClick={() => handleTabChange("recommend")}
           >
@@ -336,28 +482,43 @@ export default function SmartRoutineMainPage() {
 
         {activeTab === "mine" ? (
           <MineTabSection
-            savedMoodCustoms={sortedSavedMoodCustoms}
-            bookmarkedRecommendedMoodCustoms={bookmarkedRecommendedMoodCustoms}
-            bookmarkedMoodIds={bookmarkedMoodIds}
+            ownedMoodCustoms={ownedSavedMoodCustoms}
+            savedMoodCustoms={externalSavedMoodCustoms}
+            sharedMoodIdSet={mySharedMoodIdSet}
             openedMenuMoodId={openedMenuMoodId}
             runningMoodCustomId={runningMoodCustom?.mood_id ?? null}
+            sharingMoodId={isSharingMoodId}
+            deletingMoodId={isDeletingMoodId}
+            executingMoodId={isExecutingMoodId}
             onMoodMenuToggle={handleMoodMenuToggle}
             onShareMood={(moodId) => {
               void handleShareMood(moodId);
             }}
+            onDeleteMood={(moodId) => {
+              void handleDeleteMood(moodId);
+            }}
             onExecuteMood={(moodId) => {
               void handleExecuteMood(moodId);
             }}
-            onBookmarkToggle={handleBookmarkToggle}
             onCreateMoodCustom={() => navigate("/smartroutine/create")}
           />
         ) : (
           <RecommendTabSection
-            recommendedMoodCustoms={recommendedMoodCustoms}
-            savedMoodIds={Array.from(savedMoodIdSet)}
+            recommendedMoodCustoms={sortedRecommendedMoodCustoms}
+            mySharedMoodIdSet={mySharedMoodIdSet}
+            savedMoodIdSet={savedRecommendedMoodIdSet}
+            openedMenuMoodId={openedMenuMoodId}
             savingMoodId={isSavingMoodId}
+            sharingMoodId={isSharingMoodId}
+            onMoodMenuToggle={handleMoodMenuToggle}
             onSaveMood={(moodId) => {
               void handleSaveMood(moodId);
+            }}
+            onUnsaveMood={(moodId) => {
+              void handleUnsaveMood(moodId);
+            }}
+            onShareCancelMood={(moodId) => {
+              void handleShareMood(moodId);
             }}
           />
         )}
@@ -369,15 +530,14 @@ export default function SmartRoutineMainPage() {
           />
         ) : null}
         {isSavedMoodCustomsLoading ? <p>Loading your moods...</p> : null}
-        {savedMoodCustomsError ? (
-          <p role="alert">{savedMoodCustomsError}</p>
-        ) : null}
+        {savedMoodCustomsError ? <p role="alert">{savedMoodCustomsError}</p> : null}
         {isRecommendedMoodCustomsLoading ? <p>Loading recommended moods...</p> : null}
         {recommendedMoodCustomsError ? (
           <p role="alert">{recommendedMoodCustomsError}</p>
         ) : null}
         {shareMoodError ? <p role="alert">{shareMoodError}</p> : null}
         {saveMoodError ? <p role="alert">{saveMoodError}</p> : null}
+        {deleteMoodError ? <p role="alert">{deleteMoodError}</p> : null}
         {executeMoodError ? <p role="alert">{executeMoodError}</p> : null}
       </div>
     </MobileLayout>

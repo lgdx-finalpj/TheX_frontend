@@ -164,6 +164,12 @@
   color: #ffffff;
 }
 
+.saved-mood-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .saved-mood-badge {
   min-width: 50px;
   padding: 6px;

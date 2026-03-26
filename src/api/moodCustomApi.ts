@@ -216,6 +216,18 @@ export async function saveMoodCustom(moodId: number) {
   return extractNumericId(data, "moodId");
 }
 
+export async function unsaveMoodCustom(moodId: number) {
+  const { data } = await httpClient.delete<NumericMapResponse>(
+    `/mood/${moodId}/save`,
+  );
+  return extractNumericId(data, "moodId");
+}
+
+export async function deleteMoodCustom(moodId: number) {
+  const { data } = await httpClient.delete<NumericMapResponse>(`/mood/${moodId}`);
+  return extractNumericId(data, "moodId");
+}
+
 export async function executeMoodCustom(moodId: number) {
   const { data } = await httpClient.post<void>(`/mood/select/${moodId}`);
   return data;

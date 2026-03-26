@@ -1,23 +1,24 @@
 import createRoutineImage from "@/assets/moodcustom/나만의 루틴 만들기.png";
+import type { SavedMoodCustom } from "@/state/moodCustom.types";
 import MoodRoutineCard from "@/components/smartRoutine/MoodRoutineCard";
 import {
   getColorsetTheme,
-  toRecommendedMoodItems,
   toSavedMoodItems,
 } from "@/pages/smartRoutineMainPage.utils";
-import type { RecommendedMoodCustomRecord } from "@/types/smartRoutine";
-import type { SavedMoodCustom } from "@/state/moodCustom.types";
 
 interface MineTabSectionProps {
+  ownedMoodCustoms: SavedMoodCustom[];
   savedMoodCustoms: SavedMoodCustom[];
-  bookmarkedRecommendedMoodCustoms: RecommendedMoodCustomRecord[];
-  bookmarkedMoodIds: string[];
+  sharedMoodIdSet: ReadonlySet<string>;
   openedMenuMoodId: string | null;
   runningMoodCustomId: string | null;
+  sharingMoodId: string | null;
+  deletingMoodId: string | null;
+  executingMoodId: string | null;
   onMoodMenuToggle: (moodId: string) => void;
   onShareMood: (moodId: string) => void;
+  onDeleteMood: (moodId: string) => void;
   onExecuteMood: (moodId: string) => void;
-  onBookmarkToggle: (moodId: string) => void;
   onCreateMoodCustom: () => void;
 }
 
@@ -46,35 +47,23 @@ function MoreIcon() {
   );
 }
 
-function BookmarkIcon({ filled = false }: { filled?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M8 4.75H16C16.69 4.75 17.25 5.31 17.25 6V19L12 15.9L6.75 19V6C6.75 5.31 7.31 4.75 8 4.75Z"
-        fill={filled ? "currentColor" : "none"}
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.9"
-      />
-    </svg>
-  );
-}
-
 export default function MineTabSection({
+  ownedMoodCustoms,
   savedMoodCustoms,
-  bookmarkedRecommendedMoodCustoms,
-  bookmarkedMoodIds,
+  sharedMoodIdSet,
   openedMenuMoodId,
   runningMoodCustomId,
+  sharingMoodId,
+  deletingMoodId,
+  executingMoodId,
   onMoodMenuToggle,
   onShareMood,
+  onDeleteMood,
   onExecuteMood,
-  onBookmarkToggle,
   onCreateMoodCustom,
 }: MineTabSectionProps) {
   const hasMineCards =
-    savedMoodCustoms.length > 0 || bookmarkedRecommendedMoodCustoms.length > 0;
+    ownedMoodCustoms.length > 0 || savedMoodCustoms.length > 0;
 
   return (
     <main
@@ -82,71 +71,100 @@ export default function MineTabSection({
     >
       {hasMineCards ? (
         <section className="saved-mood-card-list">
-          {savedMoodCustoms.map((moodCustom) => (
-            <MoodRoutineCard
-              key={moodCustom.mood_id}
-              title={moodCustom.mood_name}
-              items={toSavedMoodItems(moodCustom)}
-              theme={getColorsetTheme(moodCustom.colorset_main)}
-              isExecuting={runningMoodCustomId === moodCustom.mood_id}
-              actionSlot={
-                <div className="saved-mood-action-shell">
-                  <button
-                    type="button"
-                    className="saved-mood-action-button"
-                    aria-label="무드 커스텀 옵션 열기"
-                    onClick={() => onMoodMenuToggle(moodCustom.mood_id)}
-                  >
-                    <MoreIcon />
-                  </button>
-
-                  {openedMenuMoodId === moodCustom.mood_id ? (
-                    <div className="mood-card-menu">
-                      <button type="button" className="mood-card-menu-button">
-                        무드 커스텀 수정
-                      </button>
-                      <button type="button" className="mood-card-menu-button">
-                        무드 커스텀 삭제
-                      </button>
-                      <button
-                        type="button"
-                        className="mood-card-menu-button"
-                        onClick={() => onShareMood(moodCustom.mood_id)}
-                      >
-                        무드 커스텀 공유
-                      </button>
-                      <button
-                        type="button"
-                        className="mood-card-menu-button"
-                        onClick={() => onExecuteMood(moodCustom.mood_id)}
-                      >
-                        무드 커스텀 실행
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              }
-            />
-          ))}
-
-          {bookmarkedRecommendedMoodCustoms.map((moodCustom) => {
-            const isBookmarked = bookmarkedMoodIds.includes(moodCustom.mood_id);
+          {ownedMoodCustoms.map((moodCustom) => {
+            const moodId = moodCustom.mood_id;
+            const isShared = sharedMoodIdSet.has(moodId);
+            const isPending =
+              sharingMoodId === moodId ||
+              deletingMoodId === moodId ||
+              executingMoodId === moodId;
 
             return (
               <MoodRoutineCard
-                key={moodCustom.mood_id}
+                key={moodId}
                 title={moodCustom.mood_name}
-                items={toRecommendedMoodItems(moodCustom)}
-                theme={getColorsetTheme(moodCustom.colorset_id)}
+                items={toSavedMoodItems(moodCustom)}
+                theme={getColorsetTheme(moodCustom.colorset_main)}
+                isExecuting={runningMoodCustomId === moodId}
                 actionSlot={
-                  <button
-                    type="button"
-                    className={`saved-mood-bookmark-button ${isBookmarked ? "active" : ""}`}
-                    aria-label="북마크 추가"
-                    onClick={() => onBookmarkToggle(moodCustom.mood_id)}
-                  >
-                    <BookmarkIcon filled={isBookmarked} />
-                  </button>
+                  <div className="saved-mood-action-shell">
+                    <button
+                      type="button"
+                      className="saved-mood-action-button"
+                      aria-label="무드 커스텀 옵션 열기"
+                      disabled={isPending}
+                      onClick={() => onMoodMenuToggle(moodId)}
+                    >
+                      <MoreIcon />
+                    </button>
+
+                    {openedMenuMoodId === moodId ? (
+                      <div className="mood-card-menu">
+                        <button
+                          type="button"
+                          className="mood-card-menu-button"
+                          disabled={deletingMoodId === moodId}
+                          onClick={() => onDeleteMood(moodId)}
+                        >
+                          무드 커스텀 삭제
+                        </button>
+                        <button
+                          type="button"
+                          className="mood-card-menu-button"
+                          disabled={sharingMoodId === moodId}
+                          onClick={() => onShareMood(moodId)}
+                        >
+                          {isShared ? "공유 취소" : "무드 커스텀 공유"}
+                        </button>
+                        <button
+                          type="button"
+                          className="mood-card-menu-button"
+                          disabled={executingMoodId === moodId}
+                          onClick={() => onExecuteMood(moodId)}
+                        >
+                          무드 커스텀 실행
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                }
+              />
+            );
+          })}
+
+          {savedMoodCustoms.map((moodCustom) => {
+            const moodId = moodCustom.mood_id;
+            return (
+              <MoodRoutineCard
+                key={moodId}
+                title={moodCustom.mood_name}
+                items={toSavedMoodItems(moodCustom)}
+                theme={getColorsetTheme(moodCustom.colorset_main)}
+                actionSlot={
+                  <div className="saved-mood-action-shell">
+                    <button
+                      type="button"
+                      className="saved-mood-action-button"
+                      aria-label="저장한 무드 커스텀 옵션 열기"
+                      disabled={executingMoodId === moodId}
+                      onClick={() => onMoodMenuToggle(moodId)}
+                    >
+                      <MoreIcon />
+                    </button>
+
+                    {openedMenuMoodId === moodId ? (
+                      <div className="mood-card-menu">
+                        <button
+                          type="button"
+                          className="mood-card-menu-button"
+                          disabled={executingMoodId === moodId}
+                          onClick={() => onExecuteMood(moodId)}
+                        >
+                          무드 커스텀 실행
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 }
               />
             );
@@ -162,7 +180,11 @@ export default function MineTabSection({
 
           <div className="smart-routine-copy">
             <h2>루틴을 만들어보세요.</h2>
-            <p>내가 원하는 여러 제품들을 한 번에 연동해서 실행할 수 있어요.</p>
+            <p>
+              기기와 연결된 제품을 한 번에 실행할 수 있는
+              {"\n"}
+              나만의 무드 커스텀을 추가해보세요.
+            </p>
           </div>
 
           <button type="button" className="smart-routine-link">
