@@ -6,6 +6,7 @@ const MY_RECIPE_STORE_KEY_PREFIX = "my-recipe-store";
 
 export interface StoredMyRecipeRecord {
   recipeId: number;
+  ownedRecipeId?: number;
   isCoffee: boolean;
   recipeCategory: RecipeCategory;
   recipeName: string;
@@ -71,4 +72,22 @@ export function getStoredMyRecipe(
   return readStoredRecipes().find(
     (record) => record.recipeId === recipeId && record.isCoffee === isCoffee,
   );
+}
+
+export function getStoredMyRecipeByOwnedRecipeId(
+  ownedRecipeId: number,
+  isCoffee: boolean,
+) {
+  return readStoredRecipes().find(
+    (record) => record.ownedRecipeId === ownedRecipeId && record.isCoffee === isCoffee,
+  );
+}
+
+export function removeStoredMyRecipe(recipeId: number, isCoffee: boolean) {
+  const targetIdentity = getRecipeIdentity(recipeId, isCoffee);
+  const remaining = readStoredRecipes().filter(
+    (record) => getRecipeIdentity(record.recipeId, record.isCoffee) !== targetIdentity,
+  );
+
+  writeStoredRecipes(remaining);
 }

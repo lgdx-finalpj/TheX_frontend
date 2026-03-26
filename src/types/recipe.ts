@@ -21,6 +21,7 @@ export type RecipeType = "COFFEE" | "NONE_COFFEE";
 
 export interface RecipeItem {
   recipe_id: number;
+  owned_recipe_id?: number;
   recipe_name: string;
   save_count: number;
   recipe_type: RecipeType;

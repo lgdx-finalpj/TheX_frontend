@@ -13,7 +13,9 @@ import type {
 } from "@/types/recipe";
 import {
   getStoredMyRecipe,
+  getStoredMyRecipeByOwnedRecipeId,
   listStoredMyRecipes,
+  removeStoredMyRecipe,
   type StoredMyRecipeRecord,
   upsertStoredMyRecipe,
 } from "@/utils/myRecipeStore";
@@ -45,6 +47,7 @@ interface CoffeePopularRecipeListItemResponse {
 
 interface MyRecipeListResponseItem {
   recipeId: number;
+  ownedRecipeId?: number;
   isCoffee: boolean;
   recipeName: string;
   recipeCategory?: RecipeCategory;
@@ -230,6 +233,7 @@ function mapStoredRecipeToMyRecipeListItem(
 ): MyRecipeListResponseItem {
   return {
     recipeId: item.recipeId,
+    ownedRecipeId: item.ownedRecipeId,
     isCoffee: item.isCoffee,
     recipeName: item.recipeName,
     recipeCategory: item.recipeCategory,
@@ -257,6 +261,7 @@ function mergeMyRecipeList(
 
     mergedByIdentity.set(identity, {
       ...item,
+      ownedRecipeId: item.ownedRecipeId ?? storedItem?.ownedRecipeId,
       recipeCategory: item.recipeCategory ?? storedItem?.recipeCategory,
       isShared: item.isShared ?? storedItem?.isShared,
       recipeName: item.recipeName || storedItem?.recipeName || "",
@@ -330,6 +335,8 @@ export async function fetchMyRecipesWithDetails() {
 
         return {
           ...mappedRecipe,
+          recipe_id: recipe.recipeId,
+          owned_recipe_id: recipe.ownedRecipeId,
           recipe_name: mappedRecipe.recipe_name || recipe.recipeName,
           recipe_category:
             mappedRecipe.recipe_category ??
@@ -342,6 +349,7 @@ export async function fetchMyRecipesWithDetails() {
       .catch(
         (): RecipeItem => ({
           recipe_id: recipe.recipeId,
+          owned_recipe_id: recipe.ownedRecipeId,
           recipe_name: recipe.recipeName,
           save_count: 0,
           recipe_type: recipe.isCoffee
@@ -370,11 +378,30 @@ export async function saveRecipeApi(input: CoffeeRecipeSaveRequest) {
   );
   upsertStoredMyRecipe({
     recipeId: input.recipeId,
+    ownedRecipeId:
+      response.data.userRecipeId !== input.recipeId ? response.data.userRecipeId : undefined,
     isCoffee: input.recipeCategory === "COFFEE",
     recipeCategory: input.recipeCategory,
     recipeName: input.recipeName ?? "",
     isShared: existingRecord?.isShared ?? false,
   });
+  return response.data;
+}
+
+export async function unsaveRecipeApi(
+  recipeId: number,
+  recipeCategory: RecipeCategory,
+) {
+  const response = await apiClient.delete<CoffeeRecipeSaveResponse>(
+    "/coffee/recipes/save",
+    {
+      params: {
+        recipeId,
+        recipeCategory,
+      },
+    },
+  );
+  removeStoredMyRecipe(recipeId, recipeCategory === "COFFEE");
   return response.data;
 }
 
@@ -394,6 +421,62 @@ export async function toggleRecipeShareApi(
     recipeCategory,
     recipeName,
     isShared: response.data.isShared,
+  });
+  return response.data;
+}
+
+export async function deleteOwnRecipeApi(
+  recipeId: number,
+  recipeCategory: RecipeCategory,
+) {
+  await apiClient.delete<void>(`/coffee/recipes/${recipeId}`, {
+    params: { recipeCategory },
+  });
+  removeStoredMyRecipe(recipeId, recipeCategory === "COFFEE");
+}
+
+export async function updateCoffeeRecipeApi(
+  recipeId: number,
+  input: CoffeeRecipeCustomizeCoffeeRequestDTO,
+) {
+  const response = await apiClient.patch<CoffeeRecipeCustomizeResponse>(
+    `/coffee/recipes/${recipeId}/customize/coffee`,
+    input,
+  );
+  const existingRecord =
+    getStoredMyRecipe(recipeId, true) ?? getStoredMyRecipeByOwnedRecipeId(recipeId, true);
+  upsertStoredMyRecipe({
+    recipeId: existingRecord?.recipeId ?? recipeId,
+    ownedRecipeId:
+      existingRecord?.ownedRecipeId ??
+      (response.data.recipeId !== recipeId ? response.data.recipeId : undefined),
+    isCoffee: true,
+    recipeCategory: input.recipeCategory,
+    recipeName: input.recipeName,
+    isShared: existingRecord?.isShared ?? response.data.isShared,
+  });
+  return response.data;
+}
+
+export async function updateNoneCoffeeRecipeApi(
+  recipeId: number,
+  input: NoneCoffeeCreateRequest,
+) {
+  const response = await apiClient.patch<CoffeeRecipeCustomizeResponse>(
+    `/coffee/recipes/${recipeId}/customize/none-coffee`,
+    input,
+  );
+  const existingRecord =
+    getStoredMyRecipe(recipeId, false) ?? getStoredMyRecipeByOwnedRecipeId(recipeId, false);
+  upsertStoredMyRecipe({
+    recipeId: existingRecord?.recipeId ?? recipeId,
+    ownedRecipeId:
+      existingRecord?.ownedRecipeId ??
+      (response.data.recipeId !== recipeId ? response.data.recipeId : undefined),
+    isCoffee: false,
+    recipeCategory: input.recipeCategory,
+    recipeName: input.recipeName,
+    isShared: existingRecord?.isShared ?? response.data.isShared,
   });
   return response.data;
 }

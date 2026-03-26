@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import RecipeDetailContent from "@/components/recipe-detail/RecipeDetailContent";
 import MobileLayout from "@/layouts/MobileLayout";
 import {
@@ -14,6 +14,7 @@ import { MY_RECIPE_ROUTE } from "@/routes/paths";
 
 export default function MyRecipeDetailPage() {
   const { recipeId } = useParams();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [recipe, setRecipe] = useState<RecipeItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,35 +34,89 @@ export default function MyRecipeDetailPage() {
       return;
     }
 
+    const previewRecipe =
+      location.state &&
+      typeof location.state === "object" &&
+      "recipePreview" in location.state
+        ? ((location.state as { recipePreview?: RecipeItem }).recipePreview ?? null)
+        : null;
+
+    if (
+      previewRecipe &&
+      (previewRecipe.recipe_id === recipeIdNumber ||
+        previewRecipe.owned_recipe_id === recipeIdNumber)
+    ) {
+      setRecipe(previewRecipe);
+      setErrorMessage(null);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchDetail = async () => {
       setIsLoading(true);
       setErrorMessage(null);
 
       try {
         let isCoffee = searchParams.get("isCoffee");
+        let candidateRecipeIds = [recipeIdNumber];
+        const myRecipes = await fetchMyRecipeList();
+        const matchedRecipe = myRecipes.find(
+          (item) =>
+            item.recipeId === recipeIdNumber ||
+            item.ownedRecipeId === recipeIdNumber,
+        );
 
-        if (!isCoffee) {
-          const myRecipes = await fetchMyRecipeList();
-          const matchedRecipe = myRecipes.find((item) => item.recipeId === recipeIdNumber);
-
-          if (!matchedRecipe) {
-            throw new Error("레시피 종류를 확인할 수 없습니다.");
+        if (matchedRecipe) {
+          if (!isCoffee) {
+            isCoffee = matchedRecipe.isCoffee ? "true" : "false";
           }
 
-          isCoffee = matchedRecipe.isCoffee ? "true" : "false";
+          candidateRecipeIds = Array.from(
+            new Set(
+              [
+                recipeIdNumber,
+                matchedRecipe.ownedRecipeId,
+                matchedRecipe.recipeId,
+              ].filter((value): value is number => typeof value === "number"),
+            ),
+          );
+        } else if (!isCoffee) {
+          throw new Error("레시피 종류를 확인할 수 없습니다.");
         }
 
-        const detail = await fetchRecipeDetail(recipeIdNumber, isCoffee !== "false");
-        setRecipe(mapRecipeDetailForView(detail, isCoffee !== "false"));
+        let resolvedDetail = null;
+
+        for (const candidateRecipeId of candidateRecipeIds) {
+          try {
+            resolvedDetail = await fetchRecipeDetail(
+              candidateRecipeId,
+              isCoffee !== "false",
+            );
+            break;
+          } catch {
+            continue;
+          }
+        }
+
+        if (!resolvedDetail) {
+          throw new Error("레시피 상세를 불러오지 못했습니다.");
+        }
+
+        setRecipe(mapRecipeDetailForView(resolvedDetail, isCoffee !== "false"));
       } catch (error) {
-        setErrorMessage(mapApiErrorMessage(error, "레시피 상세를 불러오지 못했습니다."));
+        if (previewRecipe) {
+          setRecipe(previewRecipe);
+          setErrorMessage(null);
+        } else {
+          setErrorMessage(mapApiErrorMessage(error, "레시피 상세를 불러오지 못했습니다."));
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     void fetchDetail();
-  }, [recipeId, searchParams]);
+  }, [location.state, recipeId, searchParams]);
 
   if (isLoading) {
     return (
