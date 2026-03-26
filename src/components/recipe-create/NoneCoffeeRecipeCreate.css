@@ -97,7 +97,7 @@
 .recipe-create-page .recipe-create-form__inline-field {
   min-height: 44px;
   padding: 0 16px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.4px;
 }
@@ -107,7 +107,7 @@
   padding: 14px 16px;
   resize: none;
   border: 1.5px solid #e0ddd8;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.3;
   letter-spacing: -0.4px;
@@ -249,13 +249,13 @@
   .recipe-create-page .recipe-create-form__inline-field {
     min-height: 40px;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .recipe-create-page .recipe-create-form__card textarea {
     min-height: calc(3 * 1.3em + 24px);
     padding: 12px;
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .recipe-create-page .recipe-create-form__level-toggle {
