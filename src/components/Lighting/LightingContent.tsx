@@ -33,6 +33,7 @@ export default function LightingContent({ onBackClick, onSpeakerClick }: Lightin
   return (
     <MobileLayout>
       <main className="device-page secondary-device-page" {...swipeHandlers}>
+        <div className="device-top-section">
         <header className="device-topbar">
           <button
             className="icon-button icon-button--plain back-button"
@@ -64,6 +65,7 @@ export default function LightingContent({ onBackClick, onSpeakerClick }: Lightin
         </section>
 
         <h2 className="secondary-device-page__title">LG 조명 현재 상태</h2>
+        </div>
 
         <section className="status-grid secondary-device-status-grid" aria-label="조명 상태 정보">
           {lightingStatusCards.map((card) => (

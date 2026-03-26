@@ -13,6 +13,9 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
   const location = useLocation();
   const isBackground2Page =
     location.pathname.startsWith("/smartroutine") ||
+    location.pathname === "/devices/coffee-machine" ||
+    location.pathname === "/devices/speaker" ||
+    location.pathname === "/devices/lighting" ||
     location.pathname.startsWith("/devices/coffee-machine/view-") ||
     location.pathname.startsWith("/devices/coffee-machine/create-recipe") ||
     location.pathname.startsWith("/devices/coffee-machine/ai-recommended");

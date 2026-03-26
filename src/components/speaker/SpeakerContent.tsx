@@ -39,6 +39,7 @@ export default function SpeakerContent({
   return (
     <MobileLayout>
       <main className="device-page secondary-device-page" {...swipeHandlers}>
+        <div className="device-top-section">
         <header className="device-topbar">
           <button
             className="icon-button icon-button--plain back-button"
@@ -77,6 +78,7 @@ export default function SpeakerContent({
         </section>
 
         <h2 className="secondary-device-page__title">LG 스피커 현재 상태</h2>
+        </div>
 
         <section className="status-grid secondary-device-status-grid" aria-label="스피커 상태 정보">
           {speakerStatusCards.map((card) => (

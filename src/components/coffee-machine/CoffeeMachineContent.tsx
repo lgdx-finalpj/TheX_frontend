@@ -146,6 +146,7 @@ export default function CoffeeMachineContent({
   return (
     <MobileLayout>
       <main className="device-page coffee-machine-page" {...swipeHandlers}>
+        <div className="device-top-section">
         <header className="device-topbar">
           <button
             className="icon-button icon-button--plain back-button"
@@ -188,6 +189,7 @@ export default function CoffeeMachineContent({
 
           <h2 className="coffee-hero__title">듀오보 2.0 현재 상태</h2>
         </section>
+        </div>
 
         <section
           className="status-grid coffee-status-grid"
