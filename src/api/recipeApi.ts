@@ -189,6 +189,21 @@ export function mapApiErrorMessage(error: unknown, fallbackMessage: string) {
   return responseData?.msg ?? responseData?.detail ?? maybeError.message ?? fallbackMessage;
 }
 
+function isEmptyMyRecipeListError(error: unknown) {
+  if (typeof error !== "object" || !error) {
+    return false;
+  }
+
+  const maybeError = error as {
+    response?: { status?: number; data?: { code?: string } };
+  };
+
+  return (
+    maybeError.response?.status === 400 &&
+    maybeError.response?.data?.code === "4000_DATA_NOT_EXIST"
+  );
+}
+
 export async function fetchBasicRecipes() {
   const response = await apiClient.get<CoffeeRecipeListResponse>("/coffee/recipes/basic");
 
@@ -311,6 +326,10 @@ export async function fetchMyRecipeList() {
   } catch (error) {
     if (storedItems.length > 0) {
       return storedItems.map(mapStoredRecipeToMyRecipeListItem);
+    }
+
+    if (isEmptyMyRecipeListError(error)) {
+      return [];
     }
 
     throw error;

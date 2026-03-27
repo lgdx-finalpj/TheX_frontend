@@ -44,14 +44,7 @@ export default function PopularRecipePage() {
       ]);
 
       const sharedMyRecipes = myRecipes.filter((recipe) => recipe.is_shared);
-      const hiddenPopularRecipeIds = new Set(
-        sharedMyRecipes.map(getRecipeIdentityFromItem),
-      );
-      const visiblePopularRecipes = popularRecipes.filter(
-        (recipe) => !hiddenPopularRecipeIds.has(getRecipeIdentityFromItem(recipe)),
-      );
-
-      setRecipes(visiblePopularRecipes);
+      setRecipes(popularRecipes);
       setSavedRecipeIdSet(new Set(myRecipes.map(getRecipeIdentityFromItem)));
       setSharedRecipeIdSet(new Set(sharedMyRecipes.map(getRecipeIdentityFromItem)));
     } catch (error) {

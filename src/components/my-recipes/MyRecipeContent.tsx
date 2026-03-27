@@ -25,6 +25,7 @@ import {
   COFFEE_RECIPE_CREATE_ROUTE,
   getNonCoffeeRecipeCreatePath,
   getMyRecipeDetailPath,
+  POPULAR_RECIPE_ROUTE,
   RECIPE_CATEGORY_SELECTION_ROUTE,
 } from "@/routes/paths";
 import { buildRecipeEditState } from "@/utils/recipeEdit";
@@ -127,11 +128,7 @@ export default function MyRecipeContent() {
       );
 
       if (response.isShared) {
-        navigate(BASIC_RECIPE_ROUTE, {
-          state: {
-            prioritizedRecipeIdentity: recipeIdentity,
-          },
-        });
+        navigate(POPULAR_RECIPE_ROUTE);
       }
 
       return response.isShared;

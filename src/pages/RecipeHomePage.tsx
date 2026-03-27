@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BasicRecipeContent from "@/components/basic-recipes/BasicRecipeContent";
 import useCurrentUserProfile from "@/hooks/useCurrentUserProfile";
 import MobileLayout from "@/layouts/MobileLayout";
@@ -18,66 +18,8 @@ import {
 } from "@/routes/paths";
 import { getRecipeIdentityFromItem } from "@/utils/recipeIdentity";
 
-function mergeRecipesById(baseRecipes: RecipeItem[], extraRecipes: RecipeItem[]) {
-  const recipeById = new Map<string, RecipeItem>();
-
-  baseRecipes.forEach((recipe) => {
-    recipeById.set(getRecipeIdentityFromItem(recipe), recipe);
-  });
-
-  extraRecipes.forEach((recipe) => {
-    const recipeIdentity = getRecipeIdentityFromItem(recipe);
-    const existing = recipeById.get(recipeIdentity);
-    recipeById.set(recipeIdentity, existing ? { ...existing, ...recipe } : recipe);
-  });
-
-  return Array.from(recipeById.values());
-}
-
-function prioritizeRecipes(
-  recipes: RecipeItem[],
-  prioritizedRecipeIdentity: string | null,
-  sharedRecipeIdentities: string[],
-) {
-  const preferredOrder = new Map<string, number>();
-
-  if (prioritizedRecipeIdentity) {
-    preferredOrder.set(prioritizedRecipeIdentity, 0);
-  }
-
-  sharedRecipeIdentities.forEach((identity) => {
-    if (!preferredOrder.has(identity)) {
-      preferredOrder.set(identity, preferredOrder.size);
-    }
-  });
-
-  if (preferredOrder.size === 0) {
-    return recipes;
-  }
-
-  return [...recipes].sort((left, right) => {
-    const leftPriority = preferredOrder.get(getRecipeIdentityFromItem(left));
-    const rightPriority = preferredOrder.get(getRecipeIdentityFromItem(right));
-
-    if (leftPriority == null && rightPriority == null) {
-      return 0;
-    }
-
-    if (leftPriority == null) {
-      return 1;
-    }
-
-    if (rightPriority == null) {
-      return -1;
-    }
-
-    return leftPriority - rightPriority;
-  });
-}
-
 export default function RecipeHomePage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user_id } = useCurrentUserProfile();
   const currentUserId = useMemo(() => {
     const parsedUserId = Number(user_id);
@@ -91,20 +33,6 @@ export default function RecipeHomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingRecipeId, setPendingRecipeId] = useState<string | null>(null);
-  const [prioritizedRecipeIdentity, setPrioritizedRecipeIdentity] = useState<string | null>(
-    null,
-  );
-
-  useEffect(() => {
-    const state = location.state as { prioritizedRecipeIdentity?: string } | null;
-
-    if (!state?.prioritizedRecipeIdentity) {
-      return;
-    }
-
-    setPrioritizedRecipeIdentity(state.prioritizedRecipeIdentity);
-    navigate(location.pathname, { replace: true, state: null });
-  }, [location.pathname, location.state, navigate]);
 
   const refreshBasicRecipes = useCallback(async () => {
     setIsLoading(true);
@@ -117,21 +45,17 @@ export default function RecipeHomePage() {
       ]);
 
       const sharedMyRecipes = myRecipes.filter((recipe) => recipe.is_shared);
-      const sharedRecipeIdentities = sharedMyRecipes.map(getRecipeIdentityFromItem);
-      const mergedRecipes = mergeRecipesById(basicRecipes, sharedMyRecipes);
 
       setBaseRecipeIdSet(new Set(basicRecipes.map(getRecipeIdentityFromItem)));
-      setRecipes(
-        prioritizeRecipes(mergedRecipes, prioritizedRecipeIdentity, sharedRecipeIdentities),
-      );
+      setRecipes(basicRecipes);
       setSavedRecipeIdSet(new Set(myRecipes.map(getRecipeIdentityFromItem)));
-      setSharedRecipeIdSet(new Set(sharedRecipeIdentities));
+      setSharedRecipeIdSet(new Set(sharedMyRecipes.map(getRecipeIdentityFromItem)));
     } catch (error) {
       setErrorMessage(mapApiErrorMessage(error, "기본 레시피를 불러오지 못했습니다."));
     } finally {
       setIsLoading(false);
     }
-  }, [prioritizedRecipeIdentity]);
+  }, []);
 
   useEffect(() => {
     void refreshBasicRecipes();
